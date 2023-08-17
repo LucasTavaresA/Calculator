@@ -18,9 +18,9 @@ internal struct Layout
         string Text,
         int FontSize,
         Color TextColor,
-        Color Color,
-        Color? PressedColor = null,
-        Color? HoveredColor = null,
+        Color BackgroundColor,
+        Color PressedColor,
+        Color HoveredColor,
         Color? ShadowColor = null,
         int ShadowDistance = 3,
         Color? BorderColor = null,
@@ -29,7 +29,7 @@ internal struct Layout
 
     internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
-    private static bool IsInsideRectangle(
+    private static bool IsPointInsideRect(
         int x,
         int y,
         int recX,
@@ -58,7 +58,7 @@ internal struct Layout
         string text,
         int fontSize,
         Color textColor,
-        Color color,
+        Color backgroundColor,
         Color? borderColor = null,
         int borderThickness = 1,
         Color? shadowColor = null,
@@ -67,11 +67,11 @@ internal struct Layout
     {
         Vector2 textSize = Raylib.MeasureTextEx(Raylib.GetFontDefault(), text, fontSize, 2);
 
-        if (x + textSize.X > x + width || y + textSize.Y > y + height)
+        if (textSize.X > width || textSize.Y > height)
         {
             Program.DebugInfo += $"ERROR: The text at the {x},{y} text box does not fit its box\n";
         }
-        else if (!IsTextVisible(color, textColor))
+        else if (!IsTextVisible(backgroundColor, textColor))
         {
             Program.DebugInfo += $"ERROR: The text at the {x},{y} text box is not visible\n";
         }
@@ -90,7 +90,7 @@ internal struct Layout
             );
         }
 
-        Raylib.DrawRectangle(x, y, width, height, color);
+        Raylib.DrawRectangle(x, y, width, height, backgroundColor);
 
         if (borderColor != null)
         {
@@ -112,18 +112,18 @@ internal struct Layout
         string text,
         int fontSize,
         Color textColor,
-        Color color,
+        Color backgroundColor,
+        Color pressedColor,
+        Color hoveredColor,
         Color? borderColor = null,
-        Color? pressedColor = null,
-        Color? hoveredColor = null,
         Color? shadowColor = null,
-        int shadowDistance = 3
+        int shadowDistance = 3,
+        int borderThickness = 1
     )
     {
         if (
-            pressedColor != null
-            && Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
-            && IsInsideRectangle(Program.MousePressedX, Program.MousePressedY, x, y, width, height)
+            Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
+            && IsPointInsideRect(Program.MousePressedX, Program.MousePressedY, x, y, width, height)
         )
         {
             DrawTextBox(
@@ -134,27 +134,9 @@ internal struct Layout
                 text,
                 fontSize,
                 textColor,
-                (Color)pressedColor,
-                borderColor: borderColor
-            );
-        }
-        else if (
-            hoveredColor != null
-            && IsInsideRectangle(Program.MouseX, Program.MouseY, x, y, width, height)
-        )
-        {
-            DrawTextBox(
-                x,
-                y,
-                width,
-                height,
-                text,
-                fontSize,
-                textColor,
-                (Color)hoveredColor,
-                shadowColor: shadowColor,
-                shadowDistance: shadowDistance,
-                borderColor: borderColor
+                pressedColor,
+                borderColor: borderColor,
+                borderThickness: borderThickness
             );
         }
         else
@@ -167,15 +149,16 @@ internal struct Layout
                 text,
                 fontSize,
                 textColor,
-                color,
-                shadowColor: shadowColor,
-                shadowDistance: shadowDistance,
-                borderColor: borderColor
+                IsPointInsideRect(Program.MouseX, Program.MouseY, x, y, width, height)
+                    ? hoveredColor
+                    : backgroundColor,
+                borderColor: borderColor,
+                borderThickness: borderThickness
             );
         }
     }
 
-    internal static void ButtonGrid(
+    internal static void DrawButtonGrid(
         int x,
         int y,
         int width,
@@ -184,7 +167,14 @@ internal struct Layout
         params ButtonRow[] rows
     )
     {
-        if (x < 0 || y < 0 || x + width > Program.ScreenWidth || y + height > Program.ScreenHeight)
+        if (
+            x < 0
+            || y < 0
+            || width <= 0
+            || height <= 0
+            || x + width > Program.ScreenWidth
+            || y + height > Program.ScreenHeight
+        )
         {
             Program.DebugInfo += "ERROR: Button grid is outside of the screen\n";
         }
@@ -213,12 +203,13 @@ internal struct Layout
                     rows[i].Buttons[j].Text,
                     rows[i].Buttons[j].FontSize,
                     rows[i].Buttons[j].TextColor,
-                    rows[i].Buttons[j].Color,
+                    rows[i].Buttons[j].BackgroundColor,
                     hoveredColor: rows[i].Buttons[j].HoveredColor,
                     shadowColor: rows[i].Buttons[j].ShadowColor,
                     pressedColor: rows[i].Buttons[j].PressedColor,
                     borderColor: rows[i].Buttons[j].BorderColor,
-                    shadowDistance: rows[i].Buttons[j].ShadowDistance
+                    shadowDistance: rows[i].Buttons[j].ShadowDistance,
+                    borderThickness: rows[i].Buttons[j].BorderThickness
                 );
 
                 curX += colLength + padding;
@@ -265,7 +256,7 @@ internal struct Program
                 "(",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -276,7 +267,7 @@ internal struct Program
                 ")",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -287,21 +278,21 @@ internal struct Program
                 "C",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
                 ShadowColor: DarkerGray
-                // TODO(LucasTA): if more buttons are needed i can do like those
-                // old phone keys
-                // HoldText: "AC"
+            // TODO(LucasTA): if more buttons are needed i can do like those
+            // old phone keys
+            // HoldText: "AC"
             ),
             new Layout.Button(
                 25,
                 "<-",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: Color.RED,
+                BackgroundColor: Color.RED,
                 PressedColor: Color.MAROON,
                 HoveredColor: Color.ORANGE,
                 BorderColor: Color.ORANGE,
@@ -315,7 +306,7 @@ internal struct Program
                 "7",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -326,7 +317,7 @@ internal struct Program
                 "8",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -337,7 +328,7 @@ internal struct Program
                 "9",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -348,7 +339,7 @@ internal struct Program
                 "=",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: LightGreen,
+                BackgroundColor: LightGreen,
                 PressedColor: Color.DARKGREEN,
                 HoveredColor: Color.GREEN,
                 BorderColor: Color.GREEN,
@@ -362,7 +353,7 @@ internal struct Program
                 "4",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -373,7 +364,7 @@ internal struct Program
                 "5",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -384,7 +375,7 @@ internal struct Program
                 "6",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -395,7 +386,7 @@ internal struct Program
                 "/",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -409,7 +400,7 @@ internal struct Program
                 "1",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -420,7 +411,7 @@ internal struct Program
                 "2",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -431,7 +422,7 @@ internal struct Program
                 "3",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -442,7 +433,7 @@ internal struct Program
                 "*",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -456,7 +447,7 @@ internal struct Program
                 "0",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -467,7 +458,7 @@ internal struct Program
                 ".",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -478,7 +469,7 @@ internal struct Program
                 "+",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -489,7 +480,7 @@ internal struct Program
                 "-",
                 FONT_SIZE,
                 TextColor: FontColor,
-                Color: DarkGray,
+                BackgroundColor: DarkGray,
                 PressedColor: DarkerGray,
                 HoveredColor: Color.GRAY,
                 BorderColor: Color.GRAY,
@@ -545,7 +536,7 @@ internal struct Program
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(BackgroundColor);
 
-                    Layout.ButtonGrid(
+                    Layout.DrawButtonGrid(
                         SCREEN_PADDING,
                         SCREEN_PADDING + (ScreenHeight / 6),
                         ScreenWidth - (SCREEN_PADDING * 2),
