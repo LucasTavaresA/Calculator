@@ -141,6 +141,11 @@ internal struct Layout
         }
         else
         {
+            if (shadowColor != null && borderColor != null)
+            {
+                Draw2DCubeShadow(x, y, width, height, (Color)shadowColor, (Color)borderColor);
+            }
+
             DrawTextBox(
                 x,
                 y,
@@ -156,6 +161,54 @@ internal struct Layout
                 borderThickness: borderThickness
             );
         }
+    }
+
+    internal static void Draw2DCubeShadow(
+        int x,
+        int y,
+        int width,
+        int height,
+        Color color,
+        Color outlineColor,
+        int distance = 3
+    )
+    {
+        Raylib.DrawRectangle(x + distance, y + distance, width, height, color);
+
+        /// button shadow corners
+        /// triangles for the shadow
+        /// lines for the 3D borders
+
+        // top right corner
+        Raylib.DrawTriangle(
+            new(x + distance, y + height),
+            new(x, y + height),
+            new(x + distance, y + height + distance),
+            color
+        );
+
+        // top right outline
+        Raylib.DrawLine(x + width, y, x + width + distance, y + distance, outlineColor);
+
+        // bottom left corner
+        Raylib.DrawTriangle(
+            new(x + width, y),
+            new(x + width, y + distance),
+            new(x + width + distance, y + distance),
+            color
+        );
+
+        // bottom left outline
+        Raylib.DrawLine(x, y + height, x + distance, y + height + distance, outlineColor);
+
+        // bottom right corner
+        Raylib.DrawLine(
+            x + width,
+            y + height,
+            x + width + distance,
+            y + height + distance,
+            outlineColor
+        );
     }
 
     internal static void DrawButtonGrid(
