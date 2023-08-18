@@ -19,13 +19,7 @@ internal struct Debug
     [Conditional("DEBUG")]
     internal static void DrawInfo()
     {
-        Raylib.DrawText(
-            DebugInfo,
-            0,
-            0,
-            20,
-            Color.RED
-        );
+        Raylib.DrawText(DebugInfo, 0, 0, 20, Color.RED);
     }
 
     [Conditional("DEBUG")]
@@ -254,11 +248,12 @@ internal struct Layout
     {
         Debug.IfTrue(
             x < 0
-            || y < 0
-            || width <= 0
-            || height <= 0
-            || x + width > Program.ScreenWidth
-            || y + height > Program.ScreenHeight, "ERROR: Button grid is outside of the screen\n"
+                || y < 0
+                || width <= 0
+                || height <= 0
+                || x + width > Program.ScreenWidth
+                || y + height > Program.ScreenHeight,
+            "ERROR: Button grid is outside of the screen\n"
         );
 
         int availableHeight = height - (padding * (rows.Length - 1));
@@ -297,13 +292,19 @@ internal struct Layout
                 curX += colLength + padding;
                 takenWidth += colLength;
 
-                Debug.IfTrue(takenWidth > availableWidth, $"ERROR: Button grid {j + 1} column takes more than the available width\n");
+                Debug.IfTrue(
+                    takenWidth > availableWidth,
+                    $"ERROR: Button grid {j + 1} column takes more than the available width\n"
+                );
             }
 
             curY += rowLength + padding;
             takenHeight += rowLength;
 
-            Debug.IfTrue(takenHeight > availableHeight, $"ERROR: Button grid {i + 1} row takes more than the available height\n");
+            Debug.IfTrue(
+                takenHeight > availableHeight,
+                $"ERROR: Button grid {i + 1} row takes more than the available height\n"
+            );
         }
     }
 }
@@ -563,8 +564,8 @@ internal struct Program
         )
     };
 
-    internal static int ScreenWidth;
-    internal static int ScreenHeight;
+    internal static int ScreenWidth = 1024;
+    internal static int ScreenHeight = 768;
 
     internal static int MouseX;
     internal static int MouseY;
@@ -573,9 +574,6 @@ internal struct Program
 
     internal static void Main()
     {
-        // Get Screen Resolution
-        (ScreenWidth, ScreenHeight) = Utils.GetScreenResolution();
-
         // Raylib context
         {
             Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
@@ -616,7 +614,8 @@ internal struct Program
                         ButtonGrid
                     );
 
-                    Debug.DebugInfo = $"FPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Debug.DebugInfo}";
+                    Debug.DebugInfo =
+                        $"FPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Debug.DebugInfo}";
                     Debug.DrawInfo();
                     Debug.DebugInfo = "";
 
