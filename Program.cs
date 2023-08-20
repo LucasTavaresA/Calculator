@@ -47,9 +47,7 @@ internal struct Log
 
 internal struct Layout
 {
-    internal readonly record struct Button(
-        int WidthPercentage,
-        string Text,
+    internal readonly record struct ButtonStyle(
         int FontSize,
         Color TextColor,
         Color BackgroundColor,
@@ -60,6 +58,8 @@ internal struct Layout
         Color? BorderColor = null,
         int BorderThickness = 1
     );
+
+    internal readonly record struct Button(int WidthPercentage, string Text, ButtonStyle Style);
 
     internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
@@ -289,15 +289,15 @@ internal struct Layout
                     colLength,
                     rowLength,
                     rows[i].Buttons[j].Text,
-                    rows[i].Buttons[j].FontSize,
-                    rows[i].Buttons[j].TextColor,
-                    rows[i].Buttons[j].BackgroundColor,
-                    hoveredColor: rows[i].Buttons[j].HoveredColor,
-                    shadowColor: rows[i].Buttons[j].ShadowColor,
-                    pressedColor: rows[i].Buttons[j].PressedColor,
-                    borderColor: rows[i].Buttons[j].BorderColor,
-                    shadowDistance: rows[i].Buttons[j].ShadowDistance,
-                    borderThickness: rows[i].Buttons[j].BorderThickness
+                    rows[i].Buttons[j].Style.FontSize,
+                    rows[i].Buttons[j].Style.TextColor,
+                    rows[i].Buttons[j].Style.BackgroundColor,
+                    hoveredColor: rows[i].Buttons[j].Style.HoveredColor,
+                    shadowColor: rows[i].Buttons[j].Style.ShadowColor,
+                    pressedColor: rows[i].Buttons[j].Style.PressedColor,
+                    borderColor: rows[i].Buttons[j].Style.BorderColor,
+                    shadowDistance: rows[i].Buttons[j].Style.ShadowDistance,
+                    borderThickness: rows[i].Buttons[j].Style.BorderThickness
                 );
 
                 curX += colLength + padding;
@@ -333,245 +333,78 @@ internal struct Program
     private static readonly Color DarkGray = new(100, 100, 100, 255);
     private static readonly Color LightGreen = new(0, 193, 47, 255);
 
+    // TODO(LucasTA): if more buttons are needed i can do like those
+    // old phone keys
+    // HoldText: "AC"
+    private static readonly Layout.ButtonStyle GreyButton =
+        new(
+            FONT_SIZE,
+            TextColor: FontColor,
+            BackgroundColor: DarkGray,
+            PressedColor: DarkerGray,
+            HoveredColor: Color.GRAY,
+            BorderColor: Color.GRAY,
+            ShadowColor: DarkerGray
+        );
+
+    private static readonly Layout.ButtonStyle RedButton =
+        new(
+            FONT_SIZE,
+            TextColor: FontColor,
+            BackgroundColor: Color.RED,
+            PressedColor: Color.MAROON,
+            HoveredColor: Color.ORANGE,
+            BorderColor: Color.ORANGE,
+            ShadowColor: Color.MAROON
+        );
+
+    private static readonly Layout.ButtonStyle GreenButton =
+        new(
+            FONT_SIZE,
+            TextColor: FontColor,
+            BackgroundColor: LightGreen,
+            PressedColor: Color.DARKGREEN,
+            HoveredColor: Color.GREEN,
+            BorderColor: Color.GREEN,
+            ShadowColor: Color.DARKGREEN
+        );
+
     private static readonly Layout.ButtonRow[] ButtonGrid = new Layout.ButtonRow[]
     {
         new Layout.ButtonRow(
             20,
-            new Layout.Button(
-                25,
-                "(",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                ")",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "C",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            // TODO(LucasTA): if more buttons are needed i can do like those
-            // old phone keys
-            // HoldText: "AC"
-            ),
-            new Layout.Button(
-                25,
-                "<-",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: Color.RED,
-                PressedColor: Color.MAROON,
-                HoveredColor: Color.ORANGE,
-                BorderColor: Color.ORANGE,
-                ShadowColor: Color.MAROON
-            )
+            new Layout.Button(25, "(", GreyButton),
+            new Layout.Button(25, ")", GreyButton),
+            new Layout.Button(25, "C", GreyButton),
+            new Layout.Button(25, "<-", RedButton)
         ),
         new Layout.ButtonRow(
             20,
-            new Layout.Button(
-                25,
-                "7",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "8",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "9",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "=",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: LightGreen,
-                PressedColor: Color.DARKGREEN,
-                HoveredColor: Color.GREEN,
-                BorderColor: Color.GREEN,
-                ShadowColor: Color.DARKGREEN
-            )
+            new Layout.Button(25, "7", GreyButton),
+            new Layout.Button(25, "8", GreyButton),
+            new Layout.Button(25, "9", GreyButton),
+            new Layout.Button(25, "=", GreenButton)
         ),
         new Layout.ButtonRow(
             20,
-            new Layout.Button(
-                25,
-                "4",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "5",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "6",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "/",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            )
+            new Layout.Button(25, "4", GreyButton),
+            new Layout.Button(25, "5", GreyButton),
+            new Layout.Button(25, "6", GreyButton),
+            new Layout.Button(25, "/", GreyButton)
         ),
         new Layout.ButtonRow(
             20,
-            new Layout.Button(
-                25,
-                "1",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "2",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "3",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "*",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            )
+            new Layout.Button(25, "1", GreyButton),
+            new Layout.Button(25, "2", GreyButton),
+            new Layout.Button(25, "3", GreyButton),
+            new Layout.Button(25, "*", GreyButton)
         ),
         new Layout.ButtonRow(
             20,
-            new Layout.Button(
-                25,
-                "0",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                ".",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "+",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            ),
-            new Layout.Button(
-                25,
-                "-",
-                FONT_SIZE,
-                TextColor: FontColor,
-                BackgroundColor: DarkGray,
-                PressedColor: DarkerGray,
-                HoveredColor: Color.GRAY,
-                BorderColor: Color.GRAY,
-                ShadowColor: DarkerGray
-            )
+            new Layout.Button(25, "0", GreyButton),
+            new Layout.Button(25, ".", GreyButton),
+            new Layout.Button(25, "+", GreyButton),
+            new Layout.Button(25, "-", GreyButton)
         )
     };
 
