@@ -75,6 +75,8 @@ internal struct Layout
         return x >= recX && x <= recX + recWidth && y >= recY && y <= recY + recHeight;
     }
 
+    // TODO(LucasTA): Allow 2.5D Shadows here, will require some shadowKind variable,
+    // maybe just a better way to define all those colors and attributes?
     internal static void DrawTextBox(
         int x,
         int y,
@@ -167,9 +169,9 @@ internal struct Layout
         }
         else
         {
-            if (shadowColor != null && borderColor != null)
+            if (shadowColor != null)
             {
-                Draw2DCubeShadow(x, y, width, height, (Color)shadowColor, (Color)borderColor);
+                Draw2DCubeShadow(x, y, width, height, (Color)shadowColor, borderColor);
             }
 
             DrawTextBox(
@@ -189,21 +191,21 @@ internal struct Layout
         }
     }
 
+    /// <summary>
+    /// Draw square shadow with corners to make it look like a 3D cube,
+    /// triangles for the shadows, lines for the 3D borders
+    /// </summary>
     internal static void Draw2DCubeShadow(
         int x,
         int y,
         int width,
         int height,
         Color color,
-        Color outlineColor,
+        Color? outlineColor = null,
         int distance = 3
     )
     {
         Raylib.DrawRectangle(x + distance, y + distance, width, height, color);
-
-        /// button shadow corners
-        /// triangles for the shadow
-        /// lines for the 3D borders
 
         // top right corner
         Raylib.DrawTriangle(
@@ -213,9 +215,6 @@ internal struct Layout
             color
         );
 
-        // top right outline
-        Raylib.DrawLine(x + width, y, x + width + distance, y + distance, outlineColor);
-
         // bottom left corner
         Raylib.DrawTriangle(
             new(x + width, y),
@@ -224,17 +223,23 @@ internal struct Layout
             color
         );
 
-        // bottom left outline
-        Raylib.DrawLine(x, y + height, x + distance, y + height + distance, outlineColor);
+        if (outlineColor != null)
+        {
+            // top right outline
+            Raylib.DrawLine(x + width, y, x + width + distance, y + distance, (Color)outlineColor);
 
-        // bottom right corner
-        Raylib.DrawLine(
-            x + width,
-            y + height,
-            x + width + distance,
-            y + height + distance,
-            outlineColor
-        );
+            // bottom left outline
+            Raylib.DrawLine(x, y + height, x + distance, y + height + distance, (Color)outlineColor);
+
+            // bottom right outline
+            Raylib.DrawLine(
+                x + width,
+                y + height,
+                x + width + distance,
+                y + height + distance,
+                (Color)outlineColor
+            );
+        }
     }
 
     internal static void DrawButtonGrid(
