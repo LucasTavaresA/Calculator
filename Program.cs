@@ -9,17 +9,17 @@ using Raylib_cs;
 
 namespace Calculator;
 
-internal struct Debug
+internal struct Log
 {
-    /// <summary>Tolerable difference in contrast between colors</summary>
-    private const int CONTRAST_THRESHOLD = 128;
+    /// <summary>Tolerable difference between colors</summary>
+    private const int CONTRAST_LIMIT = 128;
 
-    internal static string DebugInfo;
+    internal static string Message;
 
     [Conditional("DEBUG")]
-    internal static void DrawInfo()
+    internal static void Draw()
     {
-        Raylib.DrawText(DebugInfo, 0, 0, 20, Color.RED);
+        Raylib.DrawText(Message, 0, 0, 20, Color.RED);
     }
 
     [Conditional("DEBUG")]
@@ -27,20 +27,20 @@ internal struct Debug
     {
         if (result)
         {
-            DebugInfo += message;
+            Message += message;
         }
     }
 
     [Conditional("DEBUG")]
-    internal static void CheckContrast(Color backgroundColor, Color textColor, string message)
+    internal static void IfBadContrast(Color backgroundColor, Color textColor, string message)
     {
         int rDiff = Math.Abs(backgroundColor.r - textColor.r);
         int gDiff = Math.Abs(backgroundColor.g - textColor.g);
         int bDiff = Math.Abs(backgroundColor.b - textColor.b);
 
-        if ((rDiff + gDiff + bDiff) < CONTRAST_THRESHOLD)
+        if ((rDiff + gDiff + bDiff) < CONTRAST_LIMIT)
         {
-            DebugInfo += message;
+            Message += message;
         }
     }
 }
@@ -94,11 +94,11 @@ internal struct Layout
     {
         Vector2 textSize = Raylib.MeasureTextEx(Raylib.GetFontDefault(), text, fontSize, 2);
 
-        Debug.IfTrue(
+        Log.IfTrue(
             textSize.X > width || textSize.Y > height,
             $"ERROR: The text at the {x},{y} text box does not fit its box\n"
         );
-        Debug.CheckContrast(
+        Log.IfBadContrast(
             backgroundColor,
             textColor,
             $"ERROR: The text at the {x},{y} text box is not visible\n"
@@ -229,7 +229,13 @@ internal struct Layout
             Raylib.DrawLine(x + width, y, x + width + distance, y + distance, (Color)outlineColor);
 
             // bottom left outline
-            Raylib.DrawLine(x, y + height, x + distance, y + height + distance, (Color)outlineColor);
+            Raylib.DrawLine(
+                x,
+                y + height,
+                x + distance,
+                y + height + distance,
+                (Color)outlineColor
+            );
 
             // bottom right outline
             Raylib.DrawLine(
@@ -251,7 +257,7 @@ internal struct Layout
         params ButtonRow[] rows
     )
     {
-        Debug.IfTrue(
+        Log.IfTrue(
             x < 0
                 || y < 0
                 || width <= 0
@@ -297,7 +303,7 @@ internal struct Layout
                 curX += colLength + padding;
                 takenWidth += colLength;
 
-                Debug.IfTrue(
+                Log.IfTrue(
                     takenWidth > availableWidth,
                     $"ERROR: Button grid {j + 1} column takes more than the available width\n"
                 );
@@ -306,7 +312,7 @@ internal struct Layout
             curY += rowLength + padding;
             takenHeight += rowLength;
 
-            Debug.IfTrue(
+            Log.IfTrue(
                 takenHeight > availableHeight,
                 $"ERROR: Button grid {i + 1} row takes more than the available height\n"
             );
@@ -619,10 +625,10 @@ internal struct Program
                         ButtonGrid
                     );
 
-                    Debug.DebugInfo =
-                        $"FPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Debug.DebugInfo}";
-                    Debug.DrawInfo();
-                    Debug.DebugInfo = "";
+                    Log.Message =
+                        $"FPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Log.Message}";
+                    Log.Draw();
+                    Log.Message = "";
 
                     Raylib.EndDrawing();
                 }
