@@ -96,12 +96,7 @@ internal struct Layout
 
         Log.IfTrue(
             textSize.X > width || textSize.Y > height,
-            $"ERROR: The text at the {x},{y} text box does not fit its box\n"
-        );
-        Log.IfBadContrast(
-            backgroundColor,
-            textColor,
-            $"ERROR: The text at the {x},{y} text box is not visible\n"
+            $"ERROR: The text at the {x},{y} text box does not fit its box!\n"
         );
 
         int textX = x + ((width - (int)textSize.X) / 2);
@@ -117,6 +112,12 @@ internal struct Layout
                 (Color)shadowColor
             );
         }
+
+        Log.IfBadContrast(
+            backgroundColor,
+            textColor,
+            $"ERROR: The text at the {x},{y} text box is not visible!\n"
+        );
 
         Raylib.DrawRectangle(x, y, width, height, backgroundColor);
 
@@ -151,7 +152,14 @@ internal struct Layout
     {
         if (
             Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
-            && IsPointInsideRect(Program.MousePressedX, Program.MousePressedY, x, y, width, height)
+            && IsPointInsideRect(
+                Calculator.MousePressedX,
+                Calculator.MousePressedY,
+                x,
+                y,
+                width,
+                height
+            )
         )
         {
             DrawTextBox(
@@ -182,7 +190,7 @@ internal struct Layout
                 text,
                 fontSize,
                 textColor,
-                IsPointInsideRect(Program.MouseX, Program.MouseY, x, y, width, height)
+                IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height)
                     ? hoveredColor
                     : backgroundColor,
                 borderColor: borderColor,
@@ -262,9 +270,9 @@ internal struct Layout
                 || y < 0
                 || width <= 0
                 || height <= 0
-                || x + width > Program.ScreenWidth
-                || y + height > Program.ScreenHeight,
-            "ERROR: Button grid is outside of the screen\n"
+                || x + width > Calculator.ScreenWidth
+                || y + height > Calculator.ScreenHeight,
+            "ERROR: Button grid is outside of the screen!\n"
         );
 
         int availableHeight = height - (padding * (rows.Length - 1));
@@ -305,7 +313,7 @@ internal struct Layout
 
                 Log.IfTrue(
                     takenWidth > availableWidth,
-                    $"ERROR: Button grid {j + 1} column takes more than the available width\n"
+                    $"ERROR: Button grid {j + 1} column takes more than the available width!\n"
                 );
             }
 
@@ -314,13 +322,13 @@ internal struct Layout
 
             Log.IfTrue(
                 takenHeight > availableHeight,
-                $"ERROR: Button grid {i + 1} row takes more than the available height\n"
+                $"ERROR: Button grid {i + 1} row takes more than the available height!\n"
             );
         }
     }
 }
 
-internal struct Program
+internal struct Calculator
 {
     private const string APP_NAME = "Calculator";
     private const int TARGET_FPS = 60;
@@ -332,6 +340,14 @@ internal struct Program
     private static readonly Color DarkerGray = new(60, 60, 60, 255);
     private static readonly Color DarkGray = new(100, 100, 100, 255);
     private static readonly Color LightGreen = new(0, 193, 47, 255);
+
+    internal static int ScreenWidth = 1024;
+    internal static int ScreenHeight = 768;
+
+    internal static int MouseX;
+    internal static int MouseY;
+    internal static int MousePressedX;
+    internal static int MousePressedY;
 
     // TODO(LucasTA): if more buttons are needed i can do like those
     // old phone keys
@@ -407,14 +423,6 @@ internal struct Program
             new Layout.Button(25, "-", GreyButton)
         )
     };
-
-    internal static int ScreenWidth = 1024;
-    internal static int ScreenHeight = 768;
-
-    internal static int MouseX;
-    internal static int MouseY;
-    internal static int MousePressedX;
-    internal static int MousePressedY;
 
     internal static void Main()
     {
