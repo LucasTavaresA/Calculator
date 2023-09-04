@@ -12,6 +12,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Eval.cs" Version="0.5.0" />
     <PackageReference Include="Raylib-cs" Version="4.5.0.1" />
   </ItemGroup>
 

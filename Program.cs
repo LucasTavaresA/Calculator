@@ -3,9 +3,12 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Collections.Generic;
 using System.Numerics;
 
 using Raylib_cs;
+using Eval;
 
 namespace Calculator;
 
@@ -151,6 +154,20 @@ internal struct Layout
     )
     {
         if (
+            Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)
+            && IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height)
+        )
+        {
+            if (Calculator.Commands.TryGetValue(text, out Action command))
+            {
+                command();
+            }
+            else
+            {
+                Calculator.ErrorMessage = $"The '{text}' button does not have a command defined!\n";
+            }
+        }
+        else if (
             Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
             && IsPointInsideRect(
                 Calculator.MousePressedX,
@@ -315,6 +332,11 @@ internal struct Layout
                     takenWidth > availableWidth,
                     $"ERROR: Button grid {j + 1} column takes more than the available width!\n"
                 );
+
+                Log.IfTrue(
+                    !Calculator.Commands.ContainsKey(rows[i].Buttons[j].Text),
+                    $"ERROR: The '{rows[i].Buttons[j].Text}' button does not have a command defined!\n"
+                );
             }
 
             curY += rowLength + padding;
@@ -332,14 +354,67 @@ internal struct Calculator
 {
     private const string APP_NAME = "Calculator";
     private const int TARGET_FPS = 60;
-    private const int FONT_SIZE = 30;
+    private const int FONT_SIZE = 20;
     private const int SCREEN_PADDING = 10;
+
+    /// <summary>Time before updating animations and handling key presses</summary>
+    private const double UPDATE_INTERVAL = 0.1;
 
     private static readonly Color BackgroundColor = Color.BLACK;
     private static readonly Color FontColor = Color.WHITE;
     private static readonly Color DarkerGray = new(60, 60, 60, 255);
     private static readonly Color DarkGray = new(100, 100, 100, 255);
     private static readonly Color LightGreen = new(0, 193, 47, 255);
+
+    internal static readonly Dictionary<string, Action> Commands =
+        new()
+        {
+            {
+                "=",
+                () =>
+                {
+                    try
+                    {
+                        Expression = Evaluator
+                            .Evaluate(Expression)
+                            .ToString(CultureInfo.InvariantCulture);
+
+                        // TODO(LucasTA): remove exceptions from Eval.cs
+                        ErrorMessage = "";
+                    }
+                    catch (Exception e)
+                    {
+                        ErrorMessage = e switch
+                        {
+                            UnexpectedEvaluationException ue => ue.Reason,
+                            _ => e.Message,
+                        };
+                    }
+                }
+            },
+            { "C", () => Expression = "" },
+            { "<-", () => Expression = Expression == "" ? "" : Expression[..^1] },
+            { "0", () => Expression += "0" },
+            { "1", () => Expression += "1" },
+            { "2", () => Expression += "2" },
+            { "3", () => Expression += "3" },
+            { "4", () => Expression += "4" },
+            { "5", () => Expression += "5" },
+            { "6", () => Expression += "6" },
+            { "7", () => Expression += "7" },
+            { "8", () => Expression += "8" },
+            { "9", () => Expression += "9" },
+            { "+", () => Expression += "+" },
+            { "-", () => Expression += "-" },
+            { "*", () => Expression += "*" },
+            { "/", () => Expression += "/" },
+            { "%", () => Expression += "%" },
+            { ".", () => Expression += "." },
+            { "(", () => Expression += "(" },
+            { ")", () => Expression += ")" },
+        };
+
+    private static double ElapsedTime;
 
     internal static int ScreenWidth = 1024;
     internal static int ScreenHeight = 768;
@@ -348,6 +423,9 @@ internal struct Calculator
     internal static int MouseY;
     internal static int MousePressedX;
     internal static int MousePressedY;
+
+    internal static string Expression = "";
+    internal static string ErrorMessage = "";
 
     // TODO(LucasTA): if more buttons are needed i can do like those
     // old phone keys
@@ -466,10 +544,72 @@ internal struct Calculator
                         ButtonGrid
                     );
 
+                    if (ErrorMessage == "")
+                    {
+                        Layout.DrawTextBox(
+                            SCREEN_PADDING,
+                            SCREEN_PADDING,
+                            ScreenWidth - (SCREEN_PADDING * 2),
+                            (ScreenHeight / 8) - SCREEN_PADDING,
+                            Expression,
+                            FONT_SIZE,
+                            Color.WHITE,
+                            DarkerGray,
+                            borderColor: DarkGray
+                        );
+                    }
+                    else
+                    {
+                        Layout.DrawTextBox(
+                            SCREEN_PADDING,
+                            SCREEN_PADDING,
+                            ScreenWidth - (SCREEN_PADDING * 2),
+                            (ScreenHeight / 8) - SCREEN_PADDING,
+                            Expression,
+                            FONT_SIZE,
+                            Color.WHITE,
+                            DarkerGray,
+                            borderColor: Color.RED
+                        );
+
+                        Raylib.DrawText(
+                            ErrorMessage,
+                            ScreenWidth
+                                - Raylib.MeasureText(ErrorMessage, FONT_SIZE)
+                                - (SCREEN_PADDING * 2),
+                            ScreenHeight / 8,
+                            FONT_SIZE,
+                            Color.RED
+                        );
+                    }
+
+                    if (
+                        Commands.TryGetValue(
+                            ((char)Raylib.GetCharPressed()).ToString(),
+                            out Action command
+                        )
+                    )
+                    {
+                        command();
+                    }
+                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                    {
+                        Commands["="]();
+                    }
+                    else if (
+                        ElapsedTime > UPDATE_INTERVAL && Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE)
+                    )
+                    {
+                        Commands["<-"]();
+                        ElapsedTime = 0;
+                    }
+
                     Log.Message =
                         $"FPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Log.Message}";
                     Log.Draw();
                     Log.Message = "";
+
+                    ElapsedTime += Raylib.GetFrameTime();
 
                     Raylib.EndDrawing();
                 }
