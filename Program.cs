@@ -50,16 +50,30 @@ internal struct Log
 
 internal struct Layout
 {
+    internal enum ShadowKind
+    {
+        Float = 0,
+        Cast = 1,
+        Pillar = 2,
+        Cube = 3,
+        TransparentCube = 4,
+    }
+
+    internal readonly record struct ShadowStyle(
+        Color Color,
+        ShadowKind Kind = ShadowKind.Float,
+        int Distance = 3
+    );
+
     internal readonly record struct ButtonStyle(
         int FontSize,
         Color TextColor,
         Color BackgroundColor,
         Color PressedColor,
         Color HoveredColor,
-        Color? ShadowColor = null,
-        int ShadowDistance = 3,
         Color? BorderColor = null,
-        int BorderThickness = 1
+        int BorderThickness = 1,
+        ShadowStyle? ShadowStyle = null
     );
 
     internal readonly record struct Button(int WidthPercentage, string Text, ButtonStyle Style);
@@ -78,8 +92,6 @@ internal struct Layout
         return x >= recX && x <= recX + recWidth && y >= recY && y <= recY + recHeight;
     }
 
-    // TODO(LucasTA): Allow 2.5D Shadows here, will require some shadowKind variable,
-    // maybe just a better way to define all those colors and attributes?
     internal static void DrawTextBox(
         int x,
         int y,
@@ -91,8 +103,7 @@ internal struct Layout
         Color backgroundColor,
         Color? borderColor = null,
         int borderThickness = 1,
-        Color? shadowColor = null,
-        int shadowDistance = 3
+        ShadowStyle? shadowStyle = null
     )
     {
         Vector2 textSize = Raylib.MeasureTextEx(Raylib.GetFontDefault(), text, fontSize, 2);
@@ -105,15 +116,9 @@ internal struct Layout
         int textX = x + ((width - (int)textSize.X) / 2);
         int textY = y + ((height - (int)textSize.Y) / 2);
 
-        if (shadowColor != null)
+        if (shadowStyle != null)
         {
-            Raylib.DrawRectangle(
-                x + shadowDistance,
-                y + shadowDistance,
-                width,
-                height,
-                (Color)shadowColor
-            );
+            DrawShadow(x, y, width, height, (ShadowStyle)shadowStyle, borderColor);
         }
 
         Log.IfBadContrast(
@@ -148,9 +153,8 @@ internal struct Layout
         Color pressedColor,
         Color hoveredColor,
         Color? borderColor = null,
-        Color? shadowColor = null,
-        int shadowDistance = 3,
-        int borderThickness = 1
+        int borderThickness = 1,
+        ShadowStyle? shadowStyle = null
     )
     {
         if (
@@ -179,9 +183,15 @@ internal struct Layout
             )
         )
         {
+            if (shadowStyle != null)
+            {
+                x += ((ShadowStyle)shadowStyle).Distance;
+                y += ((ShadowStyle)shadowStyle).Distance;
+            }
+
             DrawTextBox(
-                x + shadowDistance,
-                y + shadowDistance,
+                x,
+                y,
                 width,
                 height,
                 text,
@@ -194,11 +204,6 @@ internal struct Layout
         }
         else
         {
-            if (shadowColor != null)
-            {
-                Draw2DCubeShadow(x, y, width, height, (Color)shadowColor, borderColor);
-            }
-
             DrawTextBox(
                 x,
                 y,
@@ -211,65 +216,107 @@ internal struct Layout
                     ? hoveredColor
                     : backgroundColor,
                 borderColor: borderColor,
-                borderThickness: borderThickness
+                borderThickness: borderThickness,
+                shadowStyle: shadowStyle
             );
         }
     }
 
-    /// <summary>
-    /// Draw square shadow with corners to make it look like a 3D cube,
-    /// triangles for the shadows, lines for the 3D borders
-    /// </summary>
-    internal static void Draw2DCubeShadow(
+    internal static void DrawShadow(
         int x,
         int y,
         int width,
         int height,
-        Color color,
-        Color? outlineColor = null,
-        int distance = 3
+        ShadowStyle shadowStyle,
+        Color? outlineColor = null
     )
     {
-        Raylib.DrawRectangle(x + distance, y + distance, width, height, color);
-
-        // top right corner
-        Raylib.DrawTriangle(
-            new(x + distance, y + height),
-            new(x, y + height),
-            new(x + distance, y + height + distance),
-            color
+        Raylib.DrawRectangle(
+            x + shadowStyle.Distance,
+            y + shadowStyle.Distance,
+            width,
+            height,
+            shadowStyle.Color
         );
 
-        // bottom left corner
-        Raylib.DrawTriangle(
-            new(x + width, y),
-            new(x + width, y + distance),
-            new(x + width + distance, y + distance),
-            color
-        );
-
-        if (outlineColor != null)
+        if (shadowStyle.Kind != ShadowKind.Float)
         {
-            // top right outline
-            Raylib.DrawLine(x + width, y, x + width + distance, y + distance, (Color)outlineColor);
-
-            // bottom left outline
-            Raylib.DrawLine(
-                x,
-                y + height,
-                x + distance,
-                y + height + distance,
-                (Color)outlineColor
+            // top right corner
+            Raylib.DrawTriangle(
+                new(x + shadowStyle.Distance, y + height),
+                new(x, y + height),
+                new(x + shadowStyle.Distance, y + height + shadowStyle.Distance),
+                shadowStyle.Color
             );
 
-            // bottom right outline
-            Raylib.DrawLine(
-                x + width,
-                y + height,
-                x + width + distance,
-                y + height + distance,
-                (Color)outlineColor
+            // bottom left corner
+            Raylib.DrawTriangle(
+                new(x + width, y),
+                new(x + width, y + shadowStyle.Distance),
+                new(x + width + shadowStyle.Distance, y + shadowStyle.Distance),
+                shadowStyle.Color
             );
+
+            if (outlineColor != null && shadowStyle.Kind != ShadowKind.Cast)
+            {
+                if (shadowStyle.Kind == ShadowKind.Cube)
+                {
+                    // left cube shadow outline
+                    Raylib.DrawLine(
+                        x + width + shadowStyle.Distance,
+                        y + shadowStyle.Distance,
+                        x + width + shadowStyle.Distance,
+                        y + height + shadowStyle.Distance,
+                        (Color)outlineColor
+                    );
+
+                    // bottom cube shadow outline
+                    Raylib.DrawLine(
+                        x + shadowStyle.Distance,
+                        y + height + shadowStyle.Distance,
+                        x + width + shadowStyle.Distance,
+                        y + height + shadowStyle.Distance,
+                        (Color)outlineColor
+                    );
+                }
+                else if (shadowStyle.Kind == ShadowKind.TransparentCube)
+                {
+                    Raylib.DrawRectangleLines(
+                        x + shadowStyle.Distance,
+                        y + shadowStyle.Distance,
+                        width,
+                        height,
+                        (Color)outlineColor
+                    );
+                }
+
+                // top right outline
+                Raylib.DrawLine(
+                    x + width,
+                    y,
+                    x + width + shadowStyle.Distance,
+                    y + shadowStyle.Distance,
+                    (Color)outlineColor
+                );
+
+                // bottom left outline
+                Raylib.DrawLine(
+                    x,
+                    y + height,
+                    x + shadowStyle.Distance,
+                    y + height + shadowStyle.Distance,
+                    (Color)outlineColor
+                );
+
+                // bottom right outline
+                Raylib.DrawLine(
+                    x + width,
+                    y + height,
+                    x + width + shadowStyle.Distance,
+                    y + height + shadowStyle.Distance,
+                    (Color)outlineColor
+                );
+            }
         }
     }
 
@@ -318,11 +365,10 @@ internal struct Layout
                     rows[i].Buttons[j].Style.TextColor,
                     rows[i].Buttons[j].Style.BackgroundColor,
                     hoveredColor: rows[i].Buttons[j].Style.HoveredColor,
-                    shadowColor: rows[i].Buttons[j].Style.ShadowColor,
                     pressedColor: rows[i].Buttons[j].Style.PressedColor,
                     borderColor: rows[i].Buttons[j].Style.BorderColor,
-                    shadowDistance: rows[i].Buttons[j].Style.ShadowDistance,
-                    borderThickness: rows[i].Buttons[j].Style.BorderThickness
+                    borderThickness: rows[i].Buttons[j].Style.BorderThickness,
+                    shadowStyle: rows[i].Buttons[j].Style.ShadowStyle
                 );
 
                 curX += colLength + padding;
@@ -358,7 +404,7 @@ internal struct Calculator
     private const int SCREEN_PADDING = 10;
 
     /// <summary>Time before updating animations and handling key presses</summary>
-    private const double UPDATE_INTERVAL = 0.1;
+    private const double UPDATE_INTERVAL = 0.05;
 
     private static readonly Color BackgroundColor = Color.BLACK;
     private static readonly Color FontColor = Color.WHITE;
@@ -427,6 +473,13 @@ internal struct Calculator
     internal static string Expression = "";
     internal static string ErrorMessage = "";
 
+    private static readonly Layout.ShadowStyle GreyButtonShadow =
+        new(DarkerGray, Layout.ShadowKind.Pillar);
+    private static readonly Layout.ShadowStyle RedButtonShadow =
+        new(Color.MAROON, Layout.ShadowKind.Pillar);
+    private static readonly Layout.ShadowStyle GreenButtonShadow =
+        new(Color.DARKGREEN, Layout.ShadowKind.Pillar);
+
     // TODO(LucasTA): if more buttons are needed i can do like those
     // old phone keys
     // HoldText: "AC"
@@ -438,7 +491,7 @@ internal struct Calculator
             PressedColor: DarkerGray,
             HoveredColor: Color.GRAY,
             BorderColor: Color.GRAY,
-            ShadowColor: DarkerGray
+            ShadowStyle: GreyButtonShadow
         );
 
     private static readonly Layout.ButtonStyle RedButton =
@@ -449,7 +502,7 @@ internal struct Calculator
             PressedColor: Color.MAROON,
             HoveredColor: Color.ORANGE,
             BorderColor: Color.ORANGE,
-            ShadowColor: Color.MAROON
+            ShadowStyle: RedButtonShadow
         );
 
     private static readonly Layout.ButtonStyle GreenButton =
@@ -460,7 +513,7 @@ internal struct Calculator
             PressedColor: Color.DARKGREEN,
             HoveredColor: Color.GREEN,
             BorderColor: Color.GREEN,
-            ShadowColor: Color.DARKGREEN
+            ShadowStyle: GreenButtonShadow
         );
 
     private static readonly Layout.ButtonRow[] ButtonGrid = new Layout.ButtonRow[]
