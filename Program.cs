@@ -170,6 +170,8 @@ internal struct Layout
             {
                 Calculator.ErrorMessage = $"The '{text}' button does not have a command defined!\n";
             }
+
+            Calculator.ButtonPressedTime = 0;
         }
         else if (
             Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
@@ -201,6 +203,21 @@ internal struct Layout
                 borderColor: borderColor,
                 borderThickness: borderThickness
             );
+
+            if (Calculator.ButtonPressedTime >= Calculator.UPDATE_INTERVAL)
+            {
+                if (Calculator.Commands.TryGetValue(text, out Action command))
+                {
+                    command();
+                }
+                else
+                {
+                    Calculator.ErrorMessage =
+                        $"The '{text}' button does not have a command defined!\n";
+                }
+            }
+
+            Calculator.ButtonPressedTime += Raylib.GetFrameTime();
         }
         else
         {
@@ -403,9 +420,6 @@ internal struct Calculator
     private const int FONT_SIZE = 20;
     private const int SCREEN_PADDING = 10;
 
-    /// <summary>Time before updating animations and handling key presses</summary>
-    private const double UPDATE_INTERVAL = 0.05;
-
     private static readonly Color BackgroundColor = Color.BLACK;
     private static readonly Color FontColor = Color.WHITE;
     private static readonly Color DarkerGray = new(60, 60, 60, 255);
@@ -460,7 +474,10 @@ internal struct Calculator
             { ")", () => Expression += ")" },
         };
 
-    private static double ElapsedTime;
+    /// <summary>Time before updating animations and handling key presses</summary>
+    internal const float UPDATE_INTERVAL = 0.5f;
+
+    internal static float ButtonPressedTime;
 
     internal static int ScreenWidth = 1024;
     internal static int ScreenHeight = 768;
@@ -644,25 +661,32 @@ internal struct Calculator
                     )
                     {
                         command();
+                        ButtonPressedTime = 0;
                     }
                     else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                     {
                         Commands["="]();
+                        ButtonPressedTime = 0;
                     }
-                    else if (
-                        ElapsedTime > UPDATE_INTERVAL && Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE)
-                    )
+                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
                     {
                         Commands["<-"]();
-                        ElapsedTime = 0;
+                        ButtonPressedTime = 0;
+                    }
+                    else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+                    {
+                        if (ButtonPressedTime >= UPDATE_INTERVAL)
+                        {
+                            Commands["<-"]();
+                        }
+
+                        ButtonPressedTime += Raylib.GetFrameTime();
                     }
 
                     Log.Message =
                         $"FPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Log.Message}";
                     Log.Draw();
                     Log.Message = "";
-
-                    ElapsedTime += Raylib.GetFrameTime();
 
                     Raylib.EndDrawing();
                 }
