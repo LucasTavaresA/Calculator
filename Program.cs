@@ -470,6 +470,7 @@ internal struct Calculator
             { "/", () => Expression += "/" },
             { "%", () => Expression += "%" },
             { ".", () => Expression += "." },
+            { ",", () => Expression += "." },
             { "(", () => Expression += "(" },
             { ")", () => Expression += ")" },
         };
