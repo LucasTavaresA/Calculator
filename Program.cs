@@ -37,9 +37,9 @@ internal struct Log
     [Conditional("DEBUG")]
     internal static void IfBadContrast(Color backgroundColor, Color textColor, string message)
     {
-        int rDiff = Math.Abs(backgroundColor.r - textColor.r);
-        int gDiff = Math.Abs(backgroundColor.g - textColor.g);
-        int bDiff = Math.Abs(backgroundColor.b - textColor.b);
+        int rDiff = Math.Abs(backgroundColor.R - textColor.R);
+        int gDiff = Math.Abs(backgroundColor.G - textColor.G);
+        int bDiff = Math.Abs(backgroundColor.B - textColor.B);
 
         if ((rDiff + gDiff + bDiff) < CONTRAST_LIMIT)
         {
