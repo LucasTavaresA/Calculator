@@ -9,6 +9,8 @@
     <LangVersion>preview</LangVersion>
     <NoWarn>CA2201</NoWarn>
     <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
