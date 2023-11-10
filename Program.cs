@@ -480,8 +480,8 @@ internal struct Calculator
 
     internal static float ButtonPressedTime;
 
-    internal static int ScreenWidth = 1024;
-    internal static int ScreenHeight = 768;
+    internal static int ScreenWidth = 800;
+    internal static int ScreenHeight = 600;
 
     internal static int MouseX;
     internal static int MouseY;
