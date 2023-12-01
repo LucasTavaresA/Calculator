@@ -15,7 +15,7 @@ namespace Calculator;
 internal struct Log
 {
     /// <summary>Tolerable difference between colors</summary>
-    private const int CONTRAST_LIMIT = 128;
+    private const int CONTRAST_LIMIT = 85;
 
     internal static string Message;
 
@@ -41,7 +41,7 @@ internal struct Log
         int gDiff = Math.Abs(backgroundColor.G - textColor.G);
         int bDiff = Math.Abs(backgroundColor.B - textColor.B);
 
-        if ((rDiff + gDiff + bDiff) < CONTRAST_LIMIT)
+        if ((rDiff + gDiff + bDiff) / 3 < CONTRAST_LIMIT)
         {
             Message += message;
         }
