@@ -33,6 +33,7 @@ main() {
   "windows")
     WINDOWS=1
     BUILD_SWITCHES="$BUILD_SWITCHES /p:DefineConstants=WINDOWS"
+    BUILD_FLAGS="$BUILD_FLAGS -r win-x64"
     ;;
   *)
     echo "'$1' is not a valid platform!"
