@@ -504,10 +504,10 @@ public struct CalculatorUI
     internal static string Expression = "";
     internal static string ErrorMessage = "";
 
-    public static Font Fonte;
+    internal static Font Fonte;
 
 #if ANDROID
-    public static int GetStatusBarHeight(Resources resources)
+    private static int GetStatusBarHeight(Resources resources)
     {
         int statusBarHeight = 0;
         int resourceId = resources.GetIdentifier("status_bar_height", "dimen", "android");
@@ -576,9 +576,7 @@ public struct CalculatorUI
                         Layout.ShadowStyle GreenButtonShadow =
                             new(Color.DARKGREEN, ShadowDistance, Layout.ShadowKind.Pillar);
 
-                        // TODO(LucasTA): if more buttons are needed i can do like those
-                        // old phone keys
-                        // HoldText: "AC"
+                        // FIXME(LucasTA): Mouse hover color is not working
                         Layout.ButtonStyle GreyButton =
                             new(
                                 TextColor: FontColor,
