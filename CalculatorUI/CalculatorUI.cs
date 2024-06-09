@@ -492,6 +492,7 @@ public struct CalculatorUI
             { "log", () => SetExpression(Expression + "log(") },
             { "pi", () => SetExpression(Expression + "pi") },
             { "e", () => SetExpression(Expression + "e") },
+            { "history", () => CurrentScene = Scene.History },
             { "0", () => SetExpression(Expression + "0") },
             { "1", () => SetExpression(Expression + "1") },
             { "2", () => SetExpression(Expression + "2") },
@@ -538,6 +539,16 @@ public struct CalculatorUI
     internal static string ErrorMessage = "";
 
     internal static Font Fonte;
+
+    internal enum Scene
+    {
+        Calculator,
+        History,
+        Settings,
+        About,
+    }
+
+    internal static Scene CurrentScene = Scene.Calculator;
 
 #if ANDROID
     private static int GetStatusBarHeight(RaylibActivity activity)
@@ -603,52 +614,55 @@ public struct CalculatorUI
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(BackgroundColor);
 
-                    // set and draw grid
+                    switch (CurrentScene)
                     {
-                        Layout.ShadowStyle GreyButtonShadow =
-                            new(DarkerGray, ShadowDistance, Layout.ShadowKind.Pillar);
-                        Layout.ShadowStyle RedButtonShadow =
-                            new(Color.MAROON, ShadowDistance, Layout.ShadowKind.Pillar);
-                        Layout.ShadowStyle GreenButtonShadow =
-                            new(Color.DARKGREEN, ShadowDistance, Layout.ShadowKind.Pillar);
+                        case Scene.Calculator:
+                            // Draw buttons
+                            {
+                                Layout.ShadowStyle GreyButtonShadow =
+                                    new(DarkerGray, ShadowDistance, Layout.ShadowKind.Pillar);
+                                Layout.ShadowStyle RedButtonShadow =
+                                    new(Color.MAROON, ShadowDistance, Layout.ShadowKind.Pillar);
+                                Layout.ShadowStyle GreenButtonShadow =
+                                    new(Color.DARKGREEN, ShadowDistance, Layout.ShadowKind.Pillar);
 
-                        Layout.ButtonStyle GreyButton =
-                            new(
-                                TextColor: FontColor,
-                                BackgroundColor: DarkGray,
-                                PressedColor: DarkerGray,
-                                HoveredColor: Color.GRAY,
-                                BorderColor: Color.GRAY,
-                                BorderThickness: BorderThickness,
-                                ShadowStyle: GreyButtonShadow
-                            );
+                                Layout.ButtonStyle GreyButton =
+                                    new(
+                                        TextColor: FontColor,
+                                        BackgroundColor: DarkGray,
+                                        PressedColor: DarkerGray,
+                                        HoveredColor: Color.GRAY,
+                                        BorderColor: Color.GRAY,
+                                        BorderThickness: BorderThickness,
+                                        ShadowStyle: GreyButtonShadow
+                                    );
 
-                        Layout.ButtonStyle RedButton =
-                            new(
-                                TextColor: FontColor,
-                                BackgroundColor: Color.RED,
-                                PressedColor: Color.MAROON,
-                                HoveredColor: Color.ORANGE,
-                                BorderColor: Color.ORANGE,
-                                BorderThickness: BorderThickness,
-                                ShadowStyle: RedButtonShadow
-                            );
+                                Layout.ButtonStyle RedButton =
+                                    new(
+                                        TextColor: FontColor,
+                                        BackgroundColor: Color.RED,
+                                        PressedColor: Color.MAROON,
+                                        HoveredColor: Color.ORANGE,
+                                        BorderColor: Color.ORANGE,
+                                        BorderThickness: BorderThickness,
+                                        ShadowStyle: RedButtonShadow
+                                    );
 
-                        Layout.ButtonStyle GreenButton =
-                            new(
-                                TextColor: FontColor,
-                                BackgroundColor: LightGreen,
-                                PressedColor: Color.DARKGREEN,
-                                HoveredColor: Color.GREEN,
-                                BorderColor: Color.GREEN,
-                                BorderThickness: BorderThickness,
-                                ShadowStyle: GreenButtonShadow
-                            );
+                                Layout.ButtonStyle GreenButton =
+                                    new(
+                                        TextColor: FontColor,
+                                        BackgroundColor: LightGreen,
+                                        PressedColor: Color.DARKGREEN,
+                                        HoveredColor: Color.GREEN,
+                                        BorderColor: Color.GREEN,
+                                        BorderThickness: BorderThickness,
+                                        ShadowStyle: GreenButtonShadow
+                                    );
 
-                        int rowAmount = 7;
-                        int heightPercentage = 100 / rowAmount;
-                        Layout.ButtonRow[] ButtonGrid = new Layout.ButtonRow[]
-                        {
+                                int rowAmount = 7;
+                                int heightPercentage = 100 / rowAmount;
+                                Layout.ButtonRow[] ButtonGrid = new Layout.ButtonRow[]
+                                {
                             new Layout.ButtonRow(
                                 heightPercentage,
                                 new Layout.Button(20, "(", GreyButton),
@@ -702,109 +716,131 @@ public struct CalculatorUI
                                 new Layout.Button(16, "tan", GreyButton),
                                 new Layout.Button(16, "log", GreyButton)
                             )
-                        };
+                                };
 
-                        Layout.DrawButtonGrid(
-                                Padding,
-                                Padding + (ScreenHeight / 6),
-                                ScreenWidth - (Padding * 2),
-                                ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
-                                Padding,
-                                ButtonGrid
-                                );
-                    }
+                                Layout.DrawButtonGrid(
+                                        Padding,
+                                        Padding + (ScreenHeight / 6),
+                                        ScreenWidth - (Padding * 2),
+                                        ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
+                                        Padding,
+                                        ButtonGrid
+                                        );
+                            }
 
-                    // Calculator Display
-                    {
-                        int DisplayX = Padding;
-                        int DisplayY = Padding;
-                        int DisplayWidth = ScreenWidth - (Padding * 2);
-                        int DisplayHeight = (ScreenHeight / 6) - Padding;
+                            // Draw Calculator Display
+                            {
+                                int DisplayX = Padding;
+                                int DisplayY = Padding;
+                                int DisplayWidth = ScreenWidth - (Padding * 2);
+                                int DisplayHeight = (ScreenHeight / 6) - Padding;
 
-                        if (ErrorMessage == "")
-                        {
-                            Layout.DrawTextBox(
-                                    DisplayX,
-                                    DisplayY,
-                                    DisplayWidth,
-                                    DisplayHeight,
-                                    Expression,
-                                    Color.WHITE,
-                                    DarkerGray,
-                                    fontSize: FontSize,
-                                    borderColor: DarkGray,
-                                    BorderThickness * 2
-                                    );
+                                if (ErrorMessage == "")
+                                {
+                                    Layout.DrawTextBox(
+                                            DisplayX,
+                                            DisplayY,
+                                            DisplayWidth,
+                                            DisplayHeight,
+                                            Expression,
+                                            Color.WHITE,
+                                            DarkerGray,
+                                            fontSize: FontSize,
+                                            borderColor: DarkGray,
+                                            BorderThickness * 2
+                                            );
 
-                            Raylib.DrawTextEx(
-                                    CalculatorUI.Fonte,
-                                    Result,
-                                    new(
-                                        DisplayX + Padding,
-                                        ScreenHeight / 8 - Padding
-                                    ),
-                                    FontSize,
-                                    CalculatorUI.FONT_SPACING,
-                                    Color.GRAY
-                                    );
-                        }
-                        else
-                        {
-                            Layout.DrawTextBox(
-                                    DisplayX,
-                                    DisplayY,
-                                    DisplayWidth,
-                                    DisplayHeight,
-                                    Expression,
-                                    Color.WHITE,
-                                    DarkerGray,
-                                    fontSize: FontSize,
-                                    borderColor: Color.RED,
-                                    BorderThickness * 2
-                                    );
+                                    Raylib.DrawTextEx(
+                                            CalculatorUI.Fonte,
+                                            Result,
+                                            new(
+                                                DisplayX + Padding,
+                                                ScreenHeight / 8 - Padding
+                                            ),
+                                            FontSize,
+                                            CalculatorUI.FONT_SPACING,
+                                            Color.GRAY
+                                            );
+                                }
+                                else
+                                {
+                                    Layout.DrawTextBox(
+                                            DisplayX,
+                                            DisplayY,
+                                            DisplayWidth,
+                                            DisplayHeight,
+                                            Expression,
+                                            Color.WHITE,
+                                            DarkerGray,
+                                            fontSize: FontSize,
+                                            borderColor: Color.RED,
+                                            BorderThickness * 2
+                                            );
 
-                            Raylib.DrawTextEx(
-                                    CalculatorUI.Fonte,
-                                    ErrorMessage,
-                                    new(
-                                        DisplayX + Padding,
-                                        ScreenHeight / 8 - Padding
-                                    ),
-                                    FontSize,
-                                    CalculatorUI.FONT_SPACING,
-                                    Color.RED
-                                    );
-                        }
-                    }
+                                    Raylib.DrawTextEx(
+                                            CalculatorUI.Fonte,
+                                            ErrorMessage,
+                                            new(
+                                                DisplayX + Padding,
+                                                ScreenHeight / 8 - Padding
+                                            ),
+                                            FontSize,
+                                            CalculatorUI.FONT_SPACING,
+                                            Color.RED
+                                            );
+                                }
+                            }
 
-                    if (
-                        Commands.TryGetValue(
-                            ((char)Raylib.GetCharPressed()).ToString(),
-                            out var command
-                        )
-                    )
-                    {
-                        command();
-                        ButtonPressedTime = 0;
-                    }
-                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
-                    {
-                        Commands["="]();
-                        ButtonPressedTime = 0;
-                    }
-                    else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
-                    {
-                        Commands["<-"]();
-                        ButtonPressedTime = 0;
-                    }
-                    else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
-                    {
-                        if (ButtonPressedTime >= UPDATE_INTERVAL)
-                        {
-                            Commands["<-"]();
-                        }
+                            if (
+                                Commands.TryGetValue(
+                                    ((char)Raylib.GetCharPressed()).ToString(),
+                                    out var command
+                                )
+                            )
+                            {
+                                command();
+                                ButtonPressedTime = 0;
+                            }
+                            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                            {
+                                Commands["="]();
+                                ButtonPressedTime = 0;
+                            }
+                            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+                            {
+                                Commands["<-"]();
+                                ButtonPressedTime = 0;
+                            }
+                            else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+                            {
+                                if (ButtonPressedTime >= UPDATE_INTERVAL)
+                                {
+                                    Commands["<-"]();
+                                }
 
-                        ButtonPressedTime += Raylib.GetFrameTime();
+                                ButtonPressedTime += Raylib.GetFrameTime();
+                            }
+                            break;
+                        case Scene.History:
+                            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+                            {
+                                CurrentScene = Scene.Calculator;
+                            }
+                            break;
+                        case Scene.Settings:
+                            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+                            {
+                                CurrentScene = Scene.Calculator;
+                            }
+                            break;
+                        case Scene.About:
+                            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+                            {
+                                CurrentScene = Scene.Calculator;
+                            }
+                            break;
+                        default:
+                            throw new UnreachableException("Unknown scene");
                     }
 
                     Log.Message =
