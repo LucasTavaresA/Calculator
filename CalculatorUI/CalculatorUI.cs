@@ -791,17 +791,9 @@ public struct CalculatorUI
                                 }
                             }
 
-                            if (
-                                Commands.TryGetValue(
-                                    ((char)Raylib.GetCharPressed()).ToString(),
-                                    out var command
-                                )
-                            )
-                            {
-                                command();
-                                ButtonPressedTime = 0;
-                            }
-                            else if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+                            int keycode = Raylib.GetCharPressed();
+
+                            if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                             {
                                 Commands["="]();
                                 ButtonPressedTime = 0;
@@ -819,6 +811,16 @@ public struct CalculatorUI
                                 }
 
                                 ButtonPressedTime += Raylib.GetFrameTime();
+                            }
+                            else if (keycode != 0)
+                            {
+                                if (char.IsAsciiLetterOrDigit((char)keycode) ||
+                                        (char)keycode is ' ' or '(' or ')' or ',' or '^'
+                                                      or '!' or '%' or '/' or '+' or '-' or '*' or '.')
+                                {
+                                    SetExpression(Expression + ((char)keycode).ToString().ToLowerInvariant());
+                                    ButtonPressedTime = 0;
+                                }
                             }
                             break;
                         case Scene.History:
