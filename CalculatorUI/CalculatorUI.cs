@@ -437,6 +437,23 @@ public struct CalculatorUI
     private static readonly Color DarkGray = new(100, 100, 100, 255);
     private static readonly Color LightGreen = new(0, 193, 47, 255);
 
+    private static void SetExpression(string value)
+    {
+        Expression = value;
+        ErrorMessage = "";
+
+        try
+        {
+            Result = Evaluator
+                .Evaluate(Expression)
+                .ToString("G", CultureInfo.InvariantCulture);
+        }
+        catch (Exception)
+        {
+            Result = "";
+        }
+    }
+
     internal static readonly Dictionary<string, Action> Commands =
         new()
         {
@@ -444,46 +461,58 @@ public struct CalculatorUI
                 "=",
                 () =>
                 {
-                    try
-                    {
-                        Expression = Evaluator
-                            .Evaluate(Expression)
-                            .ToString(CultureInfo.InvariantCulture);
+                    Result = "";
 
-                        // TODO(LucasTA): remove exceptions from Eval.cs
-                        ErrorMessage = "";
-                    }
-                    catch (Exception e)
+                    if (Expression != "")
                     {
-                        ErrorMessage = e switch
+                        try
                         {
-                            UnexpectedEvaluationException ue => ue.Reason,
-                            _ => e.Message,
-                        };
+                            Expression = Evaluator
+                                .Evaluate(Expression)
+                                .ToString("G", CultureInfo.InvariantCulture);
+                            ErrorMessage = "";
+                        }
+                        catch (Exception e)
+                        {
+                            ErrorMessage = e switch
+                            {
+                                _ => e.Message,
+                            };
+                        }
                     }
                 }
             },
-            { "C", () => Expression = "" },
-            { "<-", () => Expression = Expression == "" ? "" : Expression![..^1] },
-            { "0", () => Expression += "0" },
-            { "1", () => Expression += "1" },
-            { "2", () => Expression += "2" },
-            { "3", () => Expression += "3" },
-            { "4", () => Expression += "4" },
-            { "5", () => Expression += "5" },
-            { "6", () => Expression += "6" },
-            { "7", () => Expression += "7" },
-            { "8", () => Expression += "8" },
-            { "9", () => Expression += "9" },
-            { "+", () => Expression += "+" },
-            { "-", () => Expression += "-" },
-            { "*", () => Expression += "*" },
-            { "/", () => Expression += "/" },
-            { "%", () => Expression += "%" },
-            { ".", () => Expression += "." },
-            { ",", () => Expression += "." },
-            { "(", () => Expression += "(" },
-            { ")", () => Expression += ")" },
+            { "C", () => SetExpression("") },
+            { "<-", () => SetExpression(Expression == "" ? "" : Expression![..^1]) },
+            { "sin", () => SetExpression(Expression + "sin(") },
+            { "cos", () => SetExpression(Expression + "cos(") },
+            { "tan", () => SetExpression(Expression + "tan(") },
+            { "mod", () => SetExpression(Expression + "mod(") },
+            { "sqrt", () => SetExpression(Expression + "sqrt(") },
+            { "log", () => SetExpression(Expression + "log(") },
+            { "pi", () => SetExpression(Expression + "pi") },
+            { "e", () => SetExpression(Expression + "e") },
+            { "0", () => SetExpression(Expression + "0") },
+            { "1", () => SetExpression(Expression + "1") },
+            { "2", () => SetExpression(Expression + "2") },
+            { "3", () => SetExpression(Expression + "3") },
+            { "4", () => SetExpression(Expression + "4") },
+            { "5", () => SetExpression(Expression + "5") },
+            { "6", () => SetExpression(Expression + "6") },
+            { "7", () => SetExpression(Expression + "7") },
+            { "8", () => SetExpression(Expression + "8") },
+            { "9", () => SetExpression(Expression + "9") },
+            { "+", () => SetExpression(Expression + "+") },
+            { "-", () => SetExpression(Expression + "-") },
+            { "*", () => SetExpression(Expression + "*") },
+            { "/", () => SetExpression(Expression + "/") },
+            { "^", () => SetExpression(Expression + "^") },
+            { "%", () => SetExpression(Expression + "%") },
+            { "!", () => SetExpression(Expression + "!") },
+            { ".", () => SetExpression(Expression + ".") },
+            { ",", () => SetExpression(Expression + ", ") },
+            { "(", () => SetExpression(Expression + "(") },
+            { ")", () => SetExpression(Expression + ")") },
         };
 
     /// <summary>Time before updating animations and handling key presses</summary>
@@ -505,6 +534,7 @@ public struct CalculatorUI
     internal static int MousePressedY;
 
     internal static string Expression = "";
+    internal static string Result = "";
     internal static string ErrorMessage = "";
 
     internal static Font Fonte;
@@ -614,42 +644,62 @@ public struct CalculatorUI
                                 ShadowStyle: GreenButtonShadow
                             );
 
+                        int rowAmount = 7;
+                        int heightPercentage = 100 / rowAmount;
                         Layout.ButtonRow[] ButtonGrid = new Layout.ButtonRow[]
                         {
                             new Layout.ButtonRow(
-                                20,
-                                new Layout.Button(25, "(", GreyButton),
-                                new Layout.Button(25, ")", GreyButton),
-                                new Layout.Button(25, "C", GreyButton),
-                                new Layout.Button(25, "<-", RedButton)
+                                heightPercentage,
+                                new Layout.Button(20, "(", GreyButton),
+                                new Layout.Button(20, ")", GreyButton),
+                                new Layout.Button(20, ",", GreyButton),
+                                new Layout.Button(20, "^", GreyButton),
+                                new Layout.Button(20, "pi", GreyButton)
                             ),
                             new Layout.ButtonRow(
-                                20,
+                                heightPercentage,
+                                new Layout.Button(20, "!", GreyButton),
+                                new Layout.Button(20, "e", GreyButton),
+                                new Layout.Button(20, "%", GreyButton),
+                                new Layout.Button(20, "/", GreyButton),
+                                new Layout.Button(20, "C", GreyButton)
+                            ),
+                            new Layout.ButtonRow(
+                                heightPercentage,
                                 new Layout.Button(25, "7", GreyButton),
                                 new Layout.Button(25, "8", GreyButton),
                                 new Layout.Button(25, "9", GreyButton),
-                                new Layout.Button(25, "=", GreenButton)
-                            ),
-                            new Layout.ButtonRow(
-                                20,
-                                new Layout.Button(25, "4", GreyButton),
-                                new Layout.Button(25, "5", GreyButton),
-                                new Layout.Button(25, "6", GreyButton),
-                                new Layout.Button(25, "/", GreyButton)
-                            ),
-                            new Layout.ButtonRow(
-                                20,
-                                new Layout.Button(25, "1", GreyButton),
-                                new Layout.Button(25, "2", GreyButton),
-                                new Layout.Button(25, "3", GreyButton),
                                 new Layout.Button(25, "*", GreyButton)
                             ),
                             new Layout.ButtonRow(
-                                20,
+                                heightPercentage,
+                                new Layout.Button(25, "4", GreyButton),
+                                new Layout.Button(25, "5", GreyButton),
+                                new Layout.Button(25, "6", GreyButton),
+                                new Layout.Button(25, "-", GreyButton)
+                            ),
+                            new Layout.ButtonRow(
+                                heightPercentage,
+                                new Layout.Button(25, "1", GreyButton),
+                                new Layout.Button(25, "2", GreyButton),
+                                new Layout.Button(25, "3", GreyButton),
+                                new Layout.Button(25, "+", GreyButton)
+                            ),
+                            new Layout.ButtonRow(
+                                heightPercentage,
                                 new Layout.Button(25, "0", GreyButton),
                                 new Layout.Button(25, ".", GreyButton),
-                                new Layout.Button(25, "+", GreyButton),
-                                new Layout.Button(25, "-", GreyButton)
+                                new Layout.Button(25, "<-", RedButton),
+                                new Layout.Button(25, "=", GreenButton)
+                            ),
+                            new Layout.ButtonRow(
+                                heightPercentage,
+                                new Layout.Button(17, "sqrt", GreyButton),
+                                new Layout.Button(17, "mod", GreyButton),
+                                new Layout.Button(17, "sin", GreyButton),
+                                new Layout.Button(17, "cos", GreyButton),
+                                new Layout.Button(16, "tan", GreyButton),
+                                new Layout.Button(16, "log", GreyButton)
                             )
                         };
 
@@ -663,48 +713,67 @@ public struct CalculatorUI
                                 );
                     }
 
-                    if (ErrorMessage == "")
+                    // Calculator Display
                     {
-                        Layout.DrawTextBox(
-                            Padding,
-                            Padding,
-                            ScreenWidth - (Padding * 2),
-                            (ScreenHeight / 8) - Padding,
-                            Expression,
-                            Color.WHITE,
-                            DarkerGray,
-                            fontSize: FontSize,
-                            borderColor: DarkGray,
-                            borderThickness: BorderThickness * 2
-                        );
-                    }
-                    else
-                    {
-                        Layout.DrawTextBox(
-                            Padding,
-                            Padding,
-                            ScreenWidth - (Padding * 2),
-                            (ScreenHeight / 8) - Padding,
-                            Expression,
-                            Color.WHITE,
-                            DarkerGray,
-                            fontSize: FontSize,
-                            borderColor: Color.RED,
-                            borderThickness: BorderThickness * 2
-                        );
+                        int DisplayX = Padding;
+                        int DisplayY = Padding;
+                        int DisplayWidth = ScreenWidth - (Padding * 2);
+                        int DisplayHeight = (ScreenHeight / 6) - Padding;
 
-                        Raylib.DrawTextEx(
-                            CalculatorUI.Fonte,
-                            ErrorMessage,
-                            new(
-                            ScreenWidth
-                                - Raylib.MeasureText(ErrorMessage, FontSize)
-                                - (Padding * 2),
-                            ScreenHeight / 8),
-                            FontSize,
-                            CalculatorUI.FONT_SPACING,
-                            Color.RED
-                        );
+                        if (ErrorMessage == "")
+                        {
+                            Layout.DrawTextBox(
+                                    DisplayX,
+                                    DisplayY,
+                                    DisplayWidth,
+                                    DisplayHeight,
+                                    Expression,
+                                    Color.WHITE,
+                                    DarkerGray,
+                                    fontSize: FontSize,
+                                    borderColor: DarkGray,
+                                    BorderThickness * 2
+                                    );
+
+                            Raylib.DrawTextEx(
+                                    CalculatorUI.Fonte,
+                                    Result,
+                                    new(
+                                        DisplayX + Padding,
+                                        ScreenHeight / 8 - Padding
+                                    ),
+                                    FontSize,
+                                    CalculatorUI.FONT_SPACING,
+                                    Color.GRAY
+                                    );
+                        }
+                        else
+                        {
+                            Layout.DrawTextBox(
+                                    DisplayX,
+                                    DisplayY,
+                                    DisplayWidth,
+                                    DisplayHeight,
+                                    Expression,
+                                    Color.WHITE,
+                                    DarkerGray,
+                                    fontSize: FontSize,
+                                    borderColor: Color.RED,
+                                    BorderThickness * 2
+                                    );
+
+                            Raylib.DrawTextEx(
+                                    CalculatorUI.Fonte,
+                                    ErrorMessage,
+                                    new(
+                                        DisplayX + Padding,
+                                        ScreenHeight / 8 - Padding
+                                    ),
+                                    FontSize,
+                                    CalculatorUI.FONT_SPACING,
+                                    Color.RED
+                                    );
+                        }
                     }
 
                     if (
