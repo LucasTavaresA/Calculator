@@ -592,7 +592,7 @@ public struct CalculatorUI
 #endif
                     FontSize = (ScreenWidth < ScreenHeight ? ScreenWidth : ScreenHeight) / 20;
                     TouchCount = Raylib.GetTouchPointCount();
-                    BorderThickness = Math.Max(ScreenWidth / 500, 1);
+                    BorderThickness = Math.Max((ScreenWidth > ScreenHeight ? ScreenWidth : ScreenHeight) / 500, 1);
                     ShadowDistance = BorderThickness * 4;
                     Padding = BorderThickness * 8;
                 }
