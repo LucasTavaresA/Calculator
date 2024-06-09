@@ -507,18 +507,20 @@ public struct CalculatorUI
     internal static Font Fonte;
 
 #if ANDROID
-    private static int GetStatusBarHeight(Resources resources)
+    private static int GetStatusBarHeight(RaylibActivity activity)
     {
         int statusBarHeight = 0;
-        int resourceId = resources.GetIdentifier("status_bar_height", "dimen", "android");
+        int resourceId = activity.Resources.GetIdentifier("status_bar_height", "dimen", "android");
+
         if (resourceId > 0)
         {
-            statusBarHeight = resources.GetDimensionPixelSize(resourceId);
+            statusBarHeight = activity.Resources.GetDimensionPixelSize(resourceId);
         }
+
         return statusBarHeight;
     }
 
-    public static void MainLoop(Resources resources)
+    public static void MainLoop(RaylibActivity activity)
 #else
     public static void MainLoop()
 #endif
@@ -538,7 +540,7 @@ public struct CalculatorUI
                 {
 #if ANDROID
                     ScreenWidth = (int)DeviceDisplay.MainDisplayInfo.Width;
-                    ScreenHeight = (int)DeviceDisplay.MainDisplayInfo.Height - GetStatusBarHeight(resources);
+                    ScreenHeight = (int)DeviceDisplay.MainDisplayInfo.Height - GetStatusBarHeight(activity);
 #else
                     ScreenWidth = Raylib.GetScreenWidth();
                     ScreenHeight = Raylib.GetScreenHeight();
