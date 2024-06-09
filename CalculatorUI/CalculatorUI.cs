@@ -563,6 +563,7 @@ public struct CalculatorUI
             Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_HIGHDPI | ConfigFlags.FLAG_INTERLACED_HINT);
             Raylib.InitWindow(0, 0, APP_NAME);
             Raylib.SetTargetFPS(TARGET_FPS);
+            Raylib.SetExitKey(KeyboardKey.KEY_NULL);
             Fonte = Raylib.GetFontDefault();
 
             Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_POINT);
