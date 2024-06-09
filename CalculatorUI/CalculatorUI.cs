@@ -239,7 +239,10 @@ internal struct Layout
                 text,
                 textColor,
                 IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height)
-                    && CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor,
+#if ANDROID
+                    && CalculatorUI.TouchCount > 0
+#endif
+                    ? hoveredColor : backgroundColor,
                 fontSize: fontSize,
                 borderColor: borderColor,
                 borderThickness: borderThickness,
@@ -578,7 +581,6 @@ public struct CalculatorUI
                         Layout.ShadowStyle GreenButtonShadow =
                             new(Color.DARKGREEN, ShadowDistance, Layout.ShadowKind.Pillar);
 
-                        // FIXME(LucasTA): Mouse hover color is not working
                         Layout.ButtonStyle GreyButton =
                             new(
                                 TextColor: FontColor,
