@@ -10,6 +10,7 @@ ANDROID=0
 PROGRAM="Calculator"
 BUILD_FLAGS="-o build"
 BUILD_SWITCHES=""
+PWD="$(pwd)"
 
 print_help() {
   printf \
@@ -72,8 +73,6 @@ main() {
     shift
   done
 
-  rm -rf ./**/bin/ ./**/obj/ ./build/
-
   if [ "$RELEASE" = 0 ]; then
     BUILD_SWITCHES="$BUILD_SWITCHES /p:DefineConstants=DEBUG"
   fi
@@ -85,6 +84,10 @@ main() {
       ./build/${PROGRAM}Desktop
     fi
   elif [ "$ANDROID" = 1 ]; then
+    if [ "$RELEASE" = 1 ]; then
+      rm -rf ./**/bin/ ./**/obj/ ./build/
+    fi
+
     dotnet publish $BUILD_FLAGS "${PROGRAM}Android" $BUILD_SWITCHES
 
     if [ "$RUN" = 1 ]; then
@@ -93,4 +96,11 @@ main() {
   fi
 }
 
-main "$@"
+if [ -d ./CalculatorUI/ ] && [ -d ./.git/ ]; then
+  main "$@"
+else
+  echo "You are in ${PWD}"
+  echo "You need to be in the repo directory to build!"
+fi
+
+./after.sh
