@@ -84,9 +84,7 @@ main() {
       ./build/${PROGRAM}Desktop
     fi
   elif [ "$ANDROID" = 1 ]; then
-    if [ "$RELEASE" = 1 ]; then
-      rm -rf ./**/bin/ ./**/obj/ ./build/
-    fi
+    rm -rf ./**/bin/ ./**/obj/ ./build/
 
     dotnet publish $BUILD_FLAGS "${PROGRAM}Android" $BUILD_SWITCHES
 
