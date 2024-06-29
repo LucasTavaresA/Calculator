@@ -81,7 +81,7 @@ internal struct Layout
         ShadowStyle? ShadowStyle = null
     );
 
-    internal readonly record struct Button(int WidthPercentage, string Text, ButtonStyle Style);
+    internal readonly record struct Button(int WidthPercentage, string Text, ButtonStyle Style, bool RepeatPresses = false);
 
     internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
@@ -162,16 +162,26 @@ internal struct Layout
         Color pressedColor,
         Color hoveredColor,
         int? fontSize = null,
+        bool repeatPresses = false,
         Color? borderColor = null,
         int borderThickness = 1,
         ShadowStyle? shadowStyle = null
     )
     {
-        if (
-            Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT)
-            && IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height)
+        if (!CalculatorUI.ButtonWasPressed &&
+            Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT) &&
+            IsPointInsideRect(
+                CalculatorUI.MouseX,
+                CalculatorUI.MouseY,
+                x,
+                y,
+                width,
+                height
+            )
         )
         {
+            CalculatorUI.ButtonWasPressed = true;
+
             if (CalculatorUI.Commands.TryGetValue(text, out var command))
             {
                 command();
@@ -184,8 +194,9 @@ internal struct Layout
             CalculatorUI.ButtonPressedTime = 0;
         }
         else if (
-            Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
-            && IsPointInsideRect(
+            !CalculatorUI.ButtonWasPressed &&
+            Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) &&
+            IsPointInsideRect(
                 CalculatorUI.MousePressedX,
                 CalculatorUI.MousePressedY,
                 x,
@@ -214,8 +225,10 @@ internal struct Layout
                 borderThickness: borderThickness
             );
 
-            if (CalculatorUI.ButtonPressedTime >= CalculatorUI.UPDATE_INTERVAL)
+            if (repeatPresses && CalculatorUI.ButtonPressedTime >= CalculatorUI.UPDATE_INTERVAL)
             {
+                CalculatorUI.ButtonWasPressed = true;
+
                 if (CalculatorUI.Commands.TryGetValue(text, out var command))
                 {
                     command();
@@ -397,7 +410,8 @@ internal struct Layout
                     pressedColor: rows[i].Buttons[j].Style.PressedColor,
                     borderColor: rows[i].Buttons[j].Style.BorderColor,
                     borderThickness: rows[i].Buttons[j].Style.BorderThickness,
-                    shadowStyle: rows[i].Buttons[j].Style.ShadowStyle
+                    shadowStyle: rows[i].Buttons[j].Style.ShadowStyle,
+                    repeatPresses: rows[i].Buttons[j].RepeatPresses
                 );
 
                 curX += colLength + padding;
@@ -520,6 +534,7 @@ public struct CalculatorUI
     internal const float UPDATE_INTERVAL = 0.5f;
 
     internal static float ButtonPressedTime;
+    internal static bool ButtonWasPressed = false;
 
     internal static int ScreenWidth = 0;
     internal static int ScreenHeight = 0;
@@ -601,6 +616,7 @@ public struct CalculatorUI
                 {
                     MouseX = Raylib.GetMouseX();
                     MouseY = Raylib.GetMouseY();
+                    ButtonWasPressed = false;
 
                     if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
                     {
