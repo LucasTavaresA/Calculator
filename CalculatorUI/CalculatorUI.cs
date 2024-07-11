@@ -10,11 +10,6 @@ using System.Collections.Generic;
 using Eval;
 using Raylib_cs;
 
-#if ANDROID
-using Android.Content.Res;
-using Xamarin.Essentials;
-#endif
-
 namespace Calculator;
 
 internal struct Log
@@ -565,28 +560,12 @@ public struct CalculatorUI
 
     internal static Scene CurrentScene = Scene.Calculator;
 
-#if ANDROID
-    private static int GetStatusBarHeight(RaylibActivity activity)
-    {
-        int statusBarHeight = 0;
-        int resourceId = activity.Resources.GetIdentifier("status_bar_height", "dimen", "android");
-
-        if (resourceId > 0)
-        {
-            statusBarHeight = activity.Resources.GetDimensionPixelSize(resourceId);
-        }
-
-        return statusBarHeight;
-    }
-
-    public static void MainLoop(RaylibActivity activity)
-#else
     public static void MainLoop()
-#endif
     {
         // Raylib context
         {
-            Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_HIGHDPI | ConfigFlags.FLAG_INTERLACED_HINT);
+            // NOTE(LucasTA): HIGHDPI stops the window from being scaled as its resized
+            Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
             Raylib.InitWindow(0, 0, APP_NAME);
             Raylib.SetTargetFPS(TARGET_FPS);
             Raylib.SetExitKey(KeyboardKey.KEY_NULL);
@@ -598,13 +577,8 @@ public struct CalculatorUI
             {
                 // get screen information
                 {
-#if ANDROID
-                    ScreenWidth = (int)DeviceDisplay.MainDisplayInfo.Width;
-                    ScreenHeight = (int)DeviceDisplay.MainDisplayInfo.Height - GetStatusBarHeight(activity);
-#else
                     ScreenWidth = Raylib.GetScreenWidth();
                     ScreenHeight = Raylib.GetScreenHeight();
-#endif
                     FontSize = (ScreenWidth < ScreenHeight ? ScreenWidth : ScreenHeight) / 20;
                     TouchCount = Raylib.GetTouchPointCount();
                     BorderThickness = Math.Max((ScreenWidth > ScreenHeight ? ScreenWidth : ScreenHeight) / 500, 1);
