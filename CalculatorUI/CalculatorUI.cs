@@ -294,7 +294,7 @@ internal struct Layout
                 shadowStyle.Color
             );
 
-            if (outlineColor != null && shadowStyle.Kind != ShadowKind.Cast)
+            if (outlineColor is Color oc && shadowStyle.Kind != ShadowKind.Cast)
             {
                 if (shadowStyle.Kind == ShadowKind.Cube)
                 {
@@ -304,7 +304,7 @@ internal struct Layout
                         y + shadowStyle.Distance,
                         x + width + shadowStyle.Distance,
                         y + height + shadowStyle.Distance,
-                        (Color)outlineColor
+                        oc
                     );
 
                     // bottom cube shadow outline
@@ -313,7 +313,7 @@ internal struct Layout
                         y + height + shadowStyle.Distance,
                         x + width + shadowStyle.Distance,
                         y + height + shadowStyle.Distance,
-                        (Color)outlineColor
+                        oc
                     );
                 }
                 else if (shadowStyle.Kind == ShadowKind.TransparentCube)
@@ -323,7 +323,7 @@ internal struct Layout
                         y + shadowStyle.Distance,
                         width,
                         height,
-                        (Color)outlineColor
+                        oc
                     );
                 }
 
@@ -333,7 +333,7 @@ internal struct Layout
                     y,
                     x + width + shadowStyle.Distance,
                     y + shadowStyle.Distance,
-                    (Color)outlineColor
+                    oc
                 );
 
                 // bottom left outline
@@ -342,7 +342,7 @@ internal struct Layout
                     y + height,
                     x + shadowStyle.Distance,
                     y + height + shadowStyle.Distance,
-                    (Color)outlineColor
+                    oc
                 );
 
                 // bottom right outline
@@ -351,7 +351,7 @@ internal struct Layout
                     y + height,
                     x + width + shadowStyle.Distance,
                     y + height + shadowStyle.Distance,
-                    (Color)outlineColor
+                    oc
                 );
             }
         }
