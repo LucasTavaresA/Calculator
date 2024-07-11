@@ -6,6 +6,9 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Reflection;
+using System.IO;
 
 using Eval;
 using Raylib_cs;
@@ -50,6 +53,8 @@ internal struct Log
 
 internal struct Layout
 {
+    internal readonly static Rectangle ICON_RECTANGLE = new(0, 0, 160, 160);
+
     internal enum ShadowKind
     {
         Float = 0,
@@ -59,6 +64,12 @@ internal struct Layout
         TransparentCube = 4,
     }
 
+    internal readonly record struct TextFormat(
+        string text,
+        int fontSize,
+        Color textColor
+    );
+
     internal readonly record struct ShadowStyle(
         Color Color,
         int Distance,
@@ -66,17 +77,23 @@ internal struct Layout
     );
 
     internal readonly record struct ButtonStyle(
-        Color TextColor,
         Color BackgroundColor,
         Color PressedColor,
         Color HoveredColor,
-        int? FontSize = null,
         Color? BorderColor = null,
         int BorderThickness = 1,
-        ShadowStyle? ShadowStyle = null
+        ShadowStyle? ShadowStyle = null,
+        Texture2D? Icon = null,
+        int IconSize = 0
     );
 
-    internal readonly record struct Button(int WidthPercentage, string Text, ButtonStyle Style, bool RepeatPresses = false);
+    internal readonly record struct Button(
+        int WidthPercentage,
+        TextFormat? TextFormat,
+        Action Callback,
+        ButtonStyle Style,
+        bool RepeatPresses = false
+    );
 
     internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
@@ -92,7 +109,35 @@ internal struct Layout
         return x >= recX && x <= recX + recWidth && y >= recY && y <= recY + recHeight;
     }
 
-    internal static void DrawTextBox(
+    internal static void DrawBox(
+        int x,
+        int y,
+        int width,
+        int height,
+        Color backgroundColor,
+        Color? borderColor = null,
+        int borderThickness = 1,
+        ShadowStyle? shadowStyle = null
+    )
+    {
+        if (shadowStyle is ShadowStyle ss)
+        {
+            DrawShadow(x, y, width, height, ss, borderColor);
+        }
+
+        Raylib.DrawRectangle(x, y, width, height, backgroundColor);
+
+        if (borderColor is Color bc)
+        {
+            Raylib.DrawRectangleLinesEx(
+                new(x, y, width, height),
+                borderThickness,
+                bc
+            );
+        }
+    }
+
+    internal static void DrawText(
         int x,
         int y,
         int width,
@@ -100,17 +145,9 @@ internal struct Layout
         string text,
         Color textColor,
         Color backgroundColor,
-        int? fontSize = null,
-        Color? borderColor = null,
-        int borderThickness = 1,
-        ShadowStyle? shadowStyle = null
+        int fontSize
     )
     {
-        if (fontSize == null)
-        {
-            fontSize = CalculatorUI.FontSize;
-        }
-
         Vector2 textSize = Raylib.MeasureTextEx(CalculatorUI.Fonte, text, (int)fontSize, CalculatorUI.FONT_SPACING);
 
         Log.IfTrue(
@@ -118,32 +155,32 @@ internal struct Layout
             $"ERROR: The text at the {x},{y} text box does not fit its box!\n"
         );
 
-        int textX = x + ((width - (int)textSize.X) / 2);
-        int textY = y + ((height - (int)textSize.Y) / 2);
-
-        if (shadowStyle != null)
-        {
-            DrawShadow(x, y, width, height, (ShadowStyle)shadowStyle, borderColor);
-        }
-
         Log.IfBadContrast(
             backgroundColor,
             textColor,
             $"ERROR: The text at the {x},{y} text box is not visible!\n"
         );
 
-        Raylib.DrawRectangle(x, y, width, height, backgroundColor);
-
-        if (borderColor != null)
-        {
-            Raylib.DrawRectangleLinesEx(
-                new(x, y, width, height),
-                borderThickness,
-                (Color)borderColor
-            );
-        }
+        int textX = x + ((width - (int)textSize.X) / 2);
+        int textY = y + ((height - (int)textSize.Y) / 2);
 
         Raylib.DrawTextEx(CalculatorUI.Fonte, text, new(textX, textY), (int)fontSize, CalculatorUI.FONT_SPACING, textColor);
+    }
+
+    internal static void DrawTextBox(
+        int x,
+        int y,
+        int width,
+        int height,
+        TextFormat textFormat,
+        Color backgroundColor,
+        Color? borderColor = null,
+        int borderThickness = 1,
+        ShadowStyle? shadowStyle = null
+    )
+    {
+        DrawBox(x, y, width, height, backgroundColor, borderColor, borderThickness, shadowStyle);
+        DrawText(x, y, width, height, textFormat.text, textFormat.textColor, backgroundColor, textFormat.fontSize);
     }
 
     internal static void DrawButton(
@@ -151,20 +188,21 @@ internal struct Layout
         int y,
         int width,
         int height,
-        string text,
-        Color textColor,
         Color backgroundColor,
         Color pressedColor,
         Color hoveredColor,
-        int? fontSize = null,
+        Action callback,
+        TextFormat? textFormat = null,
         bool repeatPresses = false,
+        Texture2D? icon = null,
+        int iconSize = 0,
         Color? borderColor = null,
         int borderThickness = 1,
         ShadowStyle? shadowStyle = null
     )
     {
-        if (!CalculatorUI.ButtonWasPressed &&
-            Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT) &&
+        if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasPressed &&
+            Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT) &&
             IsPointInsideRect(
                 CalculatorUI.MouseX,
                 CalculatorUI.MouseY,
@@ -172,25 +210,7 @@ internal struct Layout
                 y,
                 width,
                 height
-            )
-        )
-        {
-            CalculatorUI.ButtonWasPressed = true;
-
-            if (CalculatorUI.Commands.TryGetValue(text, out var command))
-            {
-                command();
-            }
-            else
-            {
-                CalculatorUI.ErrorMessage = $"The '{text}' button does not have a command defined!\n";
-            }
-
-            CalculatorUI.ButtonPressedTime = 0;
-        }
-        else if (
-            !CalculatorUI.ButtonWasPressed &&
-            Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) &&
+                ) &&
             IsPointInsideRect(
                 CalculatorUI.MousePressedX,
                 CalculatorUI.MousePressedY,
@@ -201,61 +221,242 @@ internal struct Layout
             )
         )
         {
-            if (shadowStyle != null)
+            CalculatorUI.ButtonWasPressed = true;
+            CalculatorUI.ButtonPressedTime = 0;
+            CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+            callback();
+        }
+        else if (
+            Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
+        )
+        {
+            if (IsPointInsideRect(
+                    CalculatorUI.MouseX,
+                    CalculatorUI.MouseY,
+                    x,
+                    y,
+                    width,
+                    height
+                )
+            )
             {
-                x += ((ShadowStyle)shadowStyle).Distance;
-                y += ((ShadowStyle)shadowStyle).Distance;
-            }
-
-            DrawTextBox(
-                x,
-                y,
-                width,
-                height,
-                text,
-                textColor,
-                pressedColor,
-                fontSize: fontSize,
-                borderColor: borderColor,
-                borderThickness: borderThickness
-            );
-
-            if (repeatPresses && CalculatorUI.ButtonPressedTime >= CalculatorUI.UPDATE_INTERVAL)
-            {
-                CalculatorUI.ButtonWasPressed = true;
-
-                if (CalculatorUI.Commands.TryGetValue(text, out var command))
+                if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasPressed &&
+                    IsPointInsideRect(CalculatorUI.MousePressedX, CalculatorUI.MousePressedY, x, y, width, height))
                 {
-                    command();
+                    if (shadowStyle is ShadowStyle ss)
+                    {
+                        x += ss.Distance;
+                        y += ss.Distance;
+                    }
+
+                    DrawBox(
+                        x,
+                        y,
+                        width,
+                        height,
+                        pressedColor,
+                        borderColor,
+                        borderThickness,
+                        shadowStyle
+                    );
+
+                    if (textFormat is TextFormat tf)
+                    {
+                        DrawText(
+                            x,
+                            y,
+                            width,
+                            height,
+                            tf.text,
+                            tf.textColor,
+                            pressedColor,
+                            tf.fontSize
+                        );
+                    }
+
+                    CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
+
+                    if (repeatPresses && CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval)
+                    {
+                        CalculatorUI.ButtonWasPressed = true;
+                        CalculatorUI.ButtonPressedTime = 0;
+                        CalculatorUI.KeyRepeatInterval = Math.Max(CalculatorUI.KeyRepeatInterval * CalculatorUI.INITIAL_REPEAT_INTERVAL,
+                                                CalculatorUI.MIN_REPEAT_INTERVAL);
+                        callback();
+                    }
                 }
                 else
                 {
-                    CalculatorUI.ErrorMessage =
-                        $"The '{text}' button does not have a command defined!\n";
+                    backgroundColor =
+#if PLATFORM_ANDROID
+                                CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor;
+#else
+                                hoveredColor;
+#endif
+
+                    DrawBox(x, y, width, height, backgroundColor,
+                            borderColor, borderThickness, shadowStyle);
+
+                    if (textFormat is TextFormat tf)
+                    {
+                        DrawText(
+                                x,
+                                y,
+                                width,
+                                height,
+                                tf.text,
+                                tf.textColor,
+                                backgroundColor,
+                                tf.fontSize
+                                );
+                    }
                 }
             }
+            else
+            {
+                if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasPressed &&
+                    IsPointInsideRect(CalculatorUI.MousePressedX, CalculatorUI.MousePressedY, x, y, width, height))
+                {
+                    if (shadowStyle is ShadowStyle ss)
+                    {
+                        x += ss.Distance;
+                        y += ss.Distance;
+                    }
 
-            CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
+                    DrawBox(
+                        x,
+                        y,
+                        width,
+                        height,
+                        pressedColor,
+                        borderColor,
+                        borderThickness,
+                        shadowStyle
+                    );
+
+                    if (textFormat is TextFormat tf)
+                    {
+                        DrawText(
+                            x,
+                            y,
+                            width,
+                            height,
+                            tf.text,
+                            tf.textColor,
+                            pressedColor,
+                            tf.fontSize
+                        );
+                    }
+
+                    CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
+
+                    if (repeatPresses && CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval)
+                    {
+                        CalculatorUI.ButtonWasPressed = true;
+                        CalculatorUI.ButtonPressedTime = 0;
+                        CalculatorUI.KeyRepeatInterval = Math.Max(CalculatorUI.KeyRepeatInterval * CalculatorUI.INITIAL_REPEAT_INTERVAL,
+                                                CalculatorUI.MIN_REPEAT_INTERVAL);
+                        callback();
+                    }
+                }
+                else
+                {
+                    DrawBox(
+                        x,
+                        y,
+                        width,
+                        height,
+                        backgroundColor,
+                        borderColor,
+                        borderThickness,
+                        shadowStyle
+                    );
+
+                    if (textFormat is TextFormat tf)
+                    {
+                        DrawText(
+                            x,
+                            y,
+                            width,
+                            height,
+                            tf.text,
+                            tf.textColor,
+                            backgroundColor,
+                            tf.fontSize
+                        );
+                    }
+                }
+            }
         }
         else
         {
-            DrawTextBox(
-                x,
-                y,
-                width,
-                height,
-                text,
-                textColor,
-                IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height)
-#if ANDROID
-                    && CalculatorUI.TouchCount > 0
+            if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
+            {
+                backgroundColor =
+#if PLATFORM_ANDROID
+                                CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor;
+#else
+                            hoveredColor;
 #endif
-                    ? hoveredColor : backgroundColor,
-                fontSize: fontSize,
-                borderColor: borderColor,
-                borderThickness: borderThickness,
-                shadowStyle: shadowStyle
-            );
+
+                DrawBox(x, y, width, height, backgroundColor,
+                        borderColor, borderThickness, shadowStyle);
+
+                if (textFormat is TextFormat tf)
+                {
+                    DrawText(
+                            x,
+                            y,
+                            width,
+                            height,
+                            tf.text,
+                            tf.textColor,
+                            backgroundColor,
+                            tf.fontSize
+                            );
+                }
+            }
+            else
+            {
+                DrawBox(
+                    x,
+                    y,
+                    width,
+                    height,
+                    backgroundColor,
+                    borderColor,
+                    borderThickness,
+                    shadowStyle
+                );
+
+                if (textFormat is TextFormat tf)
+                {
+                    DrawText(
+                        x,
+                        y,
+                        width,
+                        height,
+                        tf.text,
+                        tf.textColor,
+                        backgroundColor,
+                        tf.fontSize
+                    );
+                }
+            }
+        }
+
+        if (icon != null)
+        {
+            // in case iconSize is not set, adjust the icon to fit the smallest side and center it
+            iconSize = iconSize > 0 ? iconSize : Math.Min(width, height);
+
+            // Draw the texture
+            Raylib.DrawTexturePro((Texture2D)icon, ICON_RECTANGLE,
+                   new(x + width / 2 - iconSize / 2,
+                       y + height / 2 - iconSize / 2,
+                       iconSize,
+                       iconSize),
+                   new(0, 0), 0, Color.WHITE);
         }
     }
 
@@ -397,16 +598,17 @@ internal struct Layout
                     curY,
                     colLength,
                     rowLength,
-                    rows[i].Buttons[j].Text,
-                    rows[i].Buttons[j].Style.TextColor,
                     rows[i].Buttons[j].Style.BackgroundColor,
-                    fontSize: rows[i].Buttons[j].Style.FontSize,
-                    hoveredColor: rows[i].Buttons[j].Style.HoveredColor,
-                    pressedColor: rows[i].Buttons[j].Style.PressedColor,
-                    borderColor: rows[i].Buttons[j].Style.BorderColor,
-                    borderThickness: rows[i].Buttons[j].Style.BorderThickness,
-                    shadowStyle: rows[i].Buttons[j].Style.ShadowStyle,
-                    repeatPresses: rows[i].Buttons[j].RepeatPresses
+                    rows[i].Buttons[j].Style.PressedColor,
+                    rows[i].Buttons[j].Style.HoveredColor,
+                    callback: rows[i].Buttons[j].Callback,
+                    rows[i].Buttons[j].TextFormat,
+                    rows[i].Buttons[j].RepeatPresses,
+                    rows[i].Buttons[j].Style.Icon,
+                    rows[i].Buttons[j].Style.IconSize,
+                    rows[i].Buttons[j].Style.BorderColor,
+                    rows[i].Buttons[j].Style.BorderThickness,
+                    rows[i].Buttons[j].Style.ShadowStyle
                 );
 
                 curX += colLength + padding;
@@ -415,11 +617,6 @@ internal struct Layout
                 Log.IfTrue(
                     takenWidth > availableWidth,
                     $"ERROR: Button grid {j + 1} column takes more than the available width!\n"
-                );
-
-                Log.IfTrue(
-                    !CalculatorUI.Commands.ContainsKey(rows[i].Buttons[j].Text),
-                    $"ERROR: The '{rows[i].Buttons[j].Text}' button does not have a command defined!\n"
                 );
             }
 
@@ -445,6 +642,7 @@ public struct CalculatorUI
     private static readonly Color DarkerGray = new(60, 60, 60, 255);
     private static readonly Color DarkGray = new(100, 100, 100, 255);
     private static readonly Color LightGreen = new(0, 193, 47, 255);
+    private static readonly Color TransparentDarkGray = new(100, 100, 100, 128);
 
     private static void SetExpression(string value)
     {
@@ -463,73 +661,57 @@ public struct CalculatorUI
         }
     }
 
-    internal static readonly Dictionary<string, Action> Commands =
-        new()
-        {
-            {
-                "=",
-                () =>
-                {
-                    Result = "";
+    internal static readonly Action Paste = () =>
+    {
+        SetExpression(Expression + Clipboard.Get());
+    };
 
-                    if (Expression != "")
-                    {
-                        try
-                        {
-                            Expression = Evaluator
-                                .Evaluate(Expression)
-                                .ToString("G", CultureInfo.InvariantCulture);
-                            ErrorMessage = "";
-                        }
-                        catch (Exception e)
-                        {
-                            ErrorMessage = e switch
-                            {
-                                _ => e.Message,
-                            };
-                        }
-                    }
-                }
-            },
-            { "C", () => SetExpression("") },
-            { "<-", () => SetExpression(Expression == "" ? "" : Expression![..^1]) },
-            { "sin", () => SetExpression(Expression + "sin(") },
-            { "cos", () => SetExpression(Expression + "cos(") },
-            { "tan", () => SetExpression(Expression + "tan(") },
-            { "mod", () => SetExpression(Expression + "mod(") },
-            { "sqrt", () => SetExpression(Expression + "sqrt(") },
-            { "log", () => SetExpression(Expression + "log(") },
-            { "pi", () => SetExpression(Expression + "pi") },
-            { "e", () => SetExpression(Expression + "e") },
-            { "history", () => CurrentScene = Scene.History },
-            { "0", () => SetExpression(Expression + "0") },
-            { "1", () => SetExpression(Expression + "1") },
-            { "2", () => SetExpression(Expression + "2") },
-            { "3", () => SetExpression(Expression + "3") },
-            { "4", () => SetExpression(Expression + "4") },
-            { "5", () => SetExpression(Expression + "5") },
-            { "6", () => SetExpression(Expression + "6") },
-            { "7", () => SetExpression(Expression + "7") },
-            { "8", () => SetExpression(Expression + "8") },
-            { "9", () => SetExpression(Expression + "9") },
-            { "+", () => SetExpression(Expression + "+") },
-            { "-", () => SetExpression(Expression + "-") },
-            { "*", () => SetExpression(Expression + "*") },
-            { "/", () => SetExpression(Expression + "/") },
-            { "^", () => SetExpression(Expression + "^") },
-            { "%", () => SetExpression(Expression + "%") },
-            { "!", () => SetExpression(Expression + "!") },
-            { ".", () => SetExpression(Expression + ".") },
-            { ",", () => SetExpression(Expression + ", ") },
-            { "(", () => SetExpression(Expression + "(") },
-            { ")", () => SetExpression(Expression + ")") },
-        };
+    internal static readonly Action Backspace = () =>
+    {
+        SetExpression(Expression == "" ? "" : Expression[..^1]);
+    };
+
+    internal static readonly Action Equal = () =>
+    {
+        Result = "";
+
+        if (Expression != "")
+        {
+            try
+            {
+                string result = Evaluator
+                    .Evaluate(Expression)
+                    .ToString("G", CultureInfo.InvariantCulture);
+                ErrorMessage = "";
+
+                ExpressionHistory.Remove(Expression);
+                ExpressionHistory.Add(Expression);
+                Clipboard.Save(string.Join(Environment.NewLine, ExpressionHistory));
+                Expression = result;
+            }
+            catch (Exception e)
+            {
+                ErrorMessage = e.Message;
+            }
+        }
+    };
+
+#if PLATFORM_ANDROID
+    internal static Vector2 StartTouchPosition;
+    internal static int TouchCount = 0;
+    internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
+#else
+    internal const float INITIAL_REPEAT_INTERVAL = 0.3f;
+    internal static float MouseScroll = 0;
+#endif
 
     /// <summary>Time before updating animations and handling key presses</summary>
     internal const float UPDATE_INTERVAL = 0.5f;
-
+    internal const float MIN_REPEAT_INTERVAL = INITIAL_REPEAT_INTERVAL / 10;
     internal static float ButtonPressedTime;
+    internal static float KeyRepeatInterval = INITIAL_REPEAT_INTERVAL;
     internal static bool ButtonWasPressed = false;
+    internal static bool Dragging = false;
 
     internal static int ScreenWidth = 0;
     internal static int ScreenHeight = 0;
@@ -537,7 +719,6 @@ public struct CalculatorUI
     internal static int BorderThickness = 0;
     internal static int ShadowDistance = 0;
     internal static int FontSize = 0;
-    internal static int TouchCount = 0;
 
     internal static int MouseX;
     internal static int MouseY;
@@ -547,6 +728,7 @@ public struct CalculatorUI
     internal static string Expression = "";
     internal static string Result = "";
     internal static string ErrorMessage = "";
+    internal static List<string> ExpressionHistory = new();
 
     internal static Font Fonte;
 
@@ -560,6 +742,53 @@ public struct CalculatorUI
 
     internal static Scene CurrentScene = Scene.Calculator;
 
+    [DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
+    static extern Image LoadImageFromMemory(string fileType, byte[] fileData, int dataSize);
+
+    public static Texture2D LoadTextureFromResource(string resourceName)
+    {
+        Texture2D texture;
+
+        using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)!)
+        {
+            if (stream == null)
+                throw new ArgumentException($"Resource '{resourceName}' not found.");
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+
+                Image image = LoadImageFromMemory(".png", memoryStream.ToArray(), (int)memoryStream.Length);
+                texture = Raylib.LoadTextureFromImage(image);
+                Raylib.UnloadImage(image);
+            }
+        }
+
+        return texture;
+    }
+
+    [DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
+    static extern unsafe Font LoadFontFromMemory(string fileType, byte[] fileData, int dataSize, int fontSize, int* codepoints, int codepointCount);
+
+    public static unsafe Font LoadFontFromResource(string resourceName, int fontSize)
+    {
+        Font font;
+
+        using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)!)
+        {
+            if (stream == null)
+                throw new ArgumentException($"Resource '{resourceName}' not found.");
+
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                stream.CopyTo(memoryStream);
+                font = LoadFontFromMemory(".ttf", memoryStream.ToArray(), (int)memoryStream.Length, fontSize, null, 256);
+            }
+        }
+
+        return font;
+    }
+
     public static void MainLoop()
     {
         // Raylib context
@@ -569,9 +798,25 @@ public struct CalculatorUI
             Raylib.InitWindow(0, 0, APP_NAME);
             Raylib.SetTargetFPS(TARGET_FPS);
             Raylib.SetExitKey(KeyboardKey.KEY_NULL);
-            Fonte = Raylib.GetFontDefault();
 
-            Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_POINT);
+            ExpressionHistory = new List<string>(Clipboard.Load());
+
+            // NOTE(LucasTA): Without HIGHDPI the font has artifacts, so we load
+            // it realy big and then scale it down
+            // just the filter is really blurry
+            Fonte = LoadFontFromResource("CalculatorUI.Resources.iosevka-regular.ttf", 64);
+            Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+
+            Texture2D plusTexture = LoadTextureFromResource("CalculatorUI.Resources.plus_icon.png");
+            Texture2D historyTexture = LoadTextureFromResource("CalculatorUI.Resources.history_icon.png");
+            Texture2D closeTexture = LoadTextureFromResource("CalculatorUI.Resources.close_icon.png");
+            Texture2D copyTexture = LoadTextureFromResource("CalculatorUI.Resources.copy_icon.png");
+            Texture2D pasteTexture = LoadTextureFromResource("CalculatorUI.Resources.paste_icon.png");
+            Texture2D openTexture = LoadTextureFromResource("CalculatorUI.Resources.open_icon.png");
+            Texture2D piTexture = LoadTextureFromResource("CalculatorUI.Resources.pi_icon.png");
+            Texture2D trashTexture = LoadTextureFromResource("CalculatorUI.Resources.trash_icon.png");
+
+            Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(plusTexture));
 
             while (!Raylib.WindowShouldClose())
             {
@@ -580,10 +825,15 @@ public struct CalculatorUI
                     ScreenWidth = Raylib.GetScreenWidth();
                     ScreenHeight = Raylib.GetScreenHeight();
                     FontSize = (ScreenWidth < ScreenHeight ? ScreenWidth : ScreenHeight) / 20;
-                    TouchCount = Raylib.GetTouchPointCount();
                     BorderThickness = Math.Max((ScreenWidth > ScreenHeight ? ScreenWidth : ScreenHeight) / 500, 1);
                     ShadowDistance = BorderThickness * 4;
                     Padding = BorderThickness * 8;
+
+#if PLATFORM_ANDROID
+      TouchCount = Raylib.GetTouchPointCount();
+#else
+                    MouseScroll = Raylib.GetMouseWheelMove() * 32;
+#endif
                 }
 
                 // get mouse information
@@ -604,6 +854,14 @@ public struct CalculatorUI
                     Raylib.BeginDrawing();
                     Raylib.ClearBackground(BackgroundColor);
 
+                    int DisplayX = Padding;
+                    int DisplayY = Padding;
+                    int DisplayWidth = ScreenWidth - (Padding * 2);
+                    int DisplayHeight = (ScreenHeight / 6) - Padding;
+
+                    Vector2 FontTextSize = Raylib.MeasureTextEx(CalculatorUI.Fonte, "0", FontSize, CalculatorUI.FONT_SPACING);
+                    int topIconSize = DisplayY + (int)FontTextSize.Y;
+
                     switch (CurrentScene)
                     {
                         case Scene.Calculator:
@@ -618,7 +876,6 @@ public struct CalculatorUI
 
                                 Layout.ButtonStyle GreyButton =
                                     new(
-                                        TextColor: FontColor,
                                         BackgroundColor: DarkGray,
                                         PressedColor: DarkerGray,
                                         HoveredColor: Color.GRAY,
@@ -629,7 +886,6 @@ public struct CalculatorUI
 
                                 Layout.ButtonStyle RedButton =
                                     new(
-                                        TextColor: FontColor,
                                         BackgroundColor: Color.RED,
                                         PressedColor: Color.MAROON,
                                         HoveredColor: Color.ORANGE,
@@ -640,7 +896,6 @@ public struct CalculatorUI
 
                                 Layout.ButtonStyle GreenButton =
                                     new(
-                                        TextColor: FontColor,
                                         BackgroundColor: LightGreen,
                                         PressedColor: Color.DARKGREEN,
                                         HoveredColor: Color.GREEN,
@@ -651,80 +906,86 @@ public struct CalculatorUI
 
                                 int rowAmount = 7;
                                 int heightPercentage = 100 / rowAmount;
+
                                 Layout.ButtonRow[] ButtonGrid = new Layout.ButtonRow[]
                                 {
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(20, "(", GreyButton),
-                                new Layout.Button(20, ")", GreyButton),
-                                new Layout.Button(20, ",", GreyButton),
-                                new Layout.Button(20, "^", GreyButton),
-                                new Layout.Button(20, "pi", GreyButton)
-                            ),
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(20, "!", GreyButton),
-                                new Layout.Button(20, "e", GreyButton),
-                                new Layout.Button(20, "%", GreyButton),
-                                new Layout.Button(20, "/", GreyButton),
-                                new Layout.Button(20, "C", GreyButton)
-                            ),
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(25, "7", GreyButton),
-                                new Layout.Button(25, "8", GreyButton),
-                                new Layout.Button(25, "9", GreyButton),
-                                new Layout.Button(25, "*", GreyButton)
-                            ),
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(25, "4", GreyButton),
-                                new Layout.Button(25, "5", GreyButton),
-                                new Layout.Button(25, "6", GreyButton),
-                                new Layout.Button(25, "-", GreyButton)
-                            ),
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(25, "1", GreyButton),
-                                new Layout.Button(25, "2", GreyButton),
-                                new Layout.Button(25, "3", GreyButton),
-                                new Layout.Button(25, "+", GreyButton)
-                            ),
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(25, "0", GreyButton),
-                                new Layout.Button(25, ".", GreyButton),
-                                new Layout.Button(25, "<-", RedButton),
-                                new Layout.Button(25, "=", GreenButton)
-                            ),
-                            new Layout.ButtonRow(
-                                heightPercentage,
-                                new Layout.Button(17, "sqrt", GreyButton),
-                                new Layout.Button(17, "mod", GreyButton),
-                                new Layout.Button(17, "sin", GreyButton),
-                                new Layout.Button(17, "cos", GreyButton),
-                                new Layout.Button(16, "tan", GreyButton),
-                                new Layout.Button(16, "log", GreyButton)
-                            )
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(20, new("(", FontSize, FontColor), () => SetExpression(Expression + "("), GreyButton, true),
+                                        new Layout.Button(20, new(")", FontSize, FontColor), () => SetExpression(Expression + ")"), GreyButton, true),
+                                        new Layout.Button(20, new(",", FontSize, FontColor), () => SetExpression(Expression + ","), GreyButton, true),
+                                        new Layout.Button(20, new("^", FontSize, FontColor), () => SetExpression(Expression + "^"), GreyButton, true),
+                                        new Layout.Button(20, null, () => SetExpression(Expression + "pi"),
+                                            new(
+                                                BackgroundColor: DarkGray,
+                                                PressedColor: DarkerGray,
+                                                HoveredColor: Color.GRAY,
+                                                BorderColor: Color.GRAY,
+                                                BorderThickness: BorderThickness,
+                                                ShadowStyle: GreyButtonShadow,
+                                                Icon: piTexture,
+                                                IconSize: (int)FontTextSize.Y
+                                            ), true)
+                                    ),
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(20, new("!", FontSize, FontColor), () => SetExpression(Expression + "!"), GreyButton, true),
+                                        new Layout.Button(20, new("e", FontSize, FontColor), () => SetExpression(Expression + "e"), GreyButton, true),
+                                        new Layout.Button(20, new("%", FontSize, FontColor), () => SetExpression(Expression + "%"), GreyButton, true),
+                                        new Layout.Button(20, new("/", FontSize, FontColor), () => SetExpression(Expression + "/"), GreyButton, true),
+                                        new Layout.Button(20, new("C", FontSize, FontColor), () => SetExpression(""), GreyButton)
+                                    ),
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(25, new("7", FontSize, FontColor), () => SetExpression(Expression + "7"), GreyButton, true),
+                                        new Layout.Button(25, new("8", FontSize, FontColor), () => SetExpression(Expression + "8"), GreyButton, true),
+                                        new Layout.Button(25, new("9", FontSize, FontColor), () => SetExpression(Expression + "9"), GreyButton, true),
+                                        new Layout.Button(25, new("*", FontSize, FontColor), () => SetExpression(Expression + "*"), GreyButton, true)
+                                    ),
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(25, new("4", FontSize, FontColor), () => SetExpression(Expression + "4"), GreyButton, true),
+                                        new Layout.Button(25, new("5", FontSize, FontColor), () => SetExpression(Expression + "5"), GreyButton, true),
+                                        new Layout.Button(25, new("6", FontSize, FontColor), () => SetExpression(Expression + "6"), GreyButton, true),
+                                        new Layout.Button(25, new("-", FontSize, FontColor), () => SetExpression(Expression + "-"), GreyButton, true)
+                                    ),
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(25, new("1", FontSize, FontColor), () => SetExpression(Expression + "1"), GreyButton, true),
+                                        new Layout.Button(25, new("2", FontSize, FontColor), () => SetExpression(Expression + "2"), GreyButton, true),
+                                        new Layout.Button(25, new("3", FontSize, FontColor), () => SetExpression(Expression + "3"), GreyButton, true),
+                                        new Layout.Button(25, new("+", FontSize, FontColor), () => SetExpression(Expression + "+"), GreyButton, true)
+                                    ),
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(25, new("0", FontSize, FontColor), () => SetExpression(Expression + "0"), GreyButton, true),
+                                        new Layout.Button(25, new(".", FontSize, FontColor), () => SetExpression(Expression + "."), GreyButton, true),
+                                        new Layout.Button(25, new("<-", FontSize, FontColor), Backspace, RedButton, true),
+                                        new Layout.Button(25, new("=", FontSize, FontColor), Equal, GreenButton)
+                                    ),
+                                    new Layout.ButtonRow(
+                                        heightPercentage,
+                                        new Layout.Button(17, new("sqrt", FontSize, FontColor), () => SetExpression(Expression + "sqrt("), GreyButton, true),
+                                        new Layout.Button(17, new("mod", FontSize, FontColor), () => SetExpression(Expression + "mod("), GreyButton, true),
+                                        new Layout.Button(17, new("sin", FontSize, FontColor), () => SetExpression(Expression + "sin("), GreyButton, true),
+                                        new Layout.Button(17, new("cos", FontSize, FontColor), () => SetExpression(Expression + "cos("), GreyButton, true),
+                                        new Layout.Button(16, new("tan", FontSize, FontColor), () => SetExpression(Expression + "tan("), GreyButton, true),
+                                        new Layout.Button(16, new("log", FontSize, FontColor), () => SetExpression(Expression + "log("), GreyButton, true)
+                                    )
                                 };
 
                                 Layout.DrawButtonGrid(
-                                        Padding,
-                                        Padding + (ScreenHeight / 6),
-                                        ScreenWidth - (Padding * 2),
-                                        ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
-                                        Padding,
-                                        ButtonGrid
-                                        );
+                                    Padding,
+                                    Padding + (ScreenHeight / 6),
+                                    ScreenWidth - (Padding * 2),
+                                    ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
+                                    Padding,
+                                    ButtonGrid
+                                );
                             }
 
                             // Draw Calculator Display
                             {
-                                int DisplayX = Padding;
-                                int DisplayY = Padding;
-                                int DisplayWidth = ScreenWidth - (Padding * 2);
-                                int DisplayHeight = (ScreenHeight / 6) - Padding;
-
                                 if (ErrorMessage == "")
                                 {
                                     Layout.DrawTextBox(
@@ -732,11 +993,9 @@ public struct CalculatorUI
                                             DisplayY,
                                             DisplayWidth,
                                             DisplayHeight,
-                                            Expression,
-                                            Color.WHITE,
+                                            new(Expression, FontSize, FontColor),
                                             DarkerGray,
-                                            fontSize: FontSize,
-                                            borderColor: DarkGray,
+                                            DarkGray,
                                             BorderThickness * 2
                                             );
 
@@ -759,11 +1018,9 @@ public struct CalculatorUI
                                             DisplayY,
                                             DisplayWidth,
                                             DisplayHeight,
-                                            Expression,
-                                            Color.WHITE,
+                                            new(Expression, FontSize, FontColor),
                                             DarkerGray,
-                                            fontSize: FontSize,
-                                            borderColor: Color.RED,
+                                            Color.RED,
                                             BorderThickness * 2
                                             );
 
@@ -785,19 +1042,31 @@ public struct CalculatorUI
 
                             if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
                             {
-                                Commands["="]();
+                                Equal();
+                                ButtonPressedTime = 0;
+                            }
+                            else if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+                                        || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL))
+                                    && Raylib.IsKeyPressed(KeyboardKey.KEY_C))
+                            {
+                                Clipboard.Set(Expression);
+                                ButtonPressedTime = 0;
+                            }
+                            else if ((Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL) || Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)) && Raylib.IsKeyPressed(KeyboardKey.KEY_V))
+                            {
+                                Paste();
                                 ButtonPressedTime = 0;
                             }
                             else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
                             {
-                                Commands["<-"]();
+                                Backspace();
                                 ButtonPressedTime = 0;
                             }
                             else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
                             {
                                 if (ButtonPressedTime >= UPDATE_INTERVAL)
                                 {
-                                    Commands["<-"]();
+                                    Backspace();
                                 }
 
                                 ButtonPressedTime += Raylib.GetFrameTime();
@@ -812,11 +1081,139 @@ public struct CalculatorUI
                                     ButtonPressedTime = 0;
                                 }
                             }
+
+                            // top buttons
+                            {
+                                Layout.DrawButton(
+                                    ScreenWidth - topIconSize,
+                                    0,
+                                    topIconSize,
+                                    topIconSize,
+                                    Color.BLANK,
+                                    Color.DARKGRAY,
+                                    TransparentDarkGray,
+                                    () => CurrentScene = Scene.History,
+                                    null,
+                                    icon: historyTexture
+                                );
+
+                                Layout.DrawButton(
+                                    ScreenWidth - (topIconSize) * 2 - Padding,
+                                    0,
+                                    topIconSize,
+                                    topIconSize,
+                                    Color.BLANK,
+                                    Color.DARKGRAY,
+                                    TransparentDarkGray,
+                                    () => Clipboard.Set(Expression),
+                                    null,
+                                    icon: copyTexture
+                                );
+
+                                Layout.DrawButton(
+                                    ScreenWidth - topIconSize * 3 - Padding * 2,
+                                    0,
+                                    topIconSize,
+                                    topIconSize,
+                                    Color.BLANK,
+                                    Color.DARKGRAY,
+                                    TransparentDarkGray,
+                                    Paste,
+                                    null,
+                                    icon: pasteTexture
+                                );
+                            }
                             break;
                         case Scene.History:
                             if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
                             {
                                 CurrentScene = Scene.Calculator;
+                            }
+
+                            Layout.DrawButton(
+                                ScreenWidth - topIconSize,
+                                0,
+                                topIconSize,
+                                topIconSize,
+                                Color.BLANK,
+                                Color.DARKGRAY,
+                                TransparentDarkGray,
+                                () => CurrentScene = Scene.Calculator,
+                                null,
+                                icon: closeTexture
+                                );
+
+                            {
+                                int rightPadding = Padding * 2 + topIconSize;
+                                int visibleColumns = 12;
+                                int entryHeight = ScreenHeight / visibleColumns;
+                                int entryX = 0;
+                                int entryWidth = ScreenWidth - rightPadding;
+
+                                for (int i = 0; i < ExpressionHistory.Count; i++)
+                                {
+                                    int entryY = i * entryHeight;
+
+                                    Layout.DrawTextBox(
+                                        entryX,
+                                        entryY,
+                                        entryWidth,
+                                        entryHeight,
+                                        new(ExpressionHistory[i], FontSize, FontColor),
+                                        Color.DARKGRAY,
+                                        Color.GRAY,
+                                        BorderThickness);
+
+                                    int buttonsY = entryY + ((entryHeight - topIconSize - BorderThickness) / 2);
+                                    int deleteX = entryX + entryWidth - topIconSize - Padding;
+
+                                    Layout.DrawButton(
+                                        deleteX,
+                                        buttonsY,
+                                        topIconSize,
+                                        topIconSize,
+                                        Color.BLANK,
+                                        Color.DARKGRAY,
+                                        TransparentDarkGray,
+                                        () => ExpressionHistory.Remove(ExpressionHistory[i]),
+                                        null,
+                                        icon: trashTexture
+                                    );
+
+                                    int copyX = deleteX - topIconSize - Padding;
+
+                                    Layout.DrawButton(
+                                        copyX,
+                                        buttonsY,
+                                        topIconSize,
+                                        topIconSize,
+                                        Color.BLANK,
+                                        Color.DARKGRAY,
+                                        TransparentDarkGray,
+                                        () => Clipboard.Set(ExpressionHistory[i]),
+                                        null,
+                                        icon: copyTexture
+                                    );
+
+                                    int pickX = copyX - topIconSize - Padding;
+
+                                    Layout.DrawButton(
+                                        pickX,
+                                        buttonsY,
+                                        topIconSize,
+                                        topIconSize,
+                                        Color.BLANK,
+                                        Color.DARKGRAY,
+                                        TransparentDarkGray,
+                                        () =>
+                                        {
+                                            SetExpression(ExpressionHistory[i]);
+                                            CurrentScene = Scene.Calculator;
+                                        },
+                                        null,
+                                        icon: openTexture
+                                    );
+                                }
                             }
                             break;
                         case Scene.Settings:
@@ -836,7 +1233,17 @@ public struct CalculatorUI
                     }
 
                     Log.Message =
-                        $"Resolution: {ScreenWidth}x{ScreenHeight}\nFPS: {Raylib.GetFPS()}\nMouseXY: {MouseX}x{MouseY}\n{Log.Message}";
+$"""
+Resolution: {ScreenWidth}x{ScreenHeight}
+FPS: {Raylib.GetFPS()}
+MouseXY: {MouseX}x{MouseY}
+BorderThickness: {BorderThickness}
+ShadowDistance: {ShadowDistance}
+Padding: {Padding}
+{Log.Message}
+"""
+;
+
                     Log.Draw();
                     Log.Message = "";
 
@@ -844,6 +1251,7 @@ public struct CalculatorUI
                 }
             }
 
+            Clipboard.Save(string.Join(Environment.NewLine, ExpressionHistory));
             Raylib.CloseWindow();
         }
     }

@@ -18,6 +18,16 @@
   <ItemGroup>
     <PackageReference Include="Eval.cs" Version="0.10.0" />
     <PackageReference Include="Raylib-cs" Version="4.5.0.4" />
+    <PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
+    <EmbeddedResource Include="Resources/history_icon.png" />
+    <EmbeddedResource Include="Resources/close_icon.png" />
+    <EmbeddedResource Include="Resources/copy_icon.png" />
+    <EmbeddedResource Include="Resources/paste_icon.png" />
+    <EmbeddedResource Include="Resources/open_icon.png" />
+    <EmbeddedResource Include="Resources/pi_icon.png" />
+    <EmbeddedResource Include="Resources/trash_icon.png" />
+    <EmbeddedResource Include="Resources/plus_icon.png" />
+    <EmbeddedResource Include="Resources/iosevka-regular.ttf" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
