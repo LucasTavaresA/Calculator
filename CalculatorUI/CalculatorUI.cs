@@ -704,8 +704,6 @@ public struct CalculatorUI
     internal static float MouseScroll = 0;
 #endif
 
-    /// <summary>Time before updating animations and handling key presses</summary>
-    internal const float UPDATE_INTERVAL = 0.5f;
     internal const float MIN_REPEAT_INTERVAL = INITIAL_REPEAT_INTERVAL / 10;
     internal static float ButtonPressedTime;
     internal static float KeyRepeatInterval = INITIAL_REPEAT_INTERVAL;
@@ -1063,7 +1061,7 @@ public struct CalculatorUI
                             }
                             else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
                             {
-                                if (ButtonPressedTime >= UPDATE_INTERVAL)
+                                if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
                                 {
                                     Backspace();
                                 }
