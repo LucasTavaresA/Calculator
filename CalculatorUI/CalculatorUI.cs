@@ -256,8 +256,7 @@ internal struct Layout
                         height,
                         pressedColor,
                         borderColor,
-                        borderThickness,
-                        shadowStyle
+                        borderThickness
                     );
 
                     if (textFormat is TextFormat tf)
