@@ -1291,6 +1291,7 @@ $"""
 Resolution: {ScreenWidth}x{ScreenHeight}
 FPS: {Raylib.GetFPS()}
 MouseXY: {MouseX}x{MouseY}
+MousePressedXY: {MousePressedX}x{MousePressedY}
 BorderThickness: {BorderThickness}
 ShadowDistance: {ShadowDistance}
 Padding: {Padding}

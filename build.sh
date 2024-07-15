@@ -9,7 +9,7 @@ LINUX=0
 ANDROID=0
 PROGRAM="Calculator"
 BUILD_FLAGS="-o build"
-BUILD_SWITCHES=""
+CONSTANTS=""
 PWD="$(pwd)"
 
 print_help() {
@@ -25,15 +25,15 @@ main() {
   case "$1" in
   "android")
     ANDROID=1
-    BUILD_SWITCHES="$BUILD_SWITCHES /p:DefineConstants=ANDROID"
+    CONSTANTS="ANDROID"
     ;;
   "linux")
     LINUX=1
-    BUILD_SWITCHES="$BUILD_SWITCHES /p:DefineConstants=LINUX"
+    CONSTANTS="LINUX"
     ;;
   "windows")
     WINDOWS=1
-    BUILD_SWITCHES="$BUILD_SWITCHES /p:DefineConstants=WINDOWS"
+    CONSTANTS="WINDOWS"
     BUILD_FLAGS="$BUILD_FLAGS -r win-x64"
     ;;
   *)
@@ -74,11 +74,11 @@ main() {
   done
 
   if [ "$RELEASE" = 0 ]; then
-    BUILD_SWITCHES="$BUILD_SWITCHES /p:DefineConstants=DEBUG"
+    CONSTANTS="$CONSTANTS DEBUG"
   fi
 
   if [ "$LINUX" = 1 ] || [ "$WINDOWS" = 1 ]; then
-    dotnet publish $BUILD_FLAGS "${PROGRAM}Desktop" $BUILD_SWITCHES
+    dotnet publish $BUILD_FLAGS "${PROGRAM}Desktop" /p:DefineConstants="\"$CONSTANTS\""
 
     if [ "$RUN" = 1 ]; then
       ./build/${PROGRAM}Desktop
@@ -86,7 +86,7 @@ main() {
   elif [ "$ANDROID" = 1 ]; then
     rm -rf ./**/bin/ ./**/obj/ ./build/
 
-    dotnet publish $BUILD_FLAGS "${PROGRAM}Android" $BUILD_SWITCHES
+    dotnet publish $BUILD_FLAGS "${PROGRAM}Android" /p:DefineConstants="'$CONSTANTS'"
 
     if [ "$RUN" = 1 ]; then
       echo "Can't run after building on android!"
