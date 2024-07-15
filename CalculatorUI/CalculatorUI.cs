@@ -64,6 +64,12 @@ internal struct Layout
         TransparentCube = 4,
     }
 
+    internal enum ButtonPressMode
+    {
+        Once,
+        HoldToRepeat,
+    }
+
     internal readonly record struct TextFormat(
         string text,
         int fontSize,
@@ -92,7 +98,7 @@ internal struct Layout
         TextFormat? TextFormat,
         Action Callback,
         ButtonStyle Style,
-        bool RepeatPresses = false
+        ButtonPressMode PressMode = ButtonPressMode.Once
     );
 
     internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
@@ -193,7 +199,7 @@ internal struct Layout
         Color hoveredColor,
         Action callback,
         TextFormat? textFormat = null,
-        bool repeatPresses = false,
+        ButtonPressMode pressMode = ButtonPressMode.Once,
         Texture2D? icon = null,
         int iconSize = 0,
         Color? borderColor = null,
@@ -224,6 +230,7 @@ internal struct Layout
             CalculatorUI.ButtonWasPressed = true;
             CalculatorUI.ButtonPressedTime = 0;
             CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+
             callback();
         }
         else if (
@@ -275,7 +282,7 @@ internal struct Layout
 
                     CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
 
-                    if (repeatPresses && CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval)
+                    if (pressMode == ButtonPressMode.HoldToRepeat && CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval)
                     {
                         CalculatorUI.ButtonWasPressed = true;
                         CalculatorUI.ButtonPressedTime = 0;
@@ -329,8 +336,7 @@ internal struct Layout
                         height,
                         pressedColor,
                         borderColor,
-                        borderThickness,
-                        shadowStyle
+                        borderThickness
                     );
 
                     if (textFormat is TextFormat tf)
@@ -349,7 +355,7 @@ internal struct Layout
 
                     CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
 
-                    if (repeatPresses && CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval)
+                    if (pressMode == ButtonPressMode.HoldToRepeat && CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval)
                     {
                         CalculatorUI.ButtonWasPressed = true;
                         CalculatorUI.ButtonPressedTime = 0;
@@ -602,7 +608,7 @@ internal struct Layout
                     rows[i].Buttons[j].Style.HoveredColor,
                     callback: rows[i].Buttons[j].Callback,
                     rows[i].Buttons[j].TextFormat,
-                    rows[i].Buttons[j].RepeatPresses,
+                    rows[i].Buttons[j].PressMode,
                     rows[i].Buttons[j].Style.Icon,
                     rows[i].Buttons[j].Style.IconSize,
                     rows[i].Buttons[j].Style.BorderColor,
@@ -908,10 +914,10 @@ public struct CalculatorUI
                                 {
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(20, new("(", FontSize, FontColor), () => SetExpression(Expression + "("), GreyButton, true),
-                                        new Layout.Button(20, new(")", FontSize, FontColor), () => SetExpression(Expression + ")"), GreyButton, true),
-                                        new Layout.Button(20, new(",", FontSize, FontColor), () => SetExpression(Expression + ","), GreyButton, true),
-                                        new Layout.Button(20, new("^", FontSize, FontColor), () => SetExpression(Expression + "^"), GreyButton, true),
+                                        new Layout.Button(20, new("(", FontSize, FontColor), () => SetExpression(Expression + "("), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(20, new(")", FontSize, FontColor), () => SetExpression(Expression + ")"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(20, new(",", FontSize, FontColor), () => SetExpression(Expression + ","), GreyButton),
+                                        new Layout.Button(20, new("^", FontSize, FontColor), () => SetExpression(Expression + "^"), GreyButton),
                                         new Layout.Button(20, null, () => SetExpression(Expression + "pi"),
                                             new(
                                                 BackgroundColor: DarkGray,
@@ -922,52 +928,52 @@ public struct CalculatorUI
                                                 ShadowStyle: GreyButtonShadow,
                                                 Icon: piTexture,
                                                 IconSize: (int)FontTextSize.Y
-                                            ), true)
+                                            ))
                                     ),
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(20, new("!", FontSize, FontColor), () => SetExpression(Expression + "!"), GreyButton, true),
-                                        new Layout.Button(20, new("e", FontSize, FontColor), () => SetExpression(Expression + "e"), GreyButton, true),
-                                        new Layout.Button(20, new("%", FontSize, FontColor), () => SetExpression(Expression + "%"), GreyButton, true),
-                                        new Layout.Button(20, new("/", FontSize, FontColor), () => SetExpression(Expression + "/"), GreyButton, true),
+                                        new Layout.Button(20, new("!", FontSize, FontColor), () => SetExpression(Expression + "!"), GreyButton),
+                                        new Layout.Button(20, new("e", FontSize, FontColor), () => SetExpression(Expression + "e"), GreyButton),
+                                        new Layout.Button(20, new("%", FontSize, FontColor), () => SetExpression(Expression + "%"), GreyButton),
+                                        new Layout.Button(20, new("/", FontSize, FontColor), () => SetExpression(Expression + "/"), GreyButton),
                                         new Layout.Button(20, new("C", FontSize, FontColor), () => SetExpression(""), GreyButton)
                                     ),
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(25, new("7", FontSize, FontColor), () => SetExpression(Expression + "7"), GreyButton, true),
-                                        new Layout.Button(25, new("8", FontSize, FontColor), () => SetExpression(Expression + "8"), GreyButton, true),
-                                        new Layout.Button(25, new("9", FontSize, FontColor), () => SetExpression(Expression + "9"), GreyButton, true),
-                                        new Layout.Button(25, new("*", FontSize, FontColor), () => SetExpression(Expression + "*"), GreyButton, true)
+                                        new Layout.Button(25, new("7", FontSize, FontColor), () => SetExpression(Expression + "7"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("8", FontSize, FontColor), () => SetExpression(Expression + "8"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("9", FontSize, FontColor), () => SetExpression(Expression + "9"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("*", FontSize, FontColor), () => SetExpression(Expression + "*"), GreyButton)
                                     ),
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(25, new("4", FontSize, FontColor), () => SetExpression(Expression + "4"), GreyButton, true),
-                                        new Layout.Button(25, new("5", FontSize, FontColor), () => SetExpression(Expression + "5"), GreyButton, true),
-                                        new Layout.Button(25, new("6", FontSize, FontColor), () => SetExpression(Expression + "6"), GreyButton, true),
-                                        new Layout.Button(25, new("-", FontSize, FontColor), () => SetExpression(Expression + "-"), GreyButton, true)
+                                        new Layout.Button(25, new("4", FontSize, FontColor), () => SetExpression(Expression + "4"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("5", FontSize, FontColor), () => SetExpression(Expression + "5"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("6", FontSize, FontColor), () => SetExpression(Expression + "6"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("-", FontSize, FontColor), () => SetExpression(Expression + "-"), GreyButton)
                                     ),
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(25, new("1", FontSize, FontColor), () => SetExpression(Expression + "1"), GreyButton, true),
-                                        new Layout.Button(25, new("2", FontSize, FontColor), () => SetExpression(Expression + "2"), GreyButton, true),
-                                        new Layout.Button(25, new("3", FontSize, FontColor), () => SetExpression(Expression + "3"), GreyButton, true),
-                                        new Layout.Button(25, new("+", FontSize, FontColor), () => SetExpression(Expression + "+"), GreyButton, true)
+                                        new Layout.Button(25, new("1", FontSize, FontColor), () => SetExpression(Expression + "1"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("2", FontSize, FontColor), () => SetExpression(Expression + "2"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("3", FontSize, FontColor), () => SetExpression(Expression + "3"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new("+", FontSize, FontColor), () => SetExpression(Expression + "+"), GreyButton)
                                     ),
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(25, new("0", FontSize, FontColor), () => SetExpression(Expression + "0"), GreyButton, true),
-                                        new Layout.Button(25, new(".", FontSize, FontColor), () => SetExpression(Expression + "."), GreyButton, true),
-                                        new Layout.Button(25, new("<-", FontSize, FontColor), Backspace, RedButton, true),
+                                        new Layout.Button(25, new("0", FontSize, FontColor), () => SetExpression(Expression + "0"), GreyButton, Layout.ButtonPressMode.HoldToRepeat),
+                                        new Layout.Button(25, new(".", FontSize, FontColor), () => SetExpression(Expression + "."), GreyButton),
+                                        new Layout.Button(25, new("<-", FontSize, FontColor), Backspace, RedButton, Layout.ButtonPressMode.HoldToRepeat),
                                         new Layout.Button(25, new("=", FontSize, FontColor), Equal, GreenButton)
                                     ),
                                     new Layout.ButtonRow(
                                         heightPercentage,
-                                        new Layout.Button(17, new("sqrt", FontSize, FontColor), () => SetExpression(Expression + "sqrt("), GreyButton, true),
-                                        new Layout.Button(17, new("mod", FontSize, FontColor), () => SetExpression(Expression + "mod("), GreyButton, true),
-                                        new Layout.Button(17, new("sin", FontSize, FontColor), () => SetExpression(Expression + "sin("), GreyButton, true),
-                                        new Layout.Button(17, new("cos", FontSize, FontColor), () => SetExpression(Expression + "cos("), GreyButton, true),
-                                        new Layout.Button(16, new("tan", FontSize, FontColor), () => SetExpression(Expression + "tan("), GreyButton, true),
-                                        new Layout.Button(16, new("log", FontSize, FontColor), () => SetExpression(Expression + "log("), GreyButton, true)
+                                        new Layout.Button(17, new("sqrt", FontSize, FontColor), () => SetExpression(Expression + "sqrt("), GreyButton),
+                                        new Layout.Button(17, new("mod", FontSize, FontColor), () => SetExpression(Expression + "mod("), GreyButton),
+                                        new Layout.Button(17, new("sin", FontSize, FontColor), () => SetExpression(Expression + "sin("), GreyButton),
+                                        new Layout.Button(17, new("cos", FontSize, FontColor), () => SetExpression(Expression + "cos("), GreyButton),
+                                        new Layout.Button(16, new("tan", FontSize, FontColor), () => SetExpression(Expression + "tan("), GreyButton),
+                                        new Layout.Button(16, new("log", FontSize, FontColor), () => SetExpression(Expression + "log("), GreyButton)
                                     )
                                 };
 
