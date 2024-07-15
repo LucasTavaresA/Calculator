@@ -320,7 +320,7 @@ internal struct Layout
                 else
                 {
                     backgroundColor =
-#if PLATFORM_ANDROID
+#if ANDROID
                                 CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor;
 #else
                                 hoveredColor;
@@ -441,7 +441,7 @@ internal struct Layout
             if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
             {
                 backgroundColor =
-#if PLATFORM_ANDROID
+#if ANDROID
                                 CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor;
 #else
                             hoveredColor;
@@ -744,10 +744,9 @@ public struct CalculatorUI
         }
     };
 
-#if PLATFORM_ANDROID
-    internal static Vector2 StartTouchPosition;
-    internal static int TouchCount = 0;
+#if ANDROID
     internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
+    internal static int TouchCount = 0;
 #else
     internal const float INITIAL_REPEAT_INTERVAL = 0.3f;
     internal static float MouseScroll = 0;
@@ -877,7 +876,7 @@ public struct CalculatorUI
                     ShadowDistance = BorderThickness * 4;
                     Padding = BorderThickness * 8;
 
-#if PLATFORM_ANDROID
+#if ANDROID
       TouchCount = Raylib.GetTouchPointCount();
 #else
                     MouseScroll = Raylib.GetMouseWheelMove() * 32;
