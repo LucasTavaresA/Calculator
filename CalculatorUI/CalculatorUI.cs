@@ -68,6 +68,7 @@ internal struct Layout
     {
         Once,
         HoldToRepeat,
+        HoldToPress,
     }
 
     internal readonly record struct TextFormat(
@@ -231,11 +232,15 @@ internal struct Layout
             )
         )
         {
+            CalculatorUI.ButtonWasHeldPressed = false;
             CalculatorUI.ButtonWasPressed = true;
             CalculatorUI.ButtonPressedTime = 0;
             CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
 
-            callback();
+            if (pressMode != ButtonPressMode.HoldToPress)
+            {
+                callback();
+            }
         }
         else if (
             Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
@@ -251,7 +256,7 @@ internal struct Layout
                 )
             )
             {
-                if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasPressed &&
+                if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasHeldPressed && !CalculatorUI.ButtonWasPressed &&
                     IsPointInsideRect(CalculatorUI.MousePressedX, CalculatorUI.MousePressedY, x, y, width, height))
                 {
                     if (shadowStyle is ShadowStyle ss)
@@ -260,11 +265,18 @@ internal struct Layout
                         y += ss.Distance;
                     }
 
+                    int progress = height;
+
+                    if (pressMode == Layout.ButtonPressMode.HoldToPress)
+                    {
+                        progress = (int)(height / CalculatorUI.ButtonHoldToPressTime * CalculatorUI.ButtonPressedTime);
+                    }
+
                     DrawBox(
                         x,
-                        y,
+                        y + height - progress,
                         width,
-                        height,
+                        progress,
                         pressedColor,
                         borderColor,
                         borderThickness
@@ -292,6 +304,16 @@ internal struct Layout
                         CalculatorUI.ButtonPressedTime = 0;
                         CalculatorUI.KeyRepeatInterval = Math.Max(CalculatorUI.KeyRepeatInterval * CalculatorUI.INITIAL_REPEAT_INTERVAL,
                                                 CalculatorUI.MIN_REPEAT_INTERVAL);
+                        callback();
+                    }
+                    else if (pressMode == ButtonPressMode.HoldToPress &&
+                             CalculatorUI.ButtonPressedTime >= CalculatorUI.ButtonHoldToPressTime)
+                    {
+                        CalculatorUI.ButtonWasHeldPressed = true;
+                        CalculatorUI.ButtonWasPressed = true;
+                        CalculatorUI.ButtonPressedTime = 0;
+                        CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+
                         callback();
                     }
                 }
@@ -324,7 +346,7 @@ internal struct Layout
             }
             else
             {
-                if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasPressed &&
+                if (!CalculatorUI.Dragging && !CalculatorUI.ButtonWasHeldPressed && !CalculatorUI.ButtonWasPressed &&
                     IsPointInsideRect(CalculatorUI.MousePressedX, CalculatorUI.MousePressedY, x, y, width, height))
                 {
                     if (shadowStyle is ShadowStyle ss)
@@ -333,11 +355,18 @@ internal struct Layout
                         y += ss.Distance;
                     }
 
+                    int progress = height;
+
+                    if (pressMode == Layout.ButtonPressMode.HoldToPress)
+                    {
+                        progress = (int)(height / CalculatorUI.ButtonHoldToPressTime * CalculatorUI.ButtonPressedTime);
+                    }
+
                     DrawBox(
                         x,
-                        y,
+                        y + height - progress,
                         width,
-                        height,
+                        progress,
                         pressedColor,
                         borderColor,
                         borderThickness
@@ -365,6 +394,16 @@ internal struct Layout
                         CalculatorUI.ButtonPressedTime = 0;
                         CalculatorUI.KeyRepeatInterval = Math.Max(CalculatorUI.KeyRepeatInterval * CalculatorUI.INITIAL_REPEAT_INTERVAL,
                                                 CalculatorUI.MIN_REPEAT_INTERVAL);
+                        callback();
+                    }
+                    else if (pressMode == ButtonPressMode.HoldToPress &&
+                             CalculatorUI.ButtonPressedTime >= CalculatorUI.ButtonHoldToPressTime)
+                    {
+                        CalculatorUI.ButtonWasHeldPressed = true;
+                        CalculatorUI.ButtonWasPressed = true;
+                        CalculatorUI.ButtonPressedTime = 0;
+                        CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+
                         callback();
                     }
                 }
@@ -717,7 +756,9 @@ public struct CalculatorUI
     internal const float MIN_REPEAT_INTERVAL = INITIAL_REPEAT_INTERVAL / 10;
     internal static float ButtonPressedTime;
     internal static float KeyRepeatInterval = INITIAL_REPEAT_INTERVAL;
+    internal static float ButtonHoldToPressTime = 0.5f;
     internal static bool ButtonWasPressed = false;
+    internal static bool ButtonWasHeldPressed = false;
     internal static bool Dragging = false;
 
     internal static int ScreenWidth = 0;
@@ -853,6 +894,12 @@ public struct CalculatorUI
                     {
                         MousePressedX = MouseX;
                         MousePressedY = MouseY;
+                    }
+
+                    if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+                    {
+                        CalculatorUI.ButtonWasHeldPressed = false;
+                        CalculatorUI.ButtonPressedTime = 0;
                     }
                 }
 
@@ -1179,11 +1226,12 @@ public struct CalculatorUI
                                         topIconSize,
                                         topIconSize,
                                         Color.BLANK,
-                                        Color.DARKGRAY,
+                                        Color.MAROON,
                                         TransparentDarkGray,
                                         () => ExpressionHistory.Remove(ExpressionHistory[i]),
                                         null,
                                         icon: new(trashTexture, LightRed),
+                                        pressMode: Layout.ButtonPressMode.HoldToPress
                                     );
 
                                     int copyX = deleteX - topIconSize - Padding;
