@@ -82,6 +82,12 @@ internal struct Layout
         ShadowKind Kind = ShadowKind.Float
     );
 
+    internal record struct Icon(
+        Texture2D Texture,
+        Color Tint,
+        int Size = 0
+    );
+
     internal readonly record struct ButtonStyle(
         Color BackgroundColor,
         Color PressedColor,
@@ -89,8 +95,7 @@ internal struct Layout
         Color? BorderColor = null,
         int BorderThickness = 1,
         ShadowStyle? ShadowStyle = null,
-        Texture2D? Icon = null,
-        int IconSize = 0
+        Icon? Icon = null
     );
 
     internal readonly record struct Button(
@@ -200,8 +205,7 @@ internal struct Layout
         Action callback,
         TextFormat? textFormat = null,
         ButtonPressMode pressMode = ButtonPressMode.Once,
-        Texture2D? icon = null,
-        int iconSize = 0,
+        Icon? icon = null,
         Color? borderColor = null,
         int borderThickness = 1,
         ShadowStyle? shadowStyle = null
@@ -450,18 +454,18 @@ internal struct Layout
             }
         }
 
-        if (icon != null)
+        if (icon is Icon i)
         {
-            // in case iconSize is not set, adjust the icon to fit the smallest side and center it
-            iconSize = iconSize > 0 ? iconSize : Math.Min(width, height);
+            // if size is not set, scale the icon to fit the rectangle and center
+            i.Size = i.Size > 0 ? i.Size : Math.Min(width, height);
 
             // Draw the texture
-            Raylib.DrawTexturePro((Texture2D)icon, ICON_RECTANGLE,
-                   new(x + width / 2 - iconSize / 2,
-                       y + height / 2 - iconSize / 2,
-                       iconSize,
-                       iconSize),
-                   new(0, 0), 0, Color.WHITE);
+            Raylib.DrawTexturePro(i.Texture, ICON_RECTANGLE,
+                   new(x + width / 2 - i.Size / 2,
+                       y + height / 2 - i.Size / 2,
+                       i.Size,
+                       i.Size),
+                   new(0, 0), 0, i.Tint);
         }
     }
 
@@ -610,7 +614,6 @@ internal struct Layout
                     rows[i].Buttons[j].TextFormat,
                     rows[i].Buttons[j].PressMode,
                     rows[i].Buttons[j].Style.Icon,
-                    rows[i].Buttons[j].Style.IconSize,
                     rows[i].Buttons[j].Style.BorderColor,
                     rows[i].Buttons[j].Style.BorderThickness,
                     rows[i].Buttons[j].Style.ShadowStyle
@@ -648,6 +651,7 @@ public struct CalculatorUI
     private static readonly Color DarkGray = new(100, 100, 100, 255);
     private static readonly Color LightGreen = new(0, 193, 47, 255);
     private static readonly Color TransparentDarkGray = new(100, 100, 100, 128);
+    private static readonly Color LightRed = new(230, 70, 70, 255);
 
     private static void SetExpression(string value)
     {
@@ -926,8 +930,7 @@ public struct CalculatorUI
                                                 BorderColor: Color.GRAY,
                                                 BorderThickness: BorderThickness,
                                                 ShadowStyle: GreyButtonShadow,
-                                                Icon: piTexture,
-                                                IconSize: (int)FontTextSize.Y
+                                                Icon: new(piTexture, Color.WHITE, (int)FontTextSize.Y)
                                             ))
                                     ),
                                     new Layout.ButtonRow(
@@ -1097,7 +1100,7 @@ public struct CalculatorUI
                                     TransparentDarkGray,
                                     () => CurrentScene = Scene.History,
                                     null,
-                                    icon: historyTexture
+                                    icon: new(historyTexture, Color.WHITE)
                                 );
 
                                 Layout.DrawButton(
@@ -1110,7 +1113,7 @@ public struct CalculatorUI
                                     TransparentDarkGray,
                                     () => Clipboard.Set(Expression),
                                     null,
-                                    icon: copyTexture
+                                    icon: new(copyTexture, Color.WHITE)
                                 );
 
                                 Layout.DrawButton(
@@ -1123,7 +1126,7 @@ public struct CalculatorUI
                                     TransparentDarkGray,
                                     Paste,
                                     null,
-                                    icon: pasteTexture
+                                    icon: new(pasteTexture, Color.WHITE)
                                 );
                             }
                             break;
@@ -1143,8 +1146,8 @@ public struct CalculatorUI
                                 TransparentDarkGray,
                                 () => CurrentScene = Scene.Calculator,
                                 null,
-                                icon: closeTexture
-                                );
+                                icon: new(closeTexture, Color.WHITE)
+                            );
 
                             {
                                 int rightPadding = Padding * 2 + topIconSize;
@@ -1180,7 +1183,7 @@ public struct CalculatorUI
                                         TransparentDarkGray,
                                         () => ExpressionHistory.Remove(ExpressionHistory[i]),
                                         null,
-                                        icon: trashTexture
+                                        icon: new(trashTexture, LightRed),
                                     );
 
                                     int copyX = deleteX - topIconSize - Padding;
@@ -1195,7 +1198,7 @@ public struct CalculatorUI
                                         TransparentDarkGray,
                                         () => Clipboard.Set(ExpressionHistory[i]),
                                         null,
-                                        icon: copyTexture
+                                        icon: new(copyTexture, Color.WHITE)
                                     );
 
                                     int pickX = copyX - topIconSize - Padding;
@@ -1214,7 +1217,7 @@ public struct CalculatorUI
                                             CurrentScene = Scene.Calculator;
                                         },
                                         null,
-                                        icon: openTexture
+                                        icon: new(openTexture, Color.WHITE)
                                     );
                                 }
                             }
