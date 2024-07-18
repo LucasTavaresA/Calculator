@@ -7,6 +7,9 @@ using System.Diagnostics;
 #elif ANDROID
 using Xamarin.Essentials;
 using Plugin.Clipboard;
+#elif WINDOWS
+#else
+#error "Yout need to specify a platform: ANDROID, WINDOWS, or LINUX"
 #endif
 
 namespace Calculator;
