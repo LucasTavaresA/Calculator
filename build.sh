@@ -86,7 +86,7 @@ main() {
   elif [ "$ANDROID" = 1 ]; then
     rm -rf ./**/bin/ ./**/obj/ ./build/
 
-    dotnet publish $BUILD_FLAGS "${PROGRAM}Android" /p:DefineConstants="'$CONSTANTS'"
+    dotnet publish $BUILD_FLAGS "${PROGRAM}Android" /p:DefineConstants="\"$CONSTANTS\""
 
     if [ "$RUN" = 1 ]; then
       echo "Can't run after building on android!"
