@@ -2,7 +2,7 @@
 
 #if LINUX
 using System.Diagnostics;
-#elif ANDROID
+#elif ANDROID || WINDOWS
 using Plugin.Clipboard;
 #endif
 
