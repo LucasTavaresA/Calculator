@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 #if LINUX
 using System.IO;
@@ -18,8 +19,7 @@ internal readonly struct History
         if (Environment.GetEnvironmentVariable("HOME") is string home)
         {
             Directory.CreateDirectory($"{home}/.cache");
-            File.WriteAllText($"{home}/.cache/CalculatorHistory",
-                $"{string.Join(Environment.NewLine, pinnedExpressions)}{Environment.NewLine};{Environment.NewLine}{string.Join(Environment.NewLine, expressionHistory)}");
+            File.WriteAllText($"{home}/.cache/CalculatorHistory", string.Join(Environment.NewLine, pinnedExpressions.Concat(new[] { ";" }).Concat(expressionHistory)));
         }
 #elif ANDROID || WINDOWS
         Preferences.Set("PinnedExpressions", string.Join(Environment.NewLine, pinnedExpressions));
