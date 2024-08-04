@@ -22,6 +22,8 @@ internal readonly struct Layout
     {
         Center,
         TopLeft,
+        Left,
+        BottomLeft
     }
 
     internal enum ButtonPressMode
@@ -142,6 +144,16 @@ internal readonly struct Layout
         {
             textX = x;
             textY = y;
+        }
+        else if (alignment == TextAlignment.Left)
+        {
+            textX = x;
+            textY = y + ((height - (int)textSize.Y) / 2);
+        }
+        else if (alignment == TextAlignment.BottomLeft)
+        {
+            textX = x;
+            textY = y + height - (int)textSize.Y;
         }
         else
         {
