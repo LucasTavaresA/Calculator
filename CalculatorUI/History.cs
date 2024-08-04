@@ -23,7 +23,7 @@ internal readonly struct History
             return;
         }
 
-        ExpressionHistory.Add(expression);
+        ExpressionHistory.Insert(0, expression);
         Save();
     }
 
@@ -37,14 +37,14 @@ internal readonly struct History
     internal static void Pin(string expression)
     {
         ExpressionHistory.Remove(expression);
-        PinnedExpressions.Add(expression);
+        PinnedExpressions.Insert(0, expression);
         Save();
     }
 
     internal static void Unpin(string expression)
     {
         PinnedExpressions.Remove(expression);
-        ExpressionHistory.Add(expression);
+        ExpressionHistory.Insert(0, expression);
         Save();
     }
 
