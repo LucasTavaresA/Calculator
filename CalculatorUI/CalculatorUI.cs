@@ -75,9 +75,7 @@ public readonly struct CalculatorUI
                     .ToString("G", CultureInfo.InvariantCulture);
                 ErrorMessage = "";
 
-                ExpressionHistory.Remove(Expression);
-                ExpressionHistory.Add(Expression);
-                History.Save(PinnedExpressions, ExpressionHistory);
+                History.Add(Expression);
                 Expression = result;
             }
             catch (Exception e)
@@ -118,8 +116,6 @@ public readonly struct CalculatorUI
     internal static string Expression = "";
     internal static string Result = "";
     internal static string ErrorMessage = "";
-    internal static List<string> ExpressionHistory = new();
-    internal static List<string> PinnedExpressions = new();
 
     internal static Font Fonte;
 
@@ -190,7 +186,7 @@ public readonly struct CalculatorUI
             Raylib.SetTargetFPS(TARGET_FPS);
             Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
-            (PinnedExpressions, ExpressionHistory) = History.Load();
+            History.Load();
 
             // NOTE(LucasTA): Without HIGHDPI the font has artifacts, so we load
             // it realy big and then scale it down
@@ -548,8 +544,8 @@ public readonly struct CalculatorUI
                                 int entryX = 0;
                                 int entryWidth = ScreenWidth - rightPadding;
 
-                                List<string> expressions = new(PinnedExpressions);
-                                expressions.AddRange(ExpressionHistory);
+                                List<string> expressions = new(History.PinnedExpressions);
+                                expressions.AddRange(History.ExpressionHistory);
 
                                 for (int i = 0; i < expressions.Count; i++)
                                 {
@@ -578,9 +574,7 @@ public readonly struct CalculatorUI
                                         TransparentDarkGray,
                                         () =>
                                         {
-                                            PinnedExpressions.Remove(expressions[i]);
-                                            ExpressionHistory.Remove(expressions[i]);
-                                            History.Save(PinnedExpressions, ExpressionHistory);
+                                            History.Remove(expressions[i]);
                                         },
                                         null,
                                         icon: new(trashTexture, LightRed),
@@ -622,7 +616,7 @@ public readonly struct CalculatorUI
                                     );
 
                                     int pinX = pickX - topIconSize - Padding;
-                                    bool pinned = PinnedExpressions.Contains(expressions[i]);
+                                    bool pinned = History.PinnedExpressions.Contains(expressions[i]);
 
                                     Layout.DrawButton(
                                         pinX,
@@ -636,17 +630,12 @@ public readonly struct CalculatorUI
                                         {
                                             if (pinned)
                                             {
-                                                PinnedExpressions.Remove(expressions[i]);
-                                                ExpressionHistory.Remove(expressions[i]);
-                                                ExpressionHistory.Add(expressions[i]);
+                                                History.Unpin(expressions[i]);
                                             }
                                             else
                                             {
-                                                ExpressionHistory.Remove(expressions[i]);
-                                                PinnedExpressions.Add(expressions[i]);
+                                                History.Pin(expressions[i]);
                                             }
-
-                                            History.Save(PinnedExpressions, ExpressionHistory);
                                         },
                                         null,
                                         icon: new(pinned ? unpinTexture : pinTexture, Color.WHITE)
@@ -690,7 +679,7 @@ Padding: {Padding}
                 }
             }
 
-            History.Save(PinnedExpressions, ExpressionHistory);
+            History.Save();
             Raylib.CloseWindow();
         }
     }
