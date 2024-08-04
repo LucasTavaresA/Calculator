@@ -18,6 +18,12 @@ internal readonly struct Layout
         TransparentCube = 4,
     }
 
+    internal enum TextAlignment
+    {
+        Center,
+        TopLeft,
+    }
+
     internal enum ButtonPressMode
     {
         Once,
@@ -26,9 +32,10 @@ internal readonly struct Layout
     }
 
     internal readonly record struct TextFormat(
-        string text,
-        int fontSize,
-        Color textColor
+        string Text,
+        int FontSize,
+        Color TextColor,
+        TextAlignment Alignment = TextAlignment.Center
     );
 
     internal readonly record struct ShadowStyle(
@@ -111,7 +118,8 @@ internal readonly struct Layout
         string text,
         Color textColor,
         Color backgroundColor,
-        int fontSize
+        int fontSize,
+        TextAlignment alignment = TextAlignment.Center
     )
     {
         Vector2 textSize = Raylib.MeasureTextEx(CalculatorUI.Fonte, text, (int)fontSize, CalculatorUI.FONT_SPACING);
@@ -127,8 +135,19 @@ internal readonly struct Layout
             $"ERROR: The text at the {x},{y} text box is not visible!\n"
         );
 
-        int textX = x + ((width - (int)textSize.X) / 2);
-        int textY = y + ((height - (int)textSize.Y) / 2);
+        int textX;
+        int textY;
+
+        if (alignment == TextAlignment.TopLeft)
+        {
+            textX = x;
+            textY = y;
+        }
+        else
+        {
+            textX = x + ((width - (int)textSize.X) / 2);
+            textY = y + ((height - (int)textSize.Y) / 2);
+        }
 
         Raylib.DrawTextEx(CalculatorUI.Fonte, text, new(textX, textY), (int)fontSize, CalculatorUI.FONT_SPACING, textColor);
     }
@@ -146,7 +165,7 @@ internal readonly struct Layout
     )
     {
         DrawBox(x, y, width, height, backgroundColor, borderColor, borderThickness, shadowStyle);
-        DrawText(x, y, width, height, textFormat.text, textFormat.textColor, backgroundColor, textFormat.fontSize);
+        DrawText(x, y, width, height, textFormat.Text, textFormat.TextColor, backgroundColor, textFormat.FontSize, textFormat.Alignment);
     }
 
     internal static void DrawButton(
@@ -243,10 +262,11 @@ internal readonly struct Layout
                             y,
                             width,
                             height,
-                            tf.text,
-                            tf.textColor,
+                            tf.Text,
+                            tf.TextColor,
                             pressedColor,
-                            tf.fontSize
+                            tf.FontSize,
+                            tf.Alignment
                         );
                     }
 
@@ -290,10 +310,11 @@ internal readonly struct Layout
                                 y,
                                 width,
                                 height,
-                                tf.text,
-                                tf.textColor,
+                                tf.Text,
+                                tf.TextColor,
                                 backgroundColor,
-                                tf.fontSize
+                                tf.FontSize,
+                                tf.Alignment
                                 );
                     }
                 }
@@ -333,10 +354,11 @@ internal readonly struct Layout
                             y,
                             width,
                             height,
-                            tf.text,
-                            tf.textColor,
+                            tf.Text,
+                            tf.TextColor,
                             pressedColor,
-                            tf.fontSize
+                            tf.FontSize,
+                            tf.Alignment
                         );
                     }
 
@@ -381,10 +403,11 @@ internal readonly struct Layout
                             y,
                             width,
                             height,
-                            tf.text,
-                            tf.textColor,
+                            tf.Text,
+                            tf.TextColor,
                             backgroundColor,
-                            tf.fontSize
+                            tf.FontSize,
+                            tf.Alignment
                         );
                     }
                 }
@@ -411,10 +434,11 @@ internal readonly struct Layout
                             y,
                             width,
                             height,
-                            tf.text,
-                            tf.textColor,
+                            tf.Text,
+                            tf.TextColor,
                             backgroundColor,
-                            tf.fontSize
+                            tf.FontSize,
+                            tf.Alignment
                             );
                 }
             }
@@ -438,10 +462,11 @@ internal readonly struct Layout
                         y,
                         width,
                         height,
-                        tf.text,
-                        tf.textColor,
+                        tf.Text,
+                        tf.TextColor,
                         backgroundColor,
-                        tf.fontSize
+                        tf.FontSize,
+                        tf.Alignment
                     );
                 }
             }
