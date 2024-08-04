@@ -548,8 +548,10 @@ public readonly struct CalculatorUI
                                 int entryX = 0;
                                 int entryWidth = ScreenWidth - rightPadding;
 
-                                // TODO(LucasTA): remove repetition using a custom list that allows pinning
-                                for (int i = 0; i < PinnedExpressions.Count; i++)
+                                List<string> expressions = new(PinnedExpressions);
+                                expressions.AddRange(ExpressionHistory);
+
+                                for (int i = 0; i < expressions.Count; i++)
                                 {
                                     int entryY = i * entryHeight;
 
@@ -558,7 +560,7 @@ public readonly struct CalculatorUI
                                         entryY,
                                         entryWidth,
                                         entryHeight,
-                                        new(PinnedExpressions[i], FontSize, FontColor),
+                                        new(expressions[i], FontSize, FontColor),
                                         Color.DARKGRAY,
                                         Color.GRAY,
                                         BorderThickness);
@@ -576,7 +578,8 @@ public readonly struct CalculatorUI
                                         TransparentDarkGray,
                                         () =>
                                         {
-                                            PinnedExpressions.Remove(PinnedExpressions[i]);
+                                            PinnedExpressions.Remove(expressions[i]);
+                                            ExpressionHistory.Remove(expressions[i]);
                                             History.Save(PinnedExpressions, ExpressionHistory);
                                         },
                                         null,
@@ -594,7 +597,7 @@ public readonly struct CalculatorUI
                                         Color.BLANK,
                                         Color.DARKGRAY,
                                         TransparentDarkGray,
-                                        () => Clipboard.Set(PinnedExpressions[i]),
+                                        () => Clipboard.Set(expressions[i]),
                                         null,
                                         icon: new(copyTexture, Color.WHITE)
                                     );
@@ -611,7 +614,7 @@ public readonly struct CalculatorUI
                                         TransparentDarkGray,
                                         () =>
                                         {
-                                            SetExpression(PinnedExpressions[i]);
+                                            SetExpression(expressions[i]);
                                             CurrentScene = Scene.Calculator;
                                         },
                                         null,
@@ -619,6 +622,7 @@ public readonly struct CalculatorUI
                                     );
 
                                     int pinX = pickX - topIconSize - Padding;
+                                    bool pinned = PinnedExpressions.Contains(expressions[i]);
 
                                     Layout.DrawButton(
                                         pinX,
@@ -630,104 +634,22 @@ public readonly struct CalculatorUI
                                         TransparentDarkGray,
                                         () =>
                                         {
-                                            ExpressionHistory.Remove(PinnedExpressions[i]);
-                                            ExpressionHistory.Add(PinnedExpressions[i]);
-                                            PinnedExpressions.Remove(PinnedExpressions[i]);
+                                            if (pinned)
+                                            {
+                                                PinnedExpressions.Remove(expressions[i]);
+                                                ExpressionHistory.Remove(expressions[i]);
+                                                ExpressionHistory.Add(expressions[i]);
+                                            }
+                                            else
+                                            {
+                                                ExpressionHistory.Remove(expressions[i]);
+                                                PinnedExpressions.Add(expressions[i]);
+                                            }
+
                                             History.Save(PinnedExpressions, ExpressionHistory);
                                         },
                                         null,
-                                        icon: new(unpinTexture, Color.WHITE)
-                                    );
-                                }
-
-                                for (int i = 0; i < ExpressionHistory.Count; i++)
-                                {
-                                    int entryY = (i + PinnedExpressions.Count) * entryHeight;
-
-                                    Layout.DrawTextBox(
-                                        entryX,
-                                        entryY,
-                                        entryWidth,
-                                        entryHeight,
-                                        new(ExpressionHistory[i], FontSize, FontColor),
-                                        Color.DARKGRAY,
-                                        Color.GRAY,
-                                        BorderThickness);
-
-                                    int buttonsY = entryY + ((entryHeight - topIconSize - BorderThickness) / 2);
-                                    int deleteX = entryX + entryWidth - topIconSize - Padding;
-
-                                    Layout.DrawButton(
-                                        deleteX,
-                                        buttonsY,
-                                        topIconSize,
-                                        topIconSize,
-                                        Color.BLANK,
-                                        Color.MAROON,
-                                        TransparentDarkGray,
-                                        () =>
-                                        {
-                                            ExpressionHistory.Remove(ExpressionHistory[i]);
-                                            History.Save(PinnedExpressions, ExpressionHistory);
-                                        },
-                                        null,
-                                        icon: new(trashTexture, LightRed),
-                                        pressMode: Layout.ButtonPressMode.HoldToPress
-                                    );
-
-                                    int copyX = deleteX - topIconSize - Padding;
-
-                                    Layout.DrawButton(
-                                        copyX,
-                                        buttonsY,
-                                        topIconSize,
-                                        topIconSize,
-                                        Color.BLANK,
-                                        Color.DARKGRAY,
-                                        TransparentDarkGray,
-                                        () => Clipboard.Set(ExpressionHistory[i]),
-                                        null,
-                                        icon: new(copyTexture, Color.WHITE)
-                                    );
-
-                                    int pickX = copyX - topIconSize - Padding;
-
-                                    Layout.DrawButton(
-                                        pickX,
-                                        buttonsY,
-                                        topIconSize,
-                                        topIconSize,
-                                        Color.BLANK,
-                                        Color.DARKGRAY,
-                                        TransparentDarkGray,
-                                        () =>
-                                        {
-                                            SetExpression(ExpressionHistory[i]);
-                                            CurrentScene = Scene.Calculator;
-                                        },
-                                        null,
-                                        icon: new(openTexture, Color.WHITE)
-                                    );
-
-                                    int pinX = pickX - topIconSize - Padding;
-
-                                    Layout.DrawButton(
-                                        pinX,
-                                        buttonsY,
-                                        topIconSize,
-                                        topIconSize,
-                                        Color.BLANK,
-                                        Color.DARKGRAY,
-                                        TransparentDarkGray,
-                                        () =>
-                                        {
-                                            PinnedExpressions.Remove(ExpressionHistory[i]);
-                                            PinnedExpressions.Add(ExpressionHistory[i]);
-                                            ExpressionHistory.Remove(ExpressionHistory[i]);
-                                            History.Save(PinnedExpressions, ExpressionHistory);
-                                        },
-                                        null,
-                                        icon: new(pinTexture, Color.WHITE)
+                                        icon: new(pinned ? unpinTexture : pinTexture, Color.WHITE)
                                     );
                                 }
                             }
