@@ -18,12 +18,17 @@ internal readonly struct History
 
     internal static void Add(string expression)
     {
-        if (PinnedExpressions.Contains(expression) || ExpressionHistory.Contains(expression))
+        if (PinnedExpressions.Contains(expression))
         {
-            return;
+            PinnedExpressions.Remove(expression);
+            PinnedExpressions.Insert(0, expression);
+        }
+        else
+        {
+            ExpressionHistory.Remove(expression);
+            ExpressionHistory.Insert(0, expression);
         }
 
-        ExpressionHistory.Insert(0, expression);
         Save();
     }
 
@@ -71,24 +76,23 @@ internal readonly struct History
         if (Environment.GetEnvironmentVariable("HOME") is string home &&
             File.Exists($"{home}/.cache/CalculatorHistory"))
         {
-            bool pinned = true;
+            bool isPinned = true;
 
             foreach (string line in File.ReadAllLines($"{home}/.cache/CalculatorHistory"))
             {
                 if (line == ";")
                 {
-                    pinned = false;
-                    continue;
+                    isPinned = false;
                 }
-
-                if (pinned)
+                else if (isPinned)
                 {
-                    History.Add(line);
-                    History.Pin(line);
+                    PinnedExpressions.Remove(line);
+                    PinnedExpressions.Add(line);
                 }
                 else
                 {
-                    History.Add(line);
+                    ExpressionHistory.Remove(line);
+                    ExpressionHistory.Add(line);
                 }
             }
         }
