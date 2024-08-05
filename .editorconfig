@@ -3,14 +3,12 @@
 # top-most EditorConfig file
 root = true
 
-# Don't use tabs for indentation.
 [*]
-indent_style = space
+indent_style = tab
 # (Please don't specify an indent_size here; that has too many unintended consequences.)
 
 # Code files
 [*.{cs,csx,vb,vbx}]
-indent_size = 4
 insert_final_newline = true
 charset = utf-8-bom
 
@@ -40,7 +38,7 @@ indent_size = 2
 
 # Sort using and Import directives with System.* appearing first
 dotnet_sort_system_directives_first = true
-dotnet_separate_import_directive_groups = false
+dotnet_separate_import_directive_groups = true
 # Avoid "this." and "Me." if not necessary
 dotnet_style_qualification_for_field = false:refactoring
 dotnet_style_qualification_for_property = false:refactoring
@@ -139,6 +137,7 @@ dotnet_diagnostic.CA1707.severity = none
 
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
+dotnet_diagnostic.IDE0073.severity = warning
 file_header_template = Licensed under the GPL3 or later versions of the GPL license.\nSee the LICENSE file in the project root for more information.
 
 # RS0016: Only enable if API files are present

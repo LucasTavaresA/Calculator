@@ -5,8 +5,8 @@ namespace Calculator;
 
 internal struct CalculatorDesktop
 {
-    internal static void Main()
-    {
-        CalculatorUI.MainLoop();
-    }
+	internal static void Main()
+	{
+		CalculatorUI.MainLoop();
+	}
 }
