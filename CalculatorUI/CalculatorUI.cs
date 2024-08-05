@@ -539,8 +539,7 @@ public readonly struct CalculatorUI
 
                             {
                                 int rightPadding = Padding * 2 + topIconSize;
-                                int visibleColumns = 12;
-                                int entryHeight = ScreenHeight / visibleColumns;
+                                int entryHeight = ((int)FontTextSize.Y * 2) + Padding;
                                 int entryX = 0;
                                 int entryWidth = ScreenWidth - rightPadding;
 
@@ -556,17 +555,16 @@ public readonly struct CalculatorUI
                                         entryY,
                                         entryWidth,
                                         entryHeight,
-                                        new(expressions[i], FontSize, FontColor),
+                                        new(expressions[i], FontSize, FontColor, Layout.TextAlignment.BottomLeft),
                                         Color.DARKGRAY,
                                         Color.GRAY,
                                         BorderThickness);
 
-                                    int buttonsY = entryY + ((entryHeight - topIconSize - BorderThickness) / 2);
                                     int deleteX = entryX + entryWidth - topIconSize - Padding;
 
                                     Layout.DrawButton(
                                         deleteX,
-                                        buttonsY,
+                                        entryY,
                                         topIconSize,
                                         topIconSize,
                                         Color.BLANK,
@@ -585,7 +583,7 @@ public readonly struct CalculatorUI
 
                                     Layout.DrawButton(
                                         copyX,
-                                        buttonsY,
+                                        entryY,
                                         topIconSize,
                                         topIconSize,
                                         Color.BLANK,
@@ -600,7 +598,7 @@ public readonly struct CalculatorUI
 
                                     Layout.DrawButton(
                                         pickX,
-                                        buttonsY,
+                                        entryY,
                                         topIconSize,
                                         topIconSize,
                                         Color.BLANK,
@@ -620,7 +618,7 @@ public readonly struct CalculatorUI
 
                                     Layout.DrawButton(
                                         pinX,
-                                        buttonsY,
+                                        entryY,
                                         topIconSize,
                                         topIconSize,
                                         Color.BLANK,
