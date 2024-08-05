@@ -555,7 +555,7 @@ public readonly struct CalculatorUI
                                         entryY,
                                         entryWidth,
                                         entryHeight,
-                                        new(expressions[i], FontSize, FontColor, Layout.TextAlignment.BottomLeft),
+                                        new(expressions[i], FontSize, FontColor, Layout.TextAlignment.BottomLeft, false),
                                         Color.DARKGRAY,
                                         Color.GRAY,
                                         BorderThickness);

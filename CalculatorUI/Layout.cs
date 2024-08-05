@@ -37,7 +37,8 @@ internal readonly struct Layout
         string Text,
         int FontSize,
         Color TextColor,
-        TextAlignment Alignment = TextAlignment.Center
+        TextAlignment Alignment = TextAlignment.Center,
+        bool Overflow = true
     );
 
     internal readonly record struct ShadowStyle(
@@ -121,7 +122,8 @@ internal readonly struct Layout
         Color textColor,
         Color backgroundColor,
         int fontSize,
-        TextAlignment alignment = TextAlignment.Center
+        TextAlignment alignment = TextAlignment.Center,
+        bool overflow = true
     )
     {
         Vector2 textSize = Raylib.MeasureTextEx(CalculatorUI.Fonte, text, (int)fontSize, CalculatorUI.FONT_SPACING);
@@ -157,11 +159,30 @@ internal readonly struct Layout
         }
         else
         {
+            // FIXME(LucasTA): Center overflows when textbox is smaller than the text
             textX = x + ((width - (int)textSize.X) / 2);
             textY = y + ((height - (int)textSize.Y) / 2);
         }
 
-        Raylib.DrawTextEx(CalculatorUI.Fonte, text, new(textX, textY), (int)fontSize, CalculatorUI.FONT_SPACING, textColor);
+        if (!overflow)
+        {
+            Vector2 charSize = Raylib.MeasureTextEx(CalculatorUI.Fonte, "-", (int)fontSize, CalculatorUI.FONT_SPACING);
+            int charsLimit = width / (int)Math.Ceiling(charSize.X + CalculatorUI.FONT_SPACING);
+
+            if (text.Length > charsLimit)
+            {
+                text = text[..Math.Max(0, charsLimit - 3)] + "...";
+            }
+
+            if (charsLimit > 3)
+            {
+                Raylib.DrawTextEx(CalculatorUI.Fonte, text, new(textX, textY), (int)fontSize, CalculatorUI.FONT_SPACING, textColor);
+            }
+        }
+        else
+        {
+            Raylib.DrawTextEx(CalculatorUI.Fonte, text, new(textX, textY), (int)fontSize, CalculatorUI.FONT_SPACING, textColor);
+        }
     }
 
     internal static void DrawTextBox(
@@ -177,7 +198,10 @@ internal readonly struct Layout
     )
     {
         DrawBox(x, y, width, height, backgroundColor, borderColor, borderThickness, shadowStyle);
-        DrawText(x, y, width, height, textFormat.Text, textFormat.TextColor, backgroundColor, textFormat.FontSize, textFormat.Alignment);
+        DrawText(x, y, width, height,
+                 textFormat.Text, textFormat.TextColor,
+                 backgroundColor, textFormat.FontSize,
+                 textFormat.Alignment, textFormat.Overflow);
     }
 
     internal static void DrawButton(
@@ -278,7 +302,8 @@ internal readonly struct Layout
                             tf.TextColor,
                             pressedColor,
                             tf.FontSize,
-                            tf.Alignment
+                            tf.Alignment,
+                            tf.Overflow
                         );
                     }
 
@@ -326,7 +351,8 @@ internal readonly struct Layout
                                 tf.TextColor,
                                 backgroundColor,
                                 tf.FontSize,
-                                tf.Alignment
+                                tf.Alignment,
+                                tf.Overflow
                                 );
                     }
                 }
@@ -370,7 +396,8 @@ internal readonly struct Layout
                             tf.TextColor,
                             pressedColor,
                             tf.FontSize,
-                            tf.Alignment
+                            tf.Alignment,
+                            tf.Overflow
                         );
                     }
 
@@ -419,7 +446,8 @@ internal readonly struct Layout
                             tf.TextColor,
                             backgroundColor,
                             tf.FontSize,
-                            tf.Alignment
+                            tf.Alignment,
+                            tf.Overflow
                         );
                     }
                 }
@@ -450,7 +478,8 @@ internal readonly struct Layout
                             tf.TextColor,
                             backgroundColor,
                             tf.FontSize,
-                            tf.Alignment
+                            tf.Alignment,
+                            tf.Overflow
                             );
                 }
             }
@@ -478,7 +507,8 @@ internal readonly struct Layout
                         tf.TextColor,
                         backgroundColor,
                         tf.FontSize,
-                        tf.Alignment
+                        tf.Alignment,
+                        tf.Overflow
                     );
                 }
             }
