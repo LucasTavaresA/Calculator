@@ -17,6 +17,11 @@ internal readonly struct History
 
 	internal static void Add(string expression)
 	{
+		if (string.IsNullOrWhiteSpace(expression))
+		{
+			return;
+		}
+
 		if (PinnedExpressions.Contains(expression))
 		{
 			PinnedExpressions.Remove(expression);
@@ -87,7 +92,11 @@ internal readonly struct History
 
 			foreach (string line in File.ReadAllLines($"{home}/.cache/CalculatorHistory"))
 			{
-				if (line == ";")
+				if (string.IsNullOrWhiteSpace(line))
+				{
+					continue;
+				}
+				else if (line == ";")
 				{
 					isPinned = false;
 				}
