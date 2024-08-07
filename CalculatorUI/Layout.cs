@@ -69,7 +69,7 @@ internal readonly struct Layout
 
 	internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
-	private static bool IsPointInsideRect(
+	internal static bool IsPointInsideRect(
 		int x,
 		int y,
 		int recX,

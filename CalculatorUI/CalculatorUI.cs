@@ -85,6 +85,7 @@ public readonly struct CalculatorUI
 #if ANDROID
 	internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
 	internal static int TouchCount = 0;
+	internal static Vector2 StartTouchPosition;
 #else
 	internal const float INITIAL_REPEAT_INTERVAL = 0.3f;
 	internal static float MouseScroll = 0;
@@ -93,6 +94,7 @@ public readonly struct CalculatorUI
 	internal const float MIN_REPEAT_INTERVAL = INITIAL_REPEAT_INTERVAL / 10;
 	internal static float ButtonPressedTime;
 	internal static float KeyRepeatInterval = INITIAL_REPEAT_INTERVAL;
+	internal static float HistoryScrollOffset = 0;
 	internal static float ButtonHoldToPressTime = 0.5f;
 	internal static bool ButtonWasPressed = false;
 	internal static bool ButtonWasHeldPressed = false;
@@ -749,10 +751,75 @@ public readonly struct CalculatorUI
 							}
 							break;
 						case Scene.History:
+							int rightPadding = Padding * 2 + topIconSize;
+							int entryHeight = ((int)FontTextSize.Y * 2) + Padding;
+							int entryX = 0;
+							int entryWidth = ScreenWidth - rightPadding;
+							int visibleEntries = ScreenHeight / entryHeight;
+
+							List<string> expressions = new(History.PinnedExpressions);
+							expressions.AddRange(History.ExpressionHistory);
+
 							if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 							{
 								CurrentScene = Scene.Calculator;
 							}
+
+#if ANDROID
+							if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+							{
+								StartTouchPosition = Raylib.GetTouchPosition(0);
+							}
+
+							if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+							{
+								Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
+
+								float touchMoveDistance = Math.Abs(
+									currentTouchPosition.Y - StartTouchPosition.Y
+								);
+
+								if (
+									touchMoveDistance > 2
+									&&
+									// NOTE(LucasTA): Don't scroll if touch starts outside the
+									// list
+									Layout.IsPointInsideRect(
+										MousePressedX,
+										MousePressedY,
+										0,
+										0,
+										ScreenWidth - rightPadding,
+										ScreenHeight
+									)
+								)
+								{
+									Dragging = true;
+
+									HistoryScrollOffset = Math.Clamp(
+										HistoryScrollOffset
+											+ currentTouchPosition.Y
+											- StartTouchPosition.Y,
+										Math.Max(0, expressions.Count - visibleEntries)
+											* -entryHeight,
+										0
+									);
+
+									StartTouchPosition = currentTouchPosition;
+								}
+							}
+#else
+							if (MouseScroll > 0)
+							{
+								Dragging = true;
+							}
+
+							HistoryScrollOffset = Math.Clamp(
+								HistoryScrollOffset + MouseScroll,
+								Math.Max(0, expressions.Count - visibleEntries) * -entryHeight,
+								0
+							);
+#endif
 
 							Layout.DrawButton(
 								ScreenWidth - topIconSize,
@@ -768,17 +835,9 @@ public readonly struct CalculatorUI
 							);
 
 							{
-								int rightPadding = Padding * 2 + topIconSize;
-								int entryHeight = ((int)FontTextSize.Y * 2) + Padding;
-								int entryX = 0;
-								int entryWidth = ScreenWidth - rightPadding;
-
-								List<string> expressions = new(History.PinnedExpressions);
-								expressions.AddRange(History.ExpressionHistory);
-
 								for (int i = 0; i < expressions.Count; i++)
 								{
-									int entryY = i * entryHeight;
+									int entryY = (int)HistoryScrollOffset + i * entryHeight;
 
 									Layout.DrawTextBox(
 										entryX,
@@ -894,6 +953,11 @@ public readonly struct CalculatorUI
 							break;
 						default:
 							throw new UnreachableException("Unknown scene");
+					}
+
+					if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+					{
+						Dragging = false;
 					}
 
 					Log.Message = $"""
