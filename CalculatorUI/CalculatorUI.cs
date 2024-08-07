@@ -235,6 +235,9 @@ public readonly struct CalculatorUI
 			Texture2D trashTexture = LoadTextureFromResource(
 				"CalculatorUI.Resources.trash_icon.png"
 			);
+			Texture2D bookmarkAddTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.bookmark_add_icon.png"
+			);
 
 			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(plusTexture));
 
@@ -747,6 +750,19 @@ public readonly struct CalculatorUI
 									Paste,
 									null,
 									icon: new(pasteTexture, Color.WHITE)
+								);
+
+								Layout.DrawButton(
+									ScreenWidth - topIconSize * 4 - Padding * 3,
+									0,
+									topIconSize,
+									topIconSize,
+									Color.BLANK,
+									Color.DARKGRAY,
+									TransparentDarkGray,
+									() => History.Add(Expression),
+									null,
+									icon: new(bookmarkAddTexture, Color.WHITE)
 								);
 							}
 							break;

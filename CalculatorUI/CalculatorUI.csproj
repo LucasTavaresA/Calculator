@@ -30,6 +30,7 @@
     <EmbeddedResource Include="Resources/plus_icon.png" />
     <EmbeddedResource Include="Resources/pin_icon.png" />
     <EmbeddedResource Include="Resources/unpin_icon.png" />
+		<EmbeddedResource Include="Resources/bookmark_add_icon.png" />
     <EmbeddedResource Include="Resources/iosevka-regular.ttf" />
   </ItemGroup>
 
