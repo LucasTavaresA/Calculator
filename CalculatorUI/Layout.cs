@@ -139,26 +139,25 @@ internal readonly struct Layout
 		int textX;
 		int textY;
 
-		if (alignment == TextAlignment.TopLeft)
+		switch (alignment)
 		{
-			textX = x;
-			textY = y;
-		}
-		else if (alignment == TextAlignment.Left)
-		{
-			textX = x;
-			textY = y + ((height - (int)textSize.Y) / 2);
-		}
-		else if (alignment == TextAlignment.BottomLeft)
-		{
-			textX = x;
-			textY = y + height - (int)textSize.Y;
-		}
-		else
-		{
-			// FIXME(LucasTA): Center overflows when textbox is smaller than the text
-			textX = x + ((width - (int)textSize.X) / 2);
-			textY = y + ((height - (int)textSize.Y) / 2);
+			case TextAlignment.TopLeft:
+				textX = x;
+				textY = y;
+				break;
+			case TextAlignment.Left:
+				textX = x;
+				textY = y + (height - (int)textSize.Y) / 2;
+				break;
+			case TextAlignment.BottomLeft:
+				textX = x;
+				textY = y + height - (int)textSize.Y;
+				break;
+			default:
+				// FIXME(LucasTA): Center overflows when textbox is smaller than the text
+				textX = x + (width - (int)textSize.X) / 2;
+				textY = y + (height - (int)textSize.Y) / 2;
+				break;
 		}
 
 		if (!overflow)
