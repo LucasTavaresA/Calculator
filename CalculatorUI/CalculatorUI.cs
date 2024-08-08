@@ -866,7 +866,7 @@ public readonly struct CalculatorUI
 											FontSize,
 											FontColor,
 											Layout.TextAlignment.BottomLeft,
-											false
+											Layout.OverflowMode.Truncate
 										),
 										Color.DARKGRAY,
 										Color.GRAY,

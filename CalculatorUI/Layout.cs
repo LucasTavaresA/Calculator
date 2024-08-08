@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Numerics;
 
 using Raylib_cs;
@@ -33,12 +34,19 @@ internal readonly struct Layout
 		HoldToPress,
 	}
 
+	internal enum OverflowMode
+	{
+		Overflow,
+		Truncate,
+		Shrink,
+	}
+
 	internal readonly record struct TextFormat(
 		string Text,
 		int FontSize,
 		Color TextColor,
 		TextAlignment Alignment = TextAlignment.Center,
-		bool Overflow = true
+		OverflowMode Overflow = OverflowMode.Overflow
 	);
 
 	internal readonly record struct ShadowStyle(
@@ -115,7 +123,7 @@ internal readonly struct Layout
 		Color backgroundColor,
 		int fontSize,
 		TextAlignment alignment = TextAlignment.Center,
-		bool overflow = true
+		OverflowMode overflow = OverflowMode.Overflow
 	)
 	{
 		Vector2 textSize = Raylib.MeasureTextEx(
@@ -154,29 +162,16 @@ internal readonly struct Layout
 				textY = y + height - (int)textSize.Y;
 				break;
 			default:
-				// FIXME(LucasTA): Center overflows when textbox is smaller than the text
+				// FIXME(LucasTA): Center alignment with OverflowMode.Truncate still
+				// 								 overflows textbox is smaller than the text
 				textX = x + (width - (int)textSize.X) / 2;
 				textY = y + (height - (int)textSize.Y) / 2;
 				break;
 		}
 
-		if (!overflow)
+		switch (overflow)
 		{
-			Vector2 charSize = Raylib.MeasureTextEx(
-				CalculatorUI.Fonte,
-				"-",
-				(int)fontSize,
-				CalculatorUI.FONT_SPACING
-			);
-			int charsLimit = width / (int)Math.Ceiling(charSize.X + CalculatorUI.FONT_SPACING);
-
-			if (text.Length > charsLimit)
-			{
-				text = text[..Math.Max(0, charsLimit - 3)] + "...";
-			}
-
-			if (charsLimit > 3)
-			{
+			case OverflowMode.Overflow:
 				Raylib.DrawTextEx(
 					CalculatorUI.Fonte,
 					text,
@@ -185,18 +180,58 @@ internal readonly struct Layout
 					CalculatorUI.FONT_SPACING,
 					textColor
 				);
-			}
-		}
-		else
-		{
-			Raylib.DrawTextEx(
-				CalculatorUI.Fonte,
-				text,
-				new(textX, textY),
-				(int)fontSize,
-				CalculatorUI.FONT_SPACING,
-				textColor
-			);
+				break;
+			case OverflowMode.Truncate:
+				Vector2 charSize = Raylib.MeasureTextEx(
+					CalculatorUI.Fonte,
+					"-",
+					(int)fontSize,
+					CalculatorUI.FONT_SPACING
+				);
+				int charsLimit = width / (int)Math.Ceiling(charSize.X + CalculatorUI.FONT_SPACING);
+
+				if (text.Length > charsLimit)
+				{
+					text = text[..Math.Max(0, charsLimit - 3)] + "...";
+				}
+
+				if (charsLimit > 3)
+				{
+					Raylib.DrawTextEx(
+						CalculatorUI.Fonte,
+						text,
+						new(textX, textY),
+						(int)fontSize,
+						CalculatorUI.FONT_SPACING,
+						textColor
+					);
+				}
+				break;
+			case OverflowMode.Shrink:
+				// HACK(LucasTA): probably slow and terrible
+				while (textSize.X > width)
+				{
+					fontSize -= 1;
+
+					textSize = Raylib.MeasureTextEx(
+						CalculatorUI.Fonte,
+						text,
+						(int)fontSize,
+						CalculatorUI.FONT_SPACING
+					);
+				}
+
+				Raylib.DrawTextEx(
+					CalculatorUI.Fonte,
+					text,
+					new(textX, textY),
+					(int)fontSize,
+					CalculatorUI.FONT_SPACING,
+					textColor
+				);
+				break;
+			default:
+				throw new UnreachableException("Unknown overflow mode");
 		}
 	}
 
