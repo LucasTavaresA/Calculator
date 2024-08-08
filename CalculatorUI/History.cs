@@ -12,6 +12,7 @@ namespace Calculator;
 // NOTE(LucasTA): no need for Path.Combine on Linux
 internal readonly struct History
 {
+	private const string HistoryFilePath = ".cache/CalculatorHistory";
 	internal static List<string> ExpressionHistory;
 	internal static List<string> PinnedExpressions;
 
@@ -64,7 +65,7 @@ internal readonly struct History
 		{
 			Directory.CreateDirectory($"{home}/.cache");
 			File.WriteAllText(
-				$"{home}/.cache/CalculatorHistory",
+				$"{home}/{HistoryFilePath}",
 				string.Join(
 					Environment.NewLine,
 					PinnedExpressions.Concat(new[] { ";" }).Concat(ExpressionHistory)
@@ -85,12 +86,12 @@ internal readonly struct History
 
 		if (
 			Environment.GetEnvironmentVariable("HOME") is string home
-			&& File.Exists($"{home}/.cache/CalculatorHistory")
+			&& File.Exists($"{home}/{HistoryFilePath}")
 		)
 		{
 			bool isPinned = true;
 
-			foreach (string line in File.ReadAllLines($"{home}/.cache/CalculatorHistory"))
+			foreach (string line in File.ReadAllLines($"{home}/{HistoryFilePath}"))
 			{
 				if (string.IsNullOrWhiteSpace(line))
 				{
