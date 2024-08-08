@@ -72,7 +72,11 @@ public readonly struct CalculatorUI
 					.ToString("G", CultureInfo.InvariantCulture);
 				ErrorMessage = "";
 
-				History.Add(Expression);
+				if (Settings.BookmarkOnEval)
+				{
+					History.Add(Expression);
+				}
+
 				Expression = result;
 			}
 			catch (Exception e)
@@ -208,6 +212,7 @@ public readonly struct CalculatorUI
 			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
 			History.Load();
+			Settings.Load();
 
 			// NOTE(LucasTA): Without HIGHDPI the font has artifacts, so we load
 			// it realy big and then scale it down
@@ -237,6 +242,15 @@ public readonly struct CalculatorUI
 			);
 			Texture2D bookmarkAddTexture = LoadTextureFromResource(
 				"CalculatorUI.Resources.bookmark_add_icon.png"
+			);
+			Texture2D settingsTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.settings_icon.png"
+			);
+			Texture2D toggleOnTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.toggle_on_icon.png"
+			);
+			Texture2D toggleOffTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.toggle_off_icon.png"
 			);
 
 			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(plusTexture));
@@ -720,6 +734,19 @@ public readonly struct CalculatorUI
 							// top buttons
 							{
 								Layout.DrawButton(
+									0,
+									0,
+									topIconSize,
+									topIconSize,
+									Color.BLANK,
+									Color.DARKGRAY,
+									TransparentDarkGray,
+									() => CurrentScene = Scene.Settings,
+									null,
+									icon: new(settingsTexture, Color.WHITE)
+								);
+
+								Layout.DrawButton(
 									ScreenWidth - topIconSize,
 									0,
 									topIconSize,
@@ -962,8 +989,66 @@ public readonly struct CalculatorUI
 							{
 								CurrentScene = Scene.Calculator;
 							}
+
+							Layout.DrawButton(
+								0,
+								0,
+								topIconSize,
+								topIconSize,
+								Color.BLANK,
+								Color.DARKGRAY,
+								TransparentDarkGray,
+								() => CurrentScene = Scene.Calculator,
+								null,
+								icon: new(closeTexture, Color.WHITE)
+							);
+
+							Layout.DrawBox(
+								menuEntryX + menuSidePadding,
+								0,
+								menuEntryWidth,
+								menuEntryHeight,
+								Color.DARKGRAY,
+								Color.GRAY,
+								BorderThickness
+							);
+
+							Layout.DrawButton(
+								ScreenWidth - menuSidePadding,
+								0,
+								menuSidePadding,
+								menuEntryHeight,
+								Color.BLANK,
+								Color.DARKGRAY,
+								TransparentDarkGray,
+								() =>
+								{
+									Settings.BookmarkOnEval = !Settings.BookmarkOnEval;
+									Settings.Save();
+								},
+								null,
+								icon: new(
+									Settings.BookmarkOnEval ? toggleOnTexture : toggleOffTexture,
+									Settings.BookmarkOnEval ? Color.SKYBLUE : Color.LIGHTGRAY
+								)
+							);
+
+							Layout.DrawText(
+								menuEntryX + menuSidePadding,
+								0,
+								menuEntryWidth - menuSidePadding,
+								menuEntryHeight,
+								"Add to history with '='",
+								FontColor,
+								Color.DARKGRAY,
+								FontSize,
+								Layout.TextAlignment.Left,
+								Layout.OverflowMode.Shrink
+							);
 							break;
 						case Scene.About:
+							// TODO(LucasTA): implement about scene
+							// show version, license, credits and misc. links
 							if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 							{
 								CurrentScene = Scene.Calculator;
