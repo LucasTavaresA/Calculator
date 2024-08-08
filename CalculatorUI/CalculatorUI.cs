@@ -299,6 +299,12 @@ public readonly struct CalculatorUI
 					);
 					int topIconSize = DisplayY + (int)FontTextSize.Y;
 
+					int menuSidePadding = Padding * 2 + topIconSize;
+					int menuEntryHeight = ((int)FontTextSize.Y * 2) + Padding;
+					int menuEntryX = 0;
+					int menuEntryWidth = ScreenWidth - menuSidePadding;
+					int menuVisibleEntries = ScreenHeight / menuEntryHeight;
+
 					switch (CurrentScene)
 					{
 						case Scene.Calculator:
@@ -767,12 +773,6 @@ public readonly struct CalculatorUI
 							}
 							break;
 						case Scene.History:
-							int rightPadding = Padding * 2 + topIconSize;
-							int entryHeight = ((int)FontTextSize.Y * 2) + Padding;
-							int entryX = 0;
-							int entryWidth = ScreenWidth - rightPadding;
-							int visibleEntries = ScreenHeight / entryHeight;
-
 							List<string> expressions = new(History.PinnedExpressions);
 							expressions.AddRange(History.ExpressionHistory);
 
@@ -805,7 +805,7 @@ public readonly struct CalculatorUI
 										MousePressedY,
 										0,
 										0,
-										ScreenWidth - rightPadding,
+										ScreenWidth - menuSidePadding,
 										ScreenHeight
 									)
 								)
@@ -816,8 +816,8 @@ public readonly struct CalculatorUI
 										HistoryScrollOffset
 											+ currentTouchPosition.Y
 											- StartTouchPosition.Y,
-										Math.Max(0, expressions.Count - visibleEntries)
-											* -entryHeight,
+										Math.Max(0, expressions.Count - menuVisibleEntries)
+											* -menuEntryHeight,
 										0
 									);
 
@@ -832,7 +832,8 @@ public readonly struct CalculatorUI
 
 							HistoryScrollOffset = Math.Clamp(
 								HistoryScrollOffset + MouseScroll,
-								Math.Max(0, expressions.Count - visibleEntries) * -entryHeight,
+								Math.Max(0, expressions.Count - menuVisibleEntries)
+									* -menuEntryHeight,
 								0
 							);
 #endif
@@ -853,13 +854,13 @@ public readonly struct CalculatorUI
 							{
 								for (int i = 0; i < expressions.Count; i++)
 								{
-									int entryY = (int)HistoryScrollOffset + i * entryHeight;
+									int menuEntryY = (int)HistoryScrollOffset + i * menuEntryHeight;
 
 									Layout.DrawTextBox(
-										entryX,
-										entryY,
-										entryWidth,
-										entryHeight,
+										menuEntryX,
+										menuEntryY,
+										menuEntryWidth,
+										menuEntryHeight,
 										new(
 											expressions[i],
 											FontSize,
@@ -872,11 +873,12 @@ public readonly struct CalculatorUI
 										BorderThickness
 									);
 
-									int deleteX = entryX + entryWidth - topIconSize - Padding;
+									int deleteX =
+										menuEntryX + menuEntryWidth - topIconSize - Padding;
 
 									Layout.DrawButton(
 										deleteX,
-										entryY,
+										menuEntryY,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -895,7 +897,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										copyX,
-										entryY,
+										menuEntryY,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -910,7 +912,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										pickX,
-										entryY,
+										menuEntryY,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -932,7 +934,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										pinX,
-										entryY,
+										menuEntryY,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
