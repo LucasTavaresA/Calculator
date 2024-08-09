@@ -17,11 +17,16 @@ using System.Runtime.InteropServices;
 using Eval;
 
 using Raylib_cs;
+#if ANDROID
+using Android.Content;
+#endif
 
 namespace Calculator;
 
 public readonly struct CalculatorUI
 {
+	private const string APP_VERSION = "1.0.0";
+	private const string APP_LICENSE = "GPL-3.0";
 	private const string APP_NAME = "Calculator";
 	private const int TARGET_FPS = 60;
 	internal const int FONT_SPACING = 2;
@@ -86,6 +91,22 @@ public readonly struct CalculatorUI
 		}
 	};
 
+	private static void OpenBrowser(string url)
+	{
+#if WINDOWS
+		Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+#elif LINUX
+		Process.Start("xdg-open", url);
+#elif ANDROID
+		var uri = Android.Net.Uri.Parse(url);
+		var intent = new Intent(Intent.ActionView, uri);
+		intent.SetFlags(ActivityFlags.NewTask);
+		Android.App.Application.Context.StartActivity(intent);
+#elif MACOS
+		Process.Start("open", url);
+#endif
+	}
+
 #if ANDROID
 	internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
 	internal static int TouchCount = 0;
@@ -126,8 +147,7 @@ public readonly struct CalculatorUI
 	{
 		Calculator,
 		History,
-		Settings,
-		About,
+		Settings
 	}
 
 	internal static Scene CurrentScene = Scene.Calculator;
@@ -251,6 +271,9 @@ public readonly struct CalculatorUI
 			);
 			Texture2D toggleOffTexture = LoadTextureFromResource(
 				"CalculatorUI.Resources.toggle_off_icon.png"
+			);
+			Texture2D githubTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.github_icon.png"
 			);
 
 			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(plusTexture));
@@ -1045,14 +1068,102 @@ public readonly struct CalculatorUI
 								Layout.TextAlignment.Left,
 								Layout.OverflowMode.Shrink
 							);
-							break;
-						case Scene.About:
-							// TODO(LucasTA): implement about scene
-							// show version, license, credits and misc. links
-							if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
-							{
-								CurrentScene = Scene.Calculator;
-							}
+
+							Layout.DrawTextBox(
+								menuEntryX + menuSidePadding,
+								menuEntryHeight,
+								menuEntryWidth,
+								menuEntryHeight,
+								new(
+									"Version:",
+									FontSize,
+									FontColor,
+									Layout.TextAlignment.Left,
+									Layout.OverflowMode.Shrink
+								),
+								Color.DARKGRAY,
+								Color.GRAY,
+								BorderThickness
+							);
+
+							Layout.DrawText(
+								menuEntryX + menuSidePadding,
+								menuEntryHeight,
+								menuEntryWidth,
+								menuEntryHeight,
+								APP_VERSION,
+								FontColor,
+								Color.DARKGRAY,
+								FontSize,
+								Layout.TextAlignment.Right,
+								Layout.OverflowMode.Shrink
+							);
+
+							Layout.DrawTextBox(
+								menuEntryX + menuSidePadding,
+								menuEntryHeight * 2,
+								menuEntryWidth,
+								menuEntryHeight,
+								new(
+									"License:",
+									FontSize,
+									FontColor,
+									Layout.TextAlignment.Left,
+									Layout.OverflowMode.Shrink
+								),
+								Color.DARKGRAY,
+								Color.GRAY,
+								BorderThickness
+							);
+
+							Layout.DrawText(
+								menuEntryX + menuSidePadding,
+								menuEntryHeight * 2,
+								menuEntryWidth,
+								menuEntryHeight,
+								APP_LICENSE,
+								FontColor,
+								Color.DARKGRAY,
+								FontSize,
+								Layout.TextAlignment.Right,
+								Layout.OverflowMode.Shrink
+							);
+
+							Layout.DrawBox(
+								menuEntryX + menuSidePadding,
+								menuEntryHeight * 3,
+								menuEntryWidth,
+								menuEntryHeight,
+								Color.DARKGRAY,
+								Color.GRAY,
+								BorderThickness
+							);
+
+							Layout.DrawButton(
+								ScreenWidth - menuSidePadding,
+								menuEntryHeight * 3,
+								menuSidePadding,
+								menuEntryHeight,
+								Color.BLANK,
+								Color.DARKGRAY,
+								TransparentDarkGray,
+								() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
+								null,
+								icon: new(githubTexture, Color.WHITE)
+							);
+
+							Layout.DrawText(
+								menuEntryX + menuSidePadding,
+								menuEntryHeight * 3,
+								menuEntryWidth - menuSidePadding,
+								menuEntryHeight,
+								"Source code:",
+								FontColor,
+								Color.DARKGRAY,
+								FontSize,
+								Layout.TextAlignment.Left,
+								Layout.OverflowMode.Shrink
+							);
 							break;
 						default:
 							throw new UnreachableException("Unknown scene");
