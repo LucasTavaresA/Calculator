@@ -124,6 +124,7 @@ internal readonly struct Layout
 		int y,
 		int width,
 		int height,
+		int padding,
 		string text,
 		Color textColor,
 		Color backgroundColor,
@@ -132,6 +133,11 @@ internal readonly struct Layout
 		OverflowMode overflow = OverflowMode.Overflow
 	)
 	{
+		x += padding;
+		y += padding;
+		width -= padding * 2;
+		height -= padding * 2;
+
 		Vector2 textSize = Raylib.MeasureTextEx(
 			CalculatorUI.Fonte,
 			text,
@@ -270,6 +276,7 @@ internal readonly struct Layout
 			y,
 			width,
 			height,
+			borderStyle?.Thickness ?? 0,
 			textFormat.Text,
 			textFormat.TextColor,
 			backgroundColor,
@@ -371,6 +378,7 @@ internal readonly struct Layout
 							y,
 							width,
 							height,
+							borderStyle?.Thickness ?? 0,
 							tf.Text,
 							tf.TextColor,
 							pressedColor,
@@ -434,6 +442,7 @@ internal readonly struct Layout
 							y,
 							width,
 							height,
+							borderStyle?.Thickness ?? 0,
 							tf.Text,
 							tf.TextColor,
 							backgroundColor,
@@ -493,6 +502,7 @@ internal readonly struct Layout
 							y,
 							width,
 							height,
+							borderStyle?.Thickness ?? 0,
 							tf.Text,
 							tf.TextColor,
 							pressedColor,
@@ -549,6 +559,7 @@ internal readonly struct Layout
 							y,
 							width,
 							height,
+							borderStyle?.Thickness ?? 0,
 							tf.Text,
 							tf.TextColor,
 							backgroundColor,
@@ -588,6 +599,7 @@ internal readonly struct Layout
 						y,
 						width,
 						height,
+						borderStyle?.Thickness ?? 0,
 						tf.Text,
 						tf.TextColor,
 						backgroundColor,
@@ -616,6 +628,7 @@ internal readonly struct Layout
 						y,
 						width,
 						height,
+						borderStyle?.Thickness ?? 0,
 						tf.Text,
 						tf.TextColor,
 						backgroundColor,
