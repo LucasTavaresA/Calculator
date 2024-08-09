@@ -942,7 +942,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										deleteX,
-										menuEntryY,
+										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -961,7 +961,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										copyX,
-										menuEntryY,
+										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -976,7 +976,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										pickX,
-										menuEntryY,
+										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -998,7 +998,7 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButton(
 										pinX,
-										menuEntryY,
+										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
 										Color.BLANK,
@@ -1051,10 +1051,10 @@ public readonly struct CalculatorUI
 							);
 
 							Layout.DrawButton(
-								ScreenWidth - menuSidePadding,
-								0,
-								menuSidePadding,
-								menuEntryHeight,
+								ScreenWidth - menuSidePadding + BorderThickness,
+								BorderThickness,
+								menuSidePadding - BorderThickness * 2,
+								menuEntryHeight - BorderThickness * 2,
 								Color.BLANK,
 								Color.DARKGRAY,
 								TransparentDarkGray,
@@ -1157,10 +1157,10 @@ public readonly struct CalculatorUI
 							);
 
 							Layout.DrawButton(
-								ScreenWidth - menuSidePadding,
-								menuEntryHeight * 3,
-								menuSidePadding,
-								menuEntryHeight,
+								ScreenWidth - menuSidePadding + BorderThickness,
+								menuEntryHeight * 3 + BorderThickness,
+								menuSidePadding - BorderThickness * 2,
+								menuEntryHeight - BorderThickness * 2,
 								Color.BLANK,
 								Color.DARKGRAY,
 								TransparentDarkGray,
