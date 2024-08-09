@@ -641,7 +641,12 @@ internal readonly struct Layout
 			Raylib.DrawTexturePro(
 				i.Texture,
 				ICON_RECTANGLE,
-				new(x + width / 2 - i.Size / 2, y + height / 2 - i.Size / 2, i.Size, i.Size),
+				new(
+					x + width / 2 - i.Size / 2 + borderThickness,
+					y + height / 2 - i.Size / 2 + borderThickness,
+					i.Size - borderThickness * 2,
+					i.Size - borderThickness * 2
+				),
 				new(0, 0),
 				0,
 				i.Tint
