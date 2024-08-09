@@ -24,7 +24,10 @@ internal readonly struct Layout
 		Center,
 		TopLeft,
 		Left,
-		BottomLeft
+		BottomLeft,
+		TopRight,
+		Right,
+		BottomRight
 	}
 
 	internal enum ButtonPressMode
@@ -160,6 +163,18 @@ internal readonly struct Layout
 			case TextAlignment.BottomLeft:
 				textX = x;
 				textY = y + height - (int)textSize.Y;
+				break;
+			case TextAlignment.TopRight:
+				textX = x + (width - (int)textSize.X);
+				textY = y;
+				break;
+			case TextAlignment.Right:
+				textX = x + (width - (int)textSize.X);
+				textY = y + (height - (int)textSize.Y) / 2;
+				break;
+			case TextAlignment.BottomRight:
+				textX = x + (width - (int)textSize.X);
+				textY = y + (height - (int)textSize.Y);
 				break;
 			default:
 				// FIXME(LucasTA): Center alignment with OverflowMode.Truncate still
