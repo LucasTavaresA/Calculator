@@ -27,6 +27,7 @@
     <EmbeddedResource Include="Resources/open_icon.png" />
     <EmbeddedResource Include="Resources/pi_icon.png" />
     <EmbeddedResource Include="Resources/trash_icon.png" />
+    <EmbeddedResource Include="Resources/trash_all_icon.png" />
     <EmbeddedResource Include="Resources/plus_icon.png" />
     <EmbeddedResource Include="Resources/pin_icon.png" />
     <EmbeddedResource Include="Resources/unpin_icon.png" />

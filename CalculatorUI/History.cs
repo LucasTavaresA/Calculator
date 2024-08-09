@@ -44,6 +44,12 @@ internal readonly struct History
 		Save();
 	}
 
+	internal static void Clear()
+	{
+		ExpressionHistory.Clear();
+		Save();
+	}
+
 	internal static void Pin(string expression)
 	{
 		ExpressionHistory.Remove(expression);

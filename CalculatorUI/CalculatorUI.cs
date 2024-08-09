@@ -260,6 +260,9 @@ public readonly struct CalculatorUI
 			Texture2D trashTexture = LoadTextureFromResource(
 				"CalculatorUI.Resources.trash_icon.png"
 			);
+			Texture2D trashAllTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.trash_all_icon.png"
+			);
 			Texture2D bookmarkAddTexture = LoadTextureFromResource(
 				"CalculatorUI.Resources.bookmark_add_icon.png"
 			);
@@ -899,6 +902,23 @@ public readonly struct CalculatorUI
 								() => CurrentScene = Scene.Calculator,
 								null,
 								icon: new(closeTexture, Color.WHITE)
+							);
+
+							Layout.DrawButton(
+								ScreenWidth - topIconSize,
+								ScreenHeight - topIconSize,
+								topIconSize,
+								topIconSize,
+								Color.BLANK,
+								Color.MAROON,
+								TransparentDarkGray,
+								() =>
+								{
+									History.Clear();
+								},
+								null,
+								icon: new(trashAllTexture, LightRed),
+								pressMode: Layout.ButtonPressMode.HoldToPress
 							);
 
 							{
