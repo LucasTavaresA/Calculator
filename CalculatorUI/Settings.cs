@@ -1,4 +1,4 @@
-﻿#if LINUX
+﻿#if LINUX || MACOS
 using System;
 using System.IO;
 #elif ANDROID || WINDOWS
@@ -15,7 +15,7 @@ internal readonly struct Settings
 
 	internal static void Save()
 	{
-#if LINUX
+#if LINUX || MACOS
 		if (Environment.GetEnvironmentVariable("HOME") is string home)
 		{
 			Directory.CreateDirectory($"{home}/.cache");
@@ -28,7 +28,7 @@ internal readonly struct Settings
 
 	internal static void Load()
 	{
-#if LINUX
+#if LINUX || MACOS
 		if (
 			Environment.GetEnvironmentVariable("HOME") is string home
 			&& File.Exists($"{home}/{SettingsFileName}")

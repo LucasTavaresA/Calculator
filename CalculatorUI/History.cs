@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-#if LINUX
+#if LINUX || MACOS
 using System.IO;
 using System.Linq;
 #elif ANDROID || WINDOWS
@@ -60,7 +60,7 @@ internal readonly struct History
 
 	internal static void Save()
 	{
-#if LINUX
+#if LINUX || MACOS
 		if (Environment.GetEnvironmentVariable("HOME") is string home)
 		{
 			Directory.CreateDirectory($"{home}/.cache");
@@ -80,7 +80,7 @@ internal readonly struct History
 
 	internal static void Load()
 	{
-#if LINUX
+#if LINUX || MACOS
 		PinnedExpressions = new();
 		ExpressionHistory = new();
 

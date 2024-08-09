@@ -7,6 +7,7 @@ RELEASE=0
 WINDOWS=0
 LINUX=0
 ANDROID=0
+MACOS=0
 PROGRAM="Calculator"
 BUILD_FLAGS="-o build"
 CONSTANTS=""
@@ -14,7 +15,7 @@ PWD="$(pwd)"
 
 print_help() {
   printf \
-    "%s [windows|linux|android] [-r -R]
+    "%s [windows|linux|android|macos] [-r -R]
 
 -r           run after building
 -R           enable release mode
@@ -35,6 +36,11 @@ main() {
     WINDOWS=1
     CONSTANTS="WINDOWS"
     BUILD_FLAGS="$BUILD_FLAGS -r win-x64"
+    ;;
+  "macos")
+    MACOS=1
+    CONSTANTS="MACOS"
+    BUILD_FLAGS="$BUILD_FLAGS -r osx-x64"
     ;;
   *)
     echo "'$1' is not a valid platform!"
@@ -77,7 +83,7 @@ main() {
     CONSTANTS="$CONSTANTS DEBUG"
   fi
 
-  if [ "$LINUX" = 1 ] || [ "$WINDOWS" = 1 ]; then
+  if [ "$LINUX" = 1 ] || [ "$WINDOWS" = 1 ] || [ "$MACOS" = 1 ]; then
     dotnet publish $BUILD_FLAGS "${PROGRAM}Desktop" /p:DefineConstants="\"$CONSTANTS\""
 
     if [ "$RUN" = 1 ]; then

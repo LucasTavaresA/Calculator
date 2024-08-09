@@ -1,8 +1,8 @@
 ﻿// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
-#if LINUX || ANDROID || WINDOWS
+#if LINUX || ANDROID || WINDOWS || MACOS
 #else
-#error "Yout need to specify a platform: ANDROID, WINDOWS, or LINUX"
+#error "Yout need to specify a platform: ANDROID, WINDOWS, MACOS, or LINUX"
 #endif
 
 using System;
