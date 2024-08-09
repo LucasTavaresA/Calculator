@@ -58,14 +58,18 @@ internal readonly struct Layout
 		ShadowKind Kind = ShadowKind.Float
 	);
 
+	internal readonly record struct BorderStyle(
+		Color Color,
+		int Thickness = 1
+	);
+
 	internal record struct Icon(Texture2D Texture, Color Tint, int Size = 0);
 
 	internal readonly record struct ButtonStyle(
 		Color BackgroundColor,
 		Color PressedColor,
 		Color HoveredColor,
-		Color? BorderColor = null,
-		int BorderThickness = 1,
+		BorderStyle? BorderStyle = null,
 		ShadowStyle? ShadowStyle = null,
 		Icon? Icon = null
 	);
@@ -98,21 +102,20 @@ internal readonly struct Layout
 		int width,
 		int height,
 		Color backgroundColor,
-		Color? borderColor = null,
-		int borderThickness = 1,
+		BorderStyle? borderStyle = null,
 		ShadowStyle? shadowStyle = null
 	)
 	{
 		if (shadowStyle is ShadowStyle ss)
 		{
-			DrawShadow(x, y, width, height, ss, borderColor);
+			DrawShadow(x, y, width, height, ss, borderStyle);
 		}
 
 		Raylib.DrawRectangle(x, y, width, height, backgroundColor);
 
-		if (borderColor is Color bc)
+		if (borderStyle is BorderStyle bs)
 		{
-			Raylib.DrawRectangleLinesEx(new(x, y, width, height), borderThickness, bc);
+			Raylib.DrawRectangleLinesEx(new(x, y, width, height), bs.Thickness, bs.Color);
 		}
 	}
 
@@ -257,12 +260,11 @@ internal readonly struct Layout
 		int height,
 		TextFormat textFormat,
 		Color backgroundColor,
-		Color? borderColor = null,
-		int borderThickness = 1,
+		BorderStyle? borderStyle = null,
 		ShadowStyle? shadowStyle = null
 	)
 	{
-		DrawBox(x, y, width, height, backgroundColor, borderColor, borderThickness, shadowStyle);
+		DrawBox(x, y, width, height, backgroundColor, borderStyle, shadowStyle);
 		DrawText(
 			x,
 			y,
@@ -289,8 +291,7 @@ internal readonly struct Layout
 		TextFormat? textFormat = null,
 		ButtonPressMode pressMode = ButtonPressMode.Once,
 		Icon? icon = null,
-		Color? borderColor = null,
-		int borderThickness = 1,
+		BorderStyle? borderStyle = null,
 		ShadowStyle? shadowStyle = null
 	)
 	{
@@ -360,8 +361,7 @@ internal readonly struct Layout
 						width,
 						progress,
 						pressedColor,
-						borderColor,
-						borderThickness
+						borderStyle
 					);
 
 					if (textFormat is TextFormat tf)
@@ -423,8 +423,7 @@ internal readonly struct Layout
 						width,
 						height,
 						backgroundColor,
-						borderColor,
-						borderThickness,
+						borderStyle,
 						shadowStyle
 					);
 
@@ -484,8 +483,7 @@ internal readonly struct Layout
 						width,
 						progress,
 						pressedColor,
-						borderColor,
-						borderThickness
+						borderStyle
 					);
 
 					if (textFormat is TextFormat tf)
@@ -540,8 +538,7 @@ internal readonly struct Layout
 						width,
 						height,
 						backgroundColor,
-						borderColor,
-						borderThickness,
+						borderStyle,
 						shadowStyle
 					);
 
@@ -580,8 +577,7 @@ internal readonly struct Layout
 					width,
 					height,
 					backgroundColor,
-					borderColor,
-					borderThickness,
+					borderStyle,
 					shadowStyle
 				);
 
@@ -609,8 +605,7 @@ internal readonly struct Layout
 					width,
 					height,
 					backgroundColor,
-					borderColor,
-					borderThickness,
+					borderStyle,
 					shadowStyle
 				);
 
@@ -637,6 +632,8 @@ internal readonly struct Layout
 			// if size is not set, scale the icon to fit the rectangle and center
 			i.Size = i.Size > 0 ? i.Size : Math.Min(width, height);
 
+			int borderThickness = borderStyle?.Thickness ?? 0;
+
 			// Draw the texture
 			Raylib.DrawTexturePro(
 				i.Texture,
@@ -660,7 +657,7 @@ internal readonly struct Layout
 		int width,
 		int height,
 		ShadowStyle shadowStyle,
-		Color? outlineColor = null
+		BorderStyle? borderStyle = null
 	)
 	{
 		Raylib.DrawRectangle(
@@ -689,7 +686,7 @@ internal readonly struct Layout
 				shadowStyle.Color
 			);
 
-			if (outlineColor is Color oc && shadowStyle.Kind != ShadowKind.Cast)
+			if (borderStyle is BorderStyle bs && shadowStyle.Kind != ShadowKind.Cast)
 			{
 				if (shadowStyle.Kind == ShadowKind.Cube)
 				{
@@ -699,7 +696,7 @@ internal readonly struct Layout
 						y + shadowStyle.Distance,
 						x + width + shadowStyle.Distance,
 						y + height + shadowStyle.Distance,
-						oc
+						bs.Color
 					);
 
 					// bottom cube shadow outline
@@ -708,7 +705,7 @@ internal readonly struct Layout
 						y + height + shadowStyle.Distance,
 						x + width + shadowStyle.Distance,
 						y + height + shadowStyle.Distance,
-						oc
+						bs.Color
 					);
 				}
 				else if (shadowStyle.Kind == ShadowKind.TransparentCube)
@@ -718,7 +715,7 @@ internal readonly struct Layout
 						y + shadowStyle.Distance,
 						width,
 						height,
-						oc
+						bs.Color
 					);
 				}
 
@@ -728,7 +725,7 @@ internal readonly struct Layout
 					y,
 					x + width + shadowStyle.Distance,
 					y + shadowStyle.Distance,
-					oc
+					bs.Color
 				);
 
 				// bottom left outline
@@ -737,7 +734,7 @@ internal readonly struct Layout
 					y + height,
 					x + shadowStyle.Distance,
 					y + height + shadowStyle.Distance,
-					oc
+					bs.Color
 				);
 
 				// bottom right outline
@@ -746,7 +743,7 @@ internal readonly struct Layout
 					y + height,
 					x + width + shadowStyle.Distance,
 					y + height + shadowStyle.Distance,
-					oc
+					bs.Color
 				);
 			}
 		}
@@ -799,8 +796,7 @@ internal readonly struct Layout
 					rows[i].Buttons[j].TextFormat,
 					rows[i].Buttons[j].PressMode,
 					rows[i].Buttons[j].Style.Icon,
-					rows[i].Buttons[j].Style.BorderColor,
-					rows[i].Buttons[j].Style.BorderThickness,
+					rows[i].Buttons[j].Style.BorderStyle,
 					rows[i].Buttons[j].Style.ShadowStyle
 				);
 

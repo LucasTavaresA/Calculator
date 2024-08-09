@@ -362,8 +362,7 @@ public readonly struct CalculatorUI
 										BackgroundColor: DarkGray,
 										PressedColor: DarkerGray,
 										HoveredColor: Color.GRAY,
-										BorderColor: Color.GRAY,
-										BorderThickness: BorderThickness,
+										new(Color.GRAY, BorderThickness),
 										ShadowStyle: GreyButtonShadow
 									);
 
@@ -372,8 +371,7 @@ public readonly struct CalculatorUI
 										BackgroundColor: Color.RED,
 										PressedColor: Color.MAROON,
 										HoveredColor: Color.ORANGE,
-										BorderColor: Color.ORANGE,
-										BorderThickness: BorderThickness,
+										new(Color.ORANGE, BorderThickness),
 										ShadowStyle: RedButtonShadow
 									);
 
@@ -382,8 +380,7 @@ public readonly struct CalculatorUI
 										BackgroundColor: LightGreen,
 										PressedColor: Color.DARKGREEN,
 										HoveredColor: Color.GREEN,
-										BorderColor: Color.GREEN,
-										BorderThickness: BorderThickness,
+										new(Color.GREEN, BorderThickness),
 										ShadowStyle: GreenButtonShadow
 									);
 
@@ -428,8 +425,7 @@ public readonly struct CalculatorUI
 												BackgroundColor: DarkGray,
 												PressedColor: DarkerGray,
 												HoveredColor: Color.GRAY,
-												BorderColor: Color.GRAY,
-												BorderThickness: BorderThickness,
+												new(Color.GRAY, BorderThickness),
 												ShadowStyle: GreyButtonShadow,
 												Icon: new(
 													piTexture,
@@ -653,8 +649,7 @@ public readonly struct CalculatorUI
 										DisplayHeight,
 										new(Expression, FontSize, FontColor),
 										DarkerGray,
-										DarkGray,
-										BorderThickness * 2
+										new(DarkGray, BorderThickness * 2)
 									);
 
 									Raylib.DrawTextEx(
@@ -675,8 +670,7 @@ public readonly struct CalculatorUI
 										DisplayHeight,
 										new(Expression, FontSize, FontColor),
 										DarkerGray,
-										Color.RED,
-										BorderThickness * 2
+										new(Color.RED, BorderThickness * 2)
 									);
 
 									Raylib.DrawTextEx(
@@ -939,8 +933,8 @@ public readonly struct CalculatorUI
 											Layout.OverflowMode.Truncate
 										),
 										Color.DARKGRAY,
-										Color.GRAY,
-										BorderThickness
+										new(Color.GRAY,
+										BorderThickness)
 									);
 
 									int deleteX =
@@ -1052,8 +1046,8 @@ public readonly struct CalculatorUI
 								menuEntryWidth,
 								menuEntryHeight,
 								Color.DARKGRAY,
-								Color.GRAY,
-								BorderThickness
+								new(Color.GRAY,
+								BorderThickness)
 							);
 
 							Layout.DrawButton(
@@ -1102,8 +1096,8 @@ public readonly struct CalculatorUI
 									Layout.OverflowMode.Shrink
 								),
 								Color.DARKGRAY,
-								Color.GRAY,
-								BorderThickness
+								new(Color.GRAY,
+								BorderThickness)
 							);
 
 							Layout.DrawText(
@@ -1132,8 +1126,8 @@ public readonly struct CalculatorUI
 									Layout.OverflowMode.Shrink
 								),
 								Color.DARKGRAY,
-								Color.GRAY,
-								BorderThickness
+								new(Color.GRAY,
+								BorderThickness)
 							);
 
 							Layout.DrawText(
@@ -1155,8 +1149,8 @@ public readonly struct CalculatorUI
 								menuEntryWidth,
 								menuEntryHeight,
 								Color.DARKGRAY,
-								Color.GRAY,
-								BorderThickness
+								new(Color.GRAY,
+								BorderThickness)
 							);
 
 							Layout.DrawButton(
