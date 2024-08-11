@@ -46,7 +46,7 @@ public readonly struct CalculatorUI
 	private static readonly Color ButtonPressedColor = DarkerGray;
 	private static readonly Color ButtonShadowColor = ButtonPressedColor;
 
-	private static readonly Color TransparentButtonColor = Color.BLANK;
+	private static readonly Color Transparent = Color.BLANK;
 	private static readonly Color TransparentButtonHoverColor = new(100, 100, 100, 128);
 
 	private static readonly Color MenuEntryBackgroundColor = Color.DARKGRAY;
@@ -198,7 +198,7 @@ public readonly struct CalculatorUI
 	{
 		Calculator,
 		History,
-		Settings
+		Settings,
 	}
 
 	internal static Scene CurrentScene = Scene.Calculator;
@@ -277,7 +277,9 @@ public readonly struct CalculatorUI
 		// Raylib context
 		{
 			// NOTE(LucasTA): HIGHDPI stops the window from being scaled as its resized
-			Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TOPMOST);
+			Raylib.SetConfigFlags(
+				ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TOPMOST
+			);
 #if ANDROID
 			Raylib.InitWindow(0, 0, APP_NAME);
 #else
@@ -727,7 +729,7 @@ public readonly struct CalculatorUI
 									DisplayY,
 									DisplayWidth / 2,
 									DisplayHeight,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() =>
@@ -743,7 +745,7 @@ public readonly struct CalculatorUI
 									DisplayY,
 									DisplayWidth / 2,
 									DisplayHeight,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() =>
@@ -889,11 +891,10 @@ public readonly struct CalculatorUI
 									0,
 									topIconSize,
 									topIconSize,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => CurrentScene = Scene.Settings,
-									null,
 									icon: new(settingsTexture, ForegroundColor)
 								);
 
@@ -902,11 +903,10 @@ public readonly struct CalculatorUI
 									0,
 									topIconSize,
 									topIconSize,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => CurrentScene = Scene.History,
-									null,
 									icon: new(historyTexture, ForegroundColor)
 								);
 
@@ -915,11 +915,10 @@ public readonly struct CalculatorUI
 									0,
 									topIconSize,
 									topIconSize,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => Clipboard.Set(Expression),
-									null,
 									icon: new(copyTexture, ForegroundColor)
 								);
 
@@ -928,11 +927,10 @@ public readonly struct CalculatorUI
 									0,
 									topIconSize,
 									topIconSize,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									Paste,
-									null,
 									icon: new(pasteTexture, ForegroundColor)
 								);
 
@@ -941,11 +939,10 @@ public readonly struct CalculatorUI
 									0,
 									topIconSize,
 									topIconSize,
-									TransparentButtonColor,
+									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => History.Add(Expression),
-									null,
 									icon: new(bookmarkAddTexture, ForegroundColor)
 								);
 							}
@@ -1021,11 +1018,10 @@ public readonly struct CalculatorUI
 								0,
 								topIconSize,
 								topIconSize,
-								TransparentButtonColor,
+								Transparent,
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => CurrentScene = Scene.Calculator,
-								null,
 								icon: new(closeTexture, ForegroundColor)
 							);
 
@@ -1034,14 +1030,13 @@ public readonly struct CalculatorUI
 								ScreenHeight - topIconSize,
 								topIconSize,
 								topIconSize,
-								TransparentButtonColor,
+								Transparent,
 								RedButtonPressedColor,
 								TransparentButtonHoverColor,
 								() =>
 								{
 									History.Clear();
 								},
-								null,
 								icon: new(trashAllTexture, RedButtonColor),
 								pressMode: Layout.ButtonPressMode.HoldToPress
 							);
@@ -1075,14 +1070,13 @@ public readonly struct CalculatorUI
 										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
-										TransparentButtonColor,
+										Transparent,
 										RedButtonPressedColor,
 										TransparentButtonHoverColor,
 										() =>
 										{
 											History.Remove(expressions[i]);
 										},
-										null,
 										icon: new(trashTexture, RedButtonColor),
 										pressMode: Layout.ButtonPressMode.HoldToPress
 									);
@@ -1094,11 +1088,10 @@ public readonly struct CalculatorUI
 										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
-										TransparentButtonColor,
+										Transparent,
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() => Clipboard.Set(expressions[i]),
-										null,
 										icon: new(copyTexture, ForegroundColor)
 									);
 
@@ -1109,7 +1102,7 @@ public readonly struct CalculatorUI
 										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
-										TransparentButtonColor,
+										Transparent,
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() =>
@@ -1131,7 +1124,6 @@ public readonly struct CalculatorUI
 											TypingIndex = Expression.Length;
 											CurrentScene = Scene.Calculator;
 										},
-										null,
 										icon: new(openTexture, ForegroundColor)
 									);
 
@@ -1145,7 +1137,7 @@ public readonly struct CalculatorUI
 										menuEntryY + BorderThickness,
 										topIconSize,
 										topIconSize,
-										TransparentButtonColor,
+										Transparent,
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() =>
@@ -1159,7 +1151,6 @@ public readonly struct CalculatorUI
 												History.Pin(expressions[i]);
 											}
 										},
-										null,
 										icon: new(
 											pinned ? unpinTexture : pinTexture,
 											ForegroundColor
@@ -1179,11 +1170,10 @@ public readonly struct CalculatorUI
 								0,
 								topIconSize,
 								topIconSize,
-								TransparentButtonColor,
+								Transparent,
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => CurrentScene = Scene.Calculator,
-								null,
 								icon: new(closeTexture, ForegroundColor)
 							);
 
@@ -1201,7 +1191,7 @@ public readonly struct CalculatorUI
 								BorderThickness,
 								menuSidePadding - BorderThickness * 2,
 								menuEntryHeight - BorderThickness * 2,
-								TransparentButtonColor,
+								Transparent,
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() =>
@@ -1209,7 +1199,6 @@ public readonly struct CalculatorUI
 									Settings.BookmarkOnEval = !Settings.BookmarkOnEval;
 									Settings.Save();
 								},
-								null,
 								icon: new(
 									Settings.BookmarkOnEval ? toggleOnTexture : toggleOffTexture,
 									Settings.BookmarkOnEval ? ToggleOnColor : ToggleOffColor
@@ -1304,11 +1293,10 @@ public readonly struct CalculatorUI
 								menuEntryHeight * 3 + BorderThickness,
 								menuSidePadding - BorderThickness * 2,
 								menuEntryHeight - BorderThickness * 2,
-								TransparentButtonColor,
+								Transparent,
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
-								null,
 								icon: new(githubTexture, Color.WHITE)
 							);
 

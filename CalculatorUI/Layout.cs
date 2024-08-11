@@ -33,7 +33,7 @@ internal readonly struct Layout
 		BottomLeft,
 		TopRight,
 		Right,
-		BottomRight
+		BottomRight,
 	}
 
 	internal enum ButtonPressMode
@@ -64,10 +64,7 @@ internal readonly struct Layout
 		ShadowKind Kind = ShadowKind.Float
 	);
 
-	internal readonly record struct BorderStyle(
-		Color Color,
-		int Thickness = 1
-	);
+	internal readonly record struct BorderStyle(Color Color, int Thickness = 1);
 
 	internal record struct Icon(Texture2D Texture, Color Tint, int Size = 0);
 
@@ -362,14 +359,7 @@ internal readonly struct Layout
 						);
 					}
 
-					DrawBox(
-						x,
-						y + height - progress,
-						width,
-						progress,
-						pressedColor,
-						borderStyle
-					);
+					DrawBox(x, y + height - progress, width, progress, pressedColor, borderStyle);
 
 					if (textFormat is TextFormat tf)
 					{
@@ -425,15 +415,7 @@ internal readonly struct Layout
 					hoveredColor;
 #endif
 
-					DrawBox(
-						x,
-						y,
-						width,
-						height,
-						backgroundColor,
-						borderStyle,
-						shadowStyle
-					);
+					DrawBox(x, y, width, height, backgroundColor, borderStyle, shadowStyle);
 
 					if (textFormat is TextFormat tf)
 					{
@@ -486,14 +468,7 @@ internal readonly struct Layout
 						);
 					}
 
-					DrawBox(
-						x,
-						y + height - progress,
-						width,
-						progress,
-						pressedColor,
-						borderStyle
-					);
+					DrawBox(x, y + height - progress, width, progress, pressedColor, borderStyle);
 
 					if (textFormat is TextFormat tf)
 					{
@@ -542,15 +517,7 @@ internal readonly struct Layout
 				}
 				else
 				{
-					DrawBox(
-						x,
-						y,
-						width,
-						height,
-						backgroundColor,
-						borderStyle,
-						shadowStyle
-					);
+					DrawBox(x, y, width, height, backgroundColor, borderStyle, shadowStyle);
 
 					if (textFormat is TextFormat tf)
 					{
@@ -585,15 +552,7 @@ internal readonly struct Layout
 				hoveredColor;
 #endif
 
-				DrawBox(
-					x,
-					y,
-					width,
-					height,
-					backgroundColor,
-					borderStyle,
-					shadowStyle
-				);
+				DrawBox(x, y, width, height, backgroundColor, borderStyle, shadowStyle);
 
 				if (textFormat is TextFormat tf)
 				{
@@ -614,15 +573,7 @@ internal readonly struct Layout
 			}
 			else
 			{
-				DrawBox(
-					x,
-					y,
-					width,
-					height,
-					backgroundColor,
-					borderStyle,
-					shadowStyle
-				);
+				DrawBox(x, y, width, height, backgroundColor, borderStyle, shadowStyle);
 
 				if (textFormat is TextFormat tf)
 				{
