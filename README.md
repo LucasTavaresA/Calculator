@@ -1,7 +1,7 @@
 # Calculator
 
 Crossplatform calculator
-![Calculator](https://github.com/LucasTavaresA/Calculator/assets/80704612/5bac9719-6a47-4145-bd11-99395ef80ed7)
+![Calculator](https://github.com/user-attachments/assets/ee04ecc2-901e-450a-bf72-b695008c6995)
 
 ## Build
 
@@ -14,3 +14,7 @@ cd Calculator
 ## Credits
 
 Made with [raylib](https://www.raylib.com/), used [Raylib-cs](https://github.com/ChrisDill/Raylib-cs) bindings
+
+Font: [Iosevka](https://github.com/be5invis/Iosevka)
+
+Icons: [Google Material Icons](https://fonts.google.com/icons)
