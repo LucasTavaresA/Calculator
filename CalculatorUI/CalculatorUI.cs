@@ -703,13 +703,18 @@ public readonly struct CalculatorUI
 										new(BorderColor, BorderThickness * 2)
 									);
 
-									Raylib.DrawTextEx(
-										CalculatorUI.Fonte,
+									Layout.DrawText(
+										DisplayX,
+										DisplayY + BorderThickness * 2,
+										DisplayWidth,
+										DisplayHeight,
+										BorderThickness * 2,
 										Result,
-										new(DisplayX + Padding, ScreenHeight / 8 - Padding),
+										DarkForegroundColor,
+										DisplayBackgroundColor,
 										FontSize,
-										CalculatorUI.FONT_SPACING,
-										DarkForegroundColor
+										Layout.TextAlignment.BottomLeft,
+										Layout.OverflowMode.Shrink
 									);
 								}
 								else
@@ -730,13 +735,18 @@ public readonly struct CalculatorUI
 										new(ErrorColor, BorderThickness * 2)
 									);
 
-									Raylib.DrawTextEx(
-										CalculatorUI.Fonte,
+									Layout.DrawText(
+										DisplayX,
+										DisplayY + BorderThickness * 2,
+										DisplayWidth,
+										DisplayHeight,
+										BorderThickness * 2,
 										ErrorMessage,
-										new(DisplayX + Padding, ScreenHeight / 8 - Padding),
+										ErrorColor,
+										DisplayBackgroundColor,
 										FontSize,
-										CalculatorUI.FONT_SPACING,
-										ErrorColor
+										Layout.TextAlignment.BottomLeft,
+										Layout.OverflowMode.Shrink
 									);
 								}
 							}
