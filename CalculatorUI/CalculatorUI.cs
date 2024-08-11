@@ -255,8 +255,12 @@ public readonly struct CalculatorUI
 		// Raylib context
 		{
 			// NOTE(LucasTA): HIGHDPI stops the window from being scaled as its resized
-			Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE);
+			Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TOPMOST);
+#if ANDROID
 			Raylib.InitWindow(0, 0, APP_NAME);
+#else
+			Raylib.InitWindow(400, 400, APP_NAME);
+#endif
 			Raylib.SetTargetFPS(TARGET_FPS);
 			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
