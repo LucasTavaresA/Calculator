@@ -692,7 +692,13 @@ public readonly struct CalculatorUI
 										DisplayY,
 										DisplayWidth,
 										DisplayHeight,
-										new(Expression, FontSize, ForegroundColor),
+										new(
+											Expression,
+											FontSize,
+											ForegroundColor,
+											Layout.TextAlignment.Center,
+											Layout.OverflowMode.Shrink
+										),
 										DisplayBackgroundColor,
 										new(BorderColor, BorderThickness * 2)
 									);
@@ -713,7 +719,13 @@ public readonly struct CalculatorUI
 										DisplayY,
 										DisplayWidth,
 										DisplayHeight,
-										new(Expression, FontSize, ForegroundColor),
+										new(
+											Expression,
+											FontSize,
+											ForegroundColor,
+											Layout.TextAlignment.Center,
+											Layout.OverflowMode.Shrink
+										),
 										DisplayBackgroundColor,
 										new(ErrorColor, BorderThickness * 2)
 									);
