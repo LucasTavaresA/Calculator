@@ -31,11 +31,12 @@ main() {
   "linux")
     LINUX=1
     CONSTANTS="LINUX"
+    BUILD_FLAGS="$BUILD_FLAGS -f net8.0"
     ;;
   "windows")
     WINDOWS=1
     CONSTANTS="WINDOWS"
-    BUILD_FLAGS="$BUILD_FLAGS -r win-x64"
+    BUILD_FLAGS="$BUILD_FLAGS -f net8.0-windows -r win-x64"
     ;;
   "macos")
     MACOS=1

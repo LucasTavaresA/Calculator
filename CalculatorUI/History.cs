@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-#if LINUX || MACOS
+#if LINUX || MACOS || WINDOWS
 using System.IO;
 using System.Linq;
-#elif ANDROID || WINDOWS
+#elif ANDROID
 using Xamarin.Essentials;
 #endif
 
 namespace Calculator;
 
-// NOTE(LucasTA): no need for Path.Combine on Linux
 internal readonly struct History
 {
-	private const string HistoryFilePath = ".cache/CalculatorHistory";
+#if !ANDROID
+	private static readonly string HistoryFilePath = Data.DataFolder + "CalculatorHistory";
+#endif
 	internal static List<string> ExpressionHistory;
 	internal static List<string> PinnedExpressions;
 
@@ -66,19 +67,16 @@ internal readonly struct History
 
 	internal static void Save()
 	{
-#if LINUX || MACOS
-		if (Environment.GetEnvironmentVariable("HOME") is string home)
-		{
-			Directory.CreateDirectory($"{home}/.cache");
-			File.WriteAllText(
-				$"{home}/{HistoryFilePath}",
-				string.Join(
-					Environment.NewLine,
-					PinnedExpressions.Concat(new[] { ";" }).Concat(ExpressionHistory)
-				)
-			);
-		}
-#elif ANDROID || WINDOWS
+#if LINUX || MACOS || WINDOWS
+		Directory.CreateDirectory(Data.DataFolder);
+		File.WriteAllText(
+			HistoryFilePath,
+			string.Join(
+				Environment.NewLine,
+				PinnedExpressions.Concat(new[] { ";" }).Concat(ExpressionHistory)
+			)
+		);
+#elif ANDROID
 		Preferences.Set("PinnedExpressions", string.Join(Environment.NewLine, PinnedExpressions));
 		Preferences.Set("ExpressionHistory", string.Join(Environment.NewLine, ExpressionHistory));
 #endif
@@ -86,18 +84,15 @@ internal readonly struct History
 
 	internal static void Load()
 	{
-#if LINUX || MACOS
+#if LINUX || MACOS || WINDOWS
 		PinnedExpressions = new();
 		ExpressionHistory = new();
 
-		if (
-			Environment.GetEnvironmentVariable("HOME") is string home
-			&& File.Exists($"{home}/{HistoryFilePath}")
-		)
+		if (File.Exists(HistoryFilePath))
 		{
 			bool isPinned = true;
 
-			foreach (string line in File.ReadAllLines($"{home}/{HistoryFilePath}"))
+			foreach (string line in File.ReadAllLines(HistoryFilePath))
 			{
 				if (string.IsNullOrWhiteSpace(line))
 				{
@@ -119,7 +114,7 @@ internal readonly struct History
 				}
 			}
 		}
-#elif ANDROID || WINDOWS
+#elif ANDROID
 		PinnedExpressions = new(
 			Preferences
 				.Get("PinnedExpressions", string.Empty)

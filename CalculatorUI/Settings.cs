@@ -1,40 +1,34 @@
-﻿#if LINUX || MACOS
-using System;
+﻿#if LINUX || MACOS || WINDOWS
 using System.IO;
-#elif ANDROID || WINDOWS
+#elif ANDROID
 using Xamarin.Essentials;
 #endif
 
 namespace Calculator;
 
-// NOTE(LucasTA): no need for Path.Combine on Linux
 internal readonly struct Settings
 {
-	private const string SettingsFileName = ".cache/CalculatorSettings";
+#if !ANDROID
+	private static readonly string SettingsFilePath = Data.DataFolder + "CalculatorSettings";
+#endif
 	internal static bool BookmarkOnEval = true;
 
 	internal static void Save()
 	{
-#if LINUX || MACOS
-		if (Environment.GetEnvironmentVariable("HOME") is string home)
-		{
-			Directory.CreateDirectory($"{home}/.cache");
-			File.WriteAllText($"{home}/{SettingsFileName}", $"BookmarkOnEval={BookmarkOnEval}");
-		}
-#elif ANDROID || WINDOWS
+#if LINUX || MACOS || WINDOWS
+		Directory.CreateDirectory(Data.DataFolder);
+		File.WriteAllText(SettingsFilePath, $"BookmarkOnEval={BookmarkOnEval}");
+#elif ANDROID
 		Preferences.Set("BookmarkOnEval", BookmarkOnEval.ToString());
 #endif
 	}
 
 	internal static void Load()
 	{
-#if LINUX || MACOS
-		if (
-			Environment.GetEnvironmentVariable("HOME") is string home
-			&& File.Exists($"{home}/{SettingsFileName}")
-		)
+#if LINUX || MACOS || WINDOWS
+		if (File.Exists(SettingsFilePath))
 		{
-			foreach (string line in File.ReadAllLines($"{home}/{SettingsFileName}"))
+			foreach (string line in File.ReadAllLines(SettingsFilePath))
 			{
 				if (string.IsNullOrWhiteSpace(line))
 				{
@@ -63,7 +57,7 @@ internal readonly struct Settings
 				}
 			}
 		}
-#elif ANDROID || WINDOWS
+#elif ANDROID
 		BookmarkOnEval = Preferences.Get("BookmarkOnEval", bool.TrueString) == bool.TrueString;
 #endif
 	}

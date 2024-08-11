@@ -5,6 +5,10 @@ namespace Calculator;
 
 internal struct CalculatorDesktop
 {
+#if WINDOWS
+	// NOTE(LucasTA): For clipboard on windows
+	[System.STAThread]
+#endif
 	internal static void Main()
 	{
 		CalculatorUI.MainLoop();

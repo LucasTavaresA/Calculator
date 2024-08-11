@@ -1,8 +1,10 @@
 ﻿using System;
 #if LINUX
 using System.Diagnostics;
-#elif ANDROID || WINDOWS
+#elif ANDROID
 using Plugin.Clipboard;
+#elif WINDOWS
+using System.Windows.Forms;
 #endif
 
 namespace Calculator;
@@ -48,7 +50,9 @@ internal readonly struct Clipboard
 		{
 			Console.WriteLine($"Failed to set text to clipboard: {e.Message}");
 		}
-#elif ANDROID || WINDOWS
+#elif WINDOWS
+		System.Windows.Forms.Clipboard.SetText(text);
+#elif ANDROID
 		CrossClipboard.Current.SetText(text);
 #endif
 	}
@@ -95,7 +99,9 @@ internal readonly struct Clipboard
 		}
 
 		return output;
-#elif ANDROID || WINDOWS
+#elif WINDOWS
+		return System.Windows.Forms.Clipboard.GetText();
+#elif ANDROID
 		return CrossClipboard.Current.GetTextAsync().Result;
 #endif
 	}
