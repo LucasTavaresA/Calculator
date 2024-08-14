@@ -685,70 +685,40 @@ public readonly struct CalculatorUI
 
 							// Draw Calculator Display
 							{
-								if (ErrorMessage == "")
-								{
-									Layout.DrawTextBox(
-										DisplayX,
-										DisplayY,
-										DisplayWidth,
-										DisplayHeight,
-										new(
-											Expression,
-											FontSize,
-											ForegroundColor,
-											Layout.TextAlignment.Center,
-											Layout.OverflowMode.Shrink
-										),
-										DisplayBackgroundColor,
-										new(BorderColor, BorderThickness * 2)
-									);
+								bool error = ErrorMessage == "";
 
-									Layout.DrawText(
-										DisplayX,
-										DisplayY + BorderThickness * 2,
-										DisplayWidth,
-										DisplayHeight,
-										BorderThickness * 2,
-										Result,
-										DarkForegroundColor,
-										DisplayBackgroundColor,
+								Layout.DrawTextBox(
+									DisplayX,
+									DisplayY,
+									DisplayWidth,
+									DisplayHeight,
+									new(
+										Expression,
 										FontSize,
-										Layout.TextAlignment.BottomLeft,
+										ForegroundColor,
+										Layout.TextAlignment.Center,
 										Layout.OverflowMode.Shrink
-									);
-								}
-								else
-								{
-									Layout.DrawTextBox(
-										DisplayX,
-										DisplayY,
-										DisplayWidth,
-										DisplayHeight,
-										new(
-											Expression,
-											FontSize,
-											ForegroundColor,
-											Layout.TextAlignment.Center,
-											Layout.OverflowMode.Shrink
-										),
-										DisplayBackgroundColor,
-										new(ErrorColor, BorderThickness * 2)
-									);
+									),
+									DisplayBackgroundColor,
+									new(
+										error ? BorderColor : ErrorColor,
+										BorderThickness * 2
+									)
+								);
 
-									Layout.DrawText(
-										DisplayX,
-										DisplayY + BorderThickness * 2,
-										DisplayWidth,
-										DisplayHeight,
-										BorderThickness * 2,
-										ErrorMessage,
-										ErrorColor,
-										DisplayBackgroundColor,
-										FontSize,
-										Layout.TextAlignment.BottomLeft,
-										Layout.OverflowMode.Shrink
-									);
-								}
+								Layout.DrawText(
+									DisplayX,
+									DisplayY + BorderThickness * 2,
+									DisplayWidth,
+									DisplayHeight,
+									BorderThickness * 2,
+									error ? Result : ErrorMessage,
+									error ? DarkForegroundColor : ErrorColor,
+									DisplayBackgroundColor,
+									FontSize,
+									Layout.TextAlignment.BottomLeft,
+									Layout.OverflowMode.Shrink
+								);
 							}
 
 							int keycode = Raylib.GetCharPressed();
