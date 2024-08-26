@@ -1227,6 +1227,9 @@ public readonly struct CalculatorUI
 						Dragging = false;
 					}
 
+					Layout.LastHotButton = Layout.HotButton;
+					Layout.HotButton = null;
+
 					Log.Message = $"""
 Resolution: {ScreenWidth}x{ScreenHeight}
 FPS: {Raylib.GetFPS()}

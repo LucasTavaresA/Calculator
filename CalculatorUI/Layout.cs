@@ -7,6 +7,13 @@ namespace Calculator;
 
 internal readonly struct Layout
 {
+	// HACK(LucasTA): this is a super shit way of dealing with overlapping buttons,
+	// but i this is not a GUI lib and there is not a lot of overlap in this project so i don't care
+	// FIXME(LucasTA): pressing a button then hovering an overlapping button depresses it,
+	// probably happens due to the button pressed check working solely on the MousePressedX/Y positions,
+	// should make so that it uses a PressedButton variable like HotButton below
+	internal static (int, int, int, int)? HotButton = null;
+	internal static (int, int, int, int)? LastHotButton = null;
 	internal static readonly Rectangle ICON_RECTANGLE = new(0, 0, 160, 160);
 
 	internal enum ShadowKind
@@ -286,6 +293,11 @@ internal readonly struct Layout
 		ShadowStyle? shadowStyle = null
 	)
 	{
+		if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
+		{
+			HotButton = (x, y, width, height);
+		}
+
 		if (
 			!CalculatorUI.Dragging
 			&& !CalculatorUI.ButtonWasPressed
@@ -299,6 +311,7 @@ internal readonly struct Layout
 				width,
 				height
 			)
+			&& LastHotButton == (x, y, width, height)
 		)
 		{
 			CalculatorUI.ButtonWasHeldPressed = false;
@@ -311,7 +324,10 @@ internal readonly struct Layout
 				callback();
 			}
 		}
-		else if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+		else if (
+			Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT)
+			&& LastHotButton == (x, y, width, height)
+		)
 		{
 			if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
 			{
@@ -557,7 +573,10 @@ internal readonly struct Layout
 		}
 		else
 		{
-			if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
+			if (
+				IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height)
+				&& LastHotButton == (x, y, width, height)
+			)
 			{
 				backgroundColor =
 #if ANDROID
