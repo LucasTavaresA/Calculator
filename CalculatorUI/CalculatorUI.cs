@@ -68,9 +68,9 @@ public readonly struct CalculatorUI
 	private static readonly Color ToggleOffColor = Color.LIGHTGRAY;
 	private static readonly Color ToggleOnColor = Color.SKYBLUE;
 
-	private static void SetExpression(string value)
+	private static void InsertExpression(int index, string value)
 	{
-		Expression = value;
+		Expression = Expression.Insert(index, value);
 		ErrorMessage = "";
 
 		try
@@ -81,16 +81,35 @@ public readonly struct CalculatorUI
 		{
 			Result = "";
 		}
+
+		TypingIndex += value.Length;
 	}
 
 	internal static readonly Action Paste = () =>
 	{
-		SetExpression(Expression + Clipboard.Get());
+		InsertExpression(TypingIndex, Clipboard.Get());
 	};
 
 	internal static readonly Action Backspace = () =>
 	{
-		SetExpression(Expression == "" ? "" : Expression[..^1]);
+		if (Expression == "" || TypingIndex == 0)
+		{
+			return;
+		}
+
+		ErrorMessage = "";
+		Expression = Expression.Remove(TypingIndex - 1, 1);
+
+		try
+		{
+			Result = Evaluator.Evaluate(Expression).ToString("G", CultureInfo.InvariantCulture);
+		}
+		catch (Exception)
+		{
+			Result = "";
+		}
+
+		TypingIndex = Math.Max(0, TypingIndex - 1);
 	};
 
 	internal static readonly Action Equal = () =>
@@ -112,6 +131,7 @@ public readonly struct CalculatorUI
 				}
 
 				Expression = result;
+				TypingIndex = Expression.Length;
 			}
 			catch (Exception e)
 			{
@@ -165,6 +185,8 @@ public readonly struct CalculatorUI
 	internal static int MouseY;
 	internal static int MousePressedX;
 	internal static int MousePressedY;
+
+	internal static int TypingIndex = 0;
 
 	internal static string Expression = "";
 	internal static string Result = "";
@@ -311,6 +333,12 @@ public readonly struct CalculatorUI
 			Texture2D githubTexture = LoadTextureFromResource(
 				"CalculatorUI.Resources.github_icon.png"
 			);
+			Texture2D arrowLeftTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.arrow_left.png"
+			);
+			Texture2D arrowRightTexture = LoadTextureFromResource(
+				"CalculatorUI.Resources.arrow_right.png"
+			);
 
 			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(plusTexture));
 
@@ -439,33 +467,33 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											20,
 											new("(", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "("),
+											() => InsertExpression(TypingIndex, "("),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											20,
 											new(")", FontSize, ForegroundColor),
-											() => SetExpression(Expression + ")"),
+											() => InsertExpression(TypingIndex, ")"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											20,
 											new(",", FontSize, ForegroundColor),
-											() => SetExpression(Expression + ","),
+											() => InsertExpression(TypingIndex, ","),
 											GreyButton
 										),
 										new Layout.Button(
 											20,
 											new("^", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "^"),
+											() => InsertExpression(TypingIndex, "^"),
 											GreyButton
 										),
 										new Layout.Button(
 											20,
 											null,
-											() => SetExpression(Expression + "pi"),
+											() => InsertExpression(TypingIndex, "pi"),
 											new(
 												BackgroundColor: ButtonBackgroundColor,
 												PressedColor: ButtonPressedColor,
@@ -485,31 +513,37 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											20,
 											new("!", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "!"),
+											() => InsertExpression(TypingIndex, "!"),
 											GreyButton
 										),
 										new Layout.Button(
 											20,
 											new("e", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "e"),
+											() => InsertExpression(TypingIndex, "e"),
 											GreyButton
 										),
 										new Layout.Button(
 											20,
 											new("%", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "%"),
+											() => InsertExpression(TypingIndex, "%"),
 											GreyButton
 										),
 										new Layout.Button(
 											20,
 											new("/", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "/"),
+											() => InsertExpression(TypingIndex, "/"),
 											GreyButton
 										),
 										new Layout.Button(
 											20,
 											new("C", FontSize, ForegroundColor),
-											() => SetExpression(""),
+											() =>
+											{
+												Expression = "";
+												ErrorMessage = "";
+												Result = "";
+												TypingIndex = 0;
+											},
 											GreyButton
 										)
 									),
@@ -518,28 +552,28 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											25,
 											new("7", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "7"),
+											() => InsertExpression(TypingIndex, "7"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("8", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "8"),
+											() => InsertExpression(TypingIndex, "8"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("9", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "9"),
+											() => InsertExpression(TypingIndex, "9"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("*", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "*"),
+											() => InsertExpression(TypingIndex, "*"),
 											GreyButton
 										)
 									),
@@ -548,28 +582,28 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											25,
 											new("4", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "4"),
+											() => InsertExpression(TypingIndex, "4"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("5", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "5"),
+											() => InsertExpression(TypingIndex, "5"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("6", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "6"),
+											() => InsertExpression(TypingIndex, "6"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("-", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "-"),
+											() => InsertExpression(TypingIndex, "-"),
 											GreyButton
 										)
 									),
@@ -578,28 +612,28 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											25,
 											new("1", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "1"),
+											() => InsertExpression(TypingIndex, "1"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("2", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "2"),
+											() => InsertExpression(TypingIndex, "2"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("3", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "3"),
+											() => InsertExpression(TypingIndex, "3"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new("+", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "+"),
+											() => InsertExpression(TypingIndex, "+"),
 											GreyButton
 										)
 									),
@@ -608,14 +642,14 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											25,
 											new("0", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "0"),
+											() => InsertExpression(TypingIndex, "0"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
 											25,
 											new(".", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "."),
+											() => InsertExpression(TypingIndex, "."),
 											GreyButton
 										),
 										new Layout.Button(
@@ -637,40 +671,40 @@ public readonly struct CalculatorUI
 										new Layout.Button(
 											17,
 											new("sqrt", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "sqrt("),
+											() => InsertExpression(TypingIndex, "sqrt("),
 											GreyButton
 										),
 										new Layout.Button(
 											17,
 											new("mod", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "mod("),
+											() => InsertExpression(TypingIndex, "mod("),
 											GreyButton
 										),
 										new Layout.Button(
 											17,
 											new("sin", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "sin("),
+											() => InsertExpression(TypingIndex, "sin("),
 											GreyButton
 										),
 										new Layout.Button(
 											17,
 											new("cos", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "cos("),
+											() => InsertExpression(TypingIndex, "cos("),
 											GreyButton
 										),
 										new Layout.Button(
 											16,
 											new("tan", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "tan("),
+											() => InsertExpression(TypingIndex, "tan("),
 											GreyButton
 										),
 										new Layout.Button(
 											16,
 											new("log", FontSize, ForegroundColor),
-											() => SetExpression(Expression + "log("),
+											() => InsertExpression(TypingIndex, "log("),
 											GreyButton
 										)
-									)
+									),
 								};
 
 								Layout.DrawButtonGrid(
@@ -686,6 +720,39 @@ public readonly struct CalculatorUI
 							// Draw Calculator Display
 							{
 								bool error = ErrorMessage == "";
+								string displayedExpression = Expression.Insert(TypingIndex, "|");
+
+								Layout.DrawButton(
+									DisplayX,
+									DisplayY,
+									DisplayWidth / 2,
+									DisplayHeight,
+									TransparentButtonColor,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() =>
+									{
+										TypingIndex = Math.Max(0, TypingIndex - 1);
+									},
+									pressMode: Layout.ButtonPressMode.HoldToRepeat,
+									icon: new(arrowLeftTexture, DisplayBackgroundColor)
+								);
+
+								Layout.DrawButton(
+									DisplayX + DisplayWidth / 2,
+									DisplayY,
+									DisplayWidth / 2,
+									DisplayHeight,
+									TransparentButtonColor,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() =>
+									{
+										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
+									},
+									pressMode: Layout.ButtonPressMode.HoldToRepeat,
+									icon: new(arrowRightTexture, DisplayBackgroundColor)
+								);
 
 								Layout.DrawTextBox(
 									DisplayX,
@@ -693,17 +760,15 @@ public readonly struct CalculatorUI
 									DisplayWidth,
 									DisplayHeight,
 									new(
-										Expression,
+										displayedExpression,
 										FontSize,
 										ForegroundColor,
 										Layout.TextAlignment.Center,
 										Layout.OverflowMode.Shrink
 									),
-									DisplayBackgroundColor,
-									new(
-										error ? BorderColor : ErrorColor,
-										BorderThickness * 2
-									)
+									// NOTE(LucasTA): so that the arrows draw behind are visible
+									TransparentButtonHoverColor,
+									new(error ? BorderColor : ErrorColor, BorderThickness * 2)
 								);
 
 								Layout.DrawText(
@@ -727,6 +792,34 @@ public readonly struct CalculatorUI
 							{
 								Equal();
 								ButtonPressedTime = 0;
+							}
+							if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
+							{
+								TypingIndex = Math.Max(0, TypingIndex - 1);
+								ButtonPressedTime = 0;
+							}
+							if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
+							{
+								TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
+								ButtonPressedTime = 0;
+							}
+							else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+							{
+								if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+								{
+									TypingIndex = Math.Max(0, TypingIndex - 1);
+								}
+
+								ButtonPressedTime += Raylib.GetFrameTime();
+							}
+							else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+							{
+								if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+								{
+									TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
+								}
+
+								ButtonPressedTime += Raylib.GetFrameTime();
 							}
 							else if (
 								(
@@ -781,8 +874,9 @@ public readonly struct CalculatorUI
 											or '.'
 								)
 								{
-									SetExpression(
-										Expression + ((char)keycode).ToString().ToLowerInvariant()
+									InsertExpression(
+										TypingIndex,
+										((char)keycode).ToString().ToLowerInvariant()
 									);
 									ButtonPressedTime = 0;
 								}
@@ -1020,7 +1114,21 @@ public readonly struct CalculatorUI
 										TransparentButtonHoverColor,
 										() =>
 										{
-											SetExpression(expressions[i]);
+											Expression = expressions[i];
+											ErrorMessage = "";
+
+											try
+											{
+												Result = Evaluator
+													.Evaluate(Expression)
+													.ToString("G", CultureInfo.InvariantCulture);
+											}
+											catch (Exception)
+											{
+												Result = "";
+											}
+
+											TypingIndex = Expression.Length;
 											CurrentScene = Scene.Calculator;
 										},
 										null,

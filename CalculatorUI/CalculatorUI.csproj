@@ -34,6 +34,8 @@
     <EmbeddedResource Include="Resources/toggle_on_icon.png" />
     <EmbeddedResource Include="Resources/toggle_off_icon.png" />
     <EmbeddedResource Include="Resources/github_icon.png" />
+    <EmbeddedResource Include="Resources/arrow_left.png" />
+    <EmbeddedResource Include="Resources/arrow_right.png" />
     <EmbeddedResource Include="Resources/iosevka-regular.ttf" />
   </ItemGroup>
 
