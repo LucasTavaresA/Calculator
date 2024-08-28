@@ -1,5 +1,5 @@
 ﻿using System;
-#if LINUX
+#if LINUX || MACOS
 using System.Diagnostics;
 #elif ANDROID
 using Plugin.Clipboard;
@@ -13,10 +13,11 @@ internal readonly struct Clipboard
 {
 	internal static void Set(string text)
 	{
-#if LINUX
+#if LINUX || MACOS
 		string processName;
 		string args;
 
+#if LINUX
 		if (Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") != null)
 		{
 			processName = "wl-copy";
@@ -27,6 +28,10 @@ internal readonly struct Clipboard
 			processName = "xsel";
 			args = "--clipboard --input";
 		}
+#elif MACOS
+		processName = "pbcopy";
+		args = string.Empty;
+#endif
 
 		try
 		{
@@ -38,8 +43,8 @@ internal readonly struct Clipboard
 						FileName = processName,
 						Arguments = args,
 						RedirectStandardInput = true,
-						UseShellExecute = false
-					}
+						UseShellExecute = false,
+					},
 				};
 			process.Start();
 			process.StandardInput.Write(text);
@@ -59,11 +64,12 @@ internal readonly struct Clipboard
 
 	internal static string Get()
 	{
-#if LINUX
+#if LINUX || MACOS
 		string processName;
 		string args;
 		string output = string.Empty;
 
+#if LINUX
 		if (Environment.GetEnvironmentVariable("WAYLAND_DISPLAY") != null)
 		{
 			processName = "wl-paste";
@@ -74,6 +80,10 @@ internal readonly struct Clipboard
 			processName = "xsel";
 			args = "--clipboard --output";
 		}
+#elif MACOS
+		processName = "pbpaste";
+		args = string.Empty;
+#endif
 
 		try
 		{
@@ -86,8 +96,8 @@ internal readonly struct Clipboard
 						Arguments = args,
 						RedirectStandardOutput = true,
 						UseShellExecute = false,
-						CreateNoWindow = true
-					}
+						CreateNoWindow = true,
+					},
 				};
 			process.Start();
 			output = process.StandardOutput.ReadToEnd().Trim();
