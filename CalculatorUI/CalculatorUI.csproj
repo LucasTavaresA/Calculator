@@ -1,62 +1,62 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net8.0;net8.0-android;net8.0-windows</TargetFrameworks>
-    <OutputType>Library</OutputType>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>CalculatorUI.cs</PackageId>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <LangVersion>preview</LangVersion>
-    <PublishSingleFile>true</PublishSingleFile>
-    <SelfContained>true</SelfContained>
-    <PublishSelfContained>true</PublishSelfContained>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net8.0;net8.0-android;net8.0-windows</TargetFrameworks>
+		<OutputType>Library</OutputType>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageId>CalculatorUI.cs</PackageId>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+		<PublishSingleFile>true</PublishSingleFile>
+		<SelfContained>true</SelfContained>
+		<PublishSelfContained>true</PublishSelfContained>
+		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Eval.cs" Version="0.10.0" />
-    <PackageReference Include="Raylib-cs" Version="4.5.0.4" />
-    <EmbeddedResource Include="Resources/history_icon.png" />
-    <EmbeddedResource Include="Resources/close_icon.png" />
-    <EmbeddedResource Include="Resources/copy_icon.png" />
-    <EmbeddedResource Include="Resources/paste_icon.png" />
-    <EmbeddedResource Include="Resources/open_icon.png" />
-    <EmbeddedResource Include="Resources/pi_icon.png" />
-    <EmbeddedResource Include="Resources/trash_icon.png" />
-    <EmbeddedResource Include="Resources/trash_all_icon.png" />
-    <EmbeddedResource Include="Resources/plus_icon.png" />
-    <EmbeddedResource Include="Resources/pin_icon.png" />
-    <EmbeddedResource Include="Resources/unpin_icon.png" />
-    <EmbeddedResource Include="Resources/bookmark_add_icon.png" />
-    <EmbeddedResource Include="Resources/settings_icon.png" />
-    <EmbeddedResource Include="Resources/toggle_on_icon.png" />
-    <EmbeddedResource Include="Resources/toggle_off_icon.png" />
-    <EmbeddedResource Include="Resources/github_icon.png" />
-    <EmbeddedResource Include="Resources/backspace_icon.png" />
-    <EmbeddedResource Include="Resources/arrow_left.png" />
-    <EmbeddedResource Include="Resources/arrow_right.png" />
-    <EmbeddedResource Include="Resources/iosevka-regular.ttf" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Eval.cs" Version="0.10.0" />
+		<PackageReference Include="Raylib-cs" Version="4.5.0.4" />
+		<EmbeddedResource Include="Resources/history_icon.png" />
+		<EmbeddedResource Include="Resources/close_icon.png" />
+		<EmbeddedResource Include="Resources/copy_icon.png" />
+		<EmbeddedResource Include="Resources/paste_icon.png" />
+		<EmbeddedResource Include="Resources/open_icon.png" />
+		<EmbeddedResource Include="Resources/pi_icon.png" />
+		<EmbeddedResource Include="Resources/trash_icon.png" />
+		<EmbeddedResource Include="Resources/trash_all_icon.png" />
+		<EmbeddedResource Include="Resources/plus_icon.png" />
+		<EmbeddedResource Include="Resources/pin_icon.png" />
+		<EmbeddedResource Include="Resources/unpin_icon.png" />
+		<EmbeddedResource Include="Resources/bookmark_add_icon.png" />
+		<EmbeddedResource Include="Resources/settings_icon.png" />
+		<EmbeddedResource Include="Resources/toggle_on_icon.png" />
+		<EmbeddedResource Include="Resources/toggle_off_icon.png" />
+		<EmbeddedResource Include="Resources/github_icon.png" />
+		<EmbeddedResource Include="Resources/backspace_icon.png" />
+		<EmbeddedResource Include="Resources/arrow_left.png" />
+		<EmbeddedResource Include="Resources/arrow_right.png" />
+		<EmbeddedResource Include="Resources/iosevka-regular.ttf" />
+	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-    <PackageReference Include="Raylib-cs.Android" Version="4.5.0.4" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
-    <PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+		<PackageReference Include="Raylib-cs.Android" Version="4.5.0.4" />
+		<PackageReference Include="Xamarin.Essentials" Version="1.8.1" />
+		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
+	</ItemGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-    <DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+		<DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
-    <UseWindowsForms>true</UseWindowsForms>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+		<UseWindowsForms>true</UseWindowsForms>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <DefineConstants>$(DefineConstants);LINUX</DefineConstants>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+	</PropertyGroup>
 </Project>
