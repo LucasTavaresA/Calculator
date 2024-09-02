@@ -1285,18 +1285,11 @@ public readonly struct CalculatorUI
 					Layout.LastHotButton = Layout.HotButton;
 					Layout.HotButton = null;
 
-					Log.Message = $"""
-Resolution: {ScreenWidth}x{ScreenHeight}
+					Log.Message += $"""
 FPS: {Raylib.GetFPS()}
-MouseXY: {MouseX}x{MouseY}
-MousePressedXY: {MousePressedX}x{MousePressedY}
-BorderThickness: {BorderThickness}
-ShadowDistance: {ShadowDistance}
-Padding: {Padding}
-{Log.Message}
 """;
 
-					Log.Draw();
+					Log.Print();
 					Log.Message = "";
 
 					Raylib.EndDrawing();
