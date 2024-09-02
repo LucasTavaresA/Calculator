@@ -194,6 +194,10 @@ public readonly struct CalculatorUI
 
 	internal static Font Fonte;
 
+	private const string ASSEMBLY_PREFIX = "CalculatorUI.Resources.";
+	private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
+	private static readonly Dictionary<string, Texture2D> Resources = new();
+
 	internal enum Scene
 	{
 		Calculator,
@@ -206,17 +210,12 @@ public readonly struct CalculatorUI
 	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
 	static extern Image LoadImageFromMemory(string fileType, byte[] fileData, int dataSize);
 
-	public static Texture2D LoadTextureFromResource(string resourceName)
+	public static Texture2D LoadTextureFromResource(string resource)
 	{
 		Texture2D texture;
 
-		using (
-			Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)!
-		)
+		using (Stream stream = Assembly.GetManifestResourceStream(resource)!)
 		{
-			if (stream == null)
-				throw new ArgumentException($"Resource '{resourceName}' not found.");
-
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				stream.CopyTo(memoryStream);
@@ -244,17 +243,12 @@ public readonly struct CalculatorUI
 		int codepointCount
 	);
 
-	public static unsafe Font LoadFontFromResource(string resourceName, int fontSize)
+	public static unsafe Font LoadFontFromResource(string resource, int fontSize)
 	{
 		Font font;
 
-		using (
-			Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName)!
-		)
+		using (Stream stream = Assembly.GetManifestResourceStream(resource)!)
 		{
-			if (stream == null)
-				throw new ArgumentException($"Resource '{resourceName}' not found.");
-
 			using (MemoryStream memoryStream = new MemoryStream())
 			{
 				stream.CopyTo(memoryStream);
@@ -291,58 +285,27 @@ public readonly struct CalculatorUI
 			History.Load();
 			Settings.Load();
 
-			// NOTE(LucasTA): Without HIGHDPI the font has artifacts, so we load
-			// it realy big and then scale it down
-			// just the filter is really blurry
-			Fonte = LoadFontFromResource("CalculatorUI.Resources.iosevka-regular.ttf", 64);
-			Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+			foreach (string resource in Assembly.GetManifestResourceNames())
+			{
+				if (resource.EndsWith(".png"))
+				{
+					Resources.Add(
+						resource.Substring(ASSEMBLY_PREFIX.Length),
+						LoadTextureFromResource(resource)
+					);
+				}
+				else if (resource.EndsWith(".ttf"))
+				{
+					// NOTE(LucasTA): Without HIGHDPI the font has artifacts, so we load
+					// it realy big and then scale it down
+					// just the filter is really blurry
+					Fonte = LoadFontFromResource(resource, 64);
+					Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+				}
+			}
 
-			Texture2D plusTexture = LoadTextureFromResource("CalculatorUI.Resources.plus_icon.png");
-			Texture2D historyTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.history_icon.png"
-			);
-			Texture2D closeTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.close_icon.png"
-			);
-			Texture2D copyTexture = LoadTextureFromResource("CalculatorUI.Resources.copy_icon.png");
-			Texture2D pasteTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.paste_icon.png"
-			);
-			Texture2D openTexture = LoadTextureFromResource("CalculatorUI.Resources.open_icon.png");
-			Texture2D pinTexture = LoadTextureFromResource("CalculatorUI.Resources.pin_icon.png");
-			Texture2D unpinTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.unpin_icon.png"
-			);
-			Texture2D piTexture = LoadTextureFromResource("CalculatorUI.Resources.pi_icon.png");
-			Texture2D trashTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.trash_icon.png"
-			);
-			Texture2D trashAllTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.trash_all_icon.png"
-			);
-			Texture2D bookmarkAddTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.bookmark_add_icon.png"
-			);
-			Texture2D settingsTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.settings_icon.png"
-			);
-			Texture2D toggleOnTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.toggle_on_icon.png"
-			);
-			Texture2D toggleOffTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.toggle_off_icon.png"
-			);
-			Texture2D githubTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.github_icon.png"
-			);
-			Texture2D arrowLeftTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.arrow_left.png"
-			);
-			Texture2D arrowRightTexture = LoadTextureFromResource(
-				"CalculatorUI.Resources.arrow_right.png"
-			);
-
-			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(plusTexture));
+			// TODO(LucasTA): make a nicer icon for the app, that matches how buttons look in it
+			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(Resources["plus_icon.png"]));
 
 			while (!Raylib.WindowShouldClose())
 			{
@@ -491,7 +454,7 @@ public readonly struct CalculatorUI
 												new(BorderColor, BorderThickness),
 												ShadowStyle: GreyButtonShadow,
 												Icon: new(
-													piTexture,
+													Resources["pi_icon.png"],
 													ForegroundColor,
 													(int)FontTextSize.Y
 												)
@@ -724,7 +687,7 @@ public readonly struct CalculatorUI
 										TypingIndex = Math.Max(0, TypingIndex - 1);
 									},
 									pressMode: Layout.ButtonPressMode.HoldToRepeat,
-									icon: new(arrowLeftTexture, DisplayBackgroundColor)
+									icon: new(Resources["arrow_left.png"], DisplayBackgroundColor)
 								);
 
 								Layout.DrawButton(
@@ -740,7 +703,7 @@ public readonly struct CalculatorUI
 										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
 									},
 									pressMode: Layout.ButtonPressMode.HoldToRepeat,
-									icon: new(arrowRightTexture, DisplayBackgroundColor)
+									icon: new(Resources["arrow_right.png"], DisplayBackgroundColor)
 								);
 
 								Layout.DrawTextBox(
@@ -881,7 +844,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => CurrentScene = Scene.Settings,
-									icon: new(settingsTexture, ForegroundColor)
+									icon: new(Resources["settings_icon.png"], ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -893,7 +856,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => CurrentScene = Scene.History,
-									icon: new(historyTexture, ForegroundColor)
+									icon: new(Resources["history_icon.png"], ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -905,7 +868,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => Clipboard.Set(Expression),
-									icon: new(copyTexture, ForegroundColor)
+									icon: new(Resources["copy_icon.png"], ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -917,7 +880,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									Paste,
-									icon: new(pasteTexture, ForegroundColor)
+									icon: new(Resources["paste_icon.png"], ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -929,7 +892,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => History.Add(Expression),
-									icon: new(bookmarkAddTexture, ForegroundColor)
+									icon: new(Resources["bookmark_add_icon.png"], ForegroundColor)
 								);
 							}
 							break;
@@ -1008,7 +971,7 @@ public readonly struct CalculatorUI
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => CurrentScene = Scene.Calculator,
-								icon: new(closeTexture, ForegroundColor)
+								icon: new(Resources["close_icon.png"], ForegroundColor)
 							);
 
 							Layout.DrawButton(
@@ -1023,7 +986,7 @@ public readonly struct CalculatorUI
 								{
 									History.Clear();
 								},
-								icon: new(trashAllTexture, RedButtonColor),
+								icon: new(Resources["trash_all_icon.png"], RedButtonColor),
 								pressMode: Layout.ButtonPressMode.HoldToPress
 							);
 
@@ -1063,7 +1026,7 @@ public readonly struct CalculatorUI
 										{
 											History.Remove(expressions[i]);
 										},
-										icon: new(trashTexture, RedButtonColor),
+										icon: new(Resources["trash_icon.png"], RedButtonColor),
 										pressMode: Layout.ButtonPressMode.HoldToPress
 									);
 
@@ -1078,7 +1041,7 @@ public readonly struct CalculatorUI
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() => Clipboard.Set(expressions[i]),
-										icon: new(copyTexture, ForegroundColor)
+										icon: new(Resources["copy_icon.png"], ForegroundColor)
 									);
 
 									int pickX = copyX - topIconSize - Padding;
@@ -1110,7 +1073,7 @@ public readonly struct CalculatorUI
 											TypingIndex = Expression.Length;
 											CurrentScene = Scene.Calculator;
 										},
-										icon: new(openTexture, ForegroundColor)
+										icon: new(Resources["open_icon.png"], ForegroundColor)
 									);
 
 									int pinX = pickX - topIconSize - Padding;
@@ -1138,7 +1101,9 @@ public readonly struct CalculatorUI
 											}
 										},
 										icon: new(
-											pinned ? unpinTexture : pinTexture,
+											pinned
+												? Resources["unpin_icon.png"]
+												: Resources["pin_icon.png"],
 											ForegroundColor
 										)
 									);
@@ -1160,7 +1125,7 @@ public readonly struct CalculatorUI
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => CurrentScene = Scene.Calculator,
-								icon: new(closeTexture, ForegroundColor)
+								icon: new(Resources["close_icon.png"], ForegroundColor)
 							);
 
 							Layout.DrawBox(
@@ -1186,7 +1151,9 @@ public readonly struct CalculatorUI
 									Settings.Save();
 								},
 								icon: new(
-									Settings.BookmarkOnEval ? toggleOnTexture : toggleOffTexture,
+									Settings.BookmarkOnEval
+										? Resources["toggle_on_icon.png"]
+										: Resources["toggle_off_icon.png"],
 									Settings.BookmarkOnEval ? ToggleOnColor : ToggleOffColor
 								)
 							);
@@ -1283,7 +1250,7 @@ public readonly struct CalculatorUI
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
-								icon: new(githubTexture, Color.WHITE)
+								icon: new(Resources["github_icon.png"], Color.WHITE)
 							);
 
 							Layout.DrawText(
