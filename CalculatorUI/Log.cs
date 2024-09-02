@@ -10,7 +10,27 @@ internal readonly struct Log
 	/// <summary>Tolerable difference between colors</summary>
 	private const int CONTRAST_LIMIT = 85;
 
+	private static string OldMessage = "";
 	internal static string Message = "";
+
+	[Conditional("DEBUG")]
+	public static void Assert(bool condition, string message)
+	{
+		if (!condition)
+		{
+			throw new InvalidOperationException(message);
+		}
+	}
+
+	[Conditional("DEBUG")]
+	internal static void Print()
+	{
+		if (OldMessage != Message)
+		{
+			Console.WriteLine(Message);
+			OldMessage = Message;
+		}
+	}
 
 	[Conditional("DEBUG")]
 	internal static void Draw()
