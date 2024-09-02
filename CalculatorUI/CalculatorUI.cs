@@ -408,57 +408,45 @@ public readonly struct CalculatorUI
 					int menuEntryWidth = ScreenWidth - menuSidePadding;
 					int menuVisibleEntries = ScreenHeight / menuEntryHeight;
 
+					Layout.ShadowStyle GreyButtonShadow =
+						new(ButtonShadowColor, ShadowDistance, Layout.ShadowKind.Pillar);
+					Layout.ShadowStyle RedButtonShadow =
+						new(RedButtonShadowColor, ShadowDistance, Layout.ShadowKind.Pillar);
+					Layout.ShadowStyle GreenButtonShadow =
+						new(GreenButtonShadowColor, ShadowDistance, Layout.ShadowKind.Pillar);
+
+					Layout.ButtonStyle GreyButton =
+						new(
+							BackgroundColor: ButtonBackgroundColor,
+							PressedColor: ButtonPressedColor,
+							HoveredColor: ButtonHoverColor,
+							new(BorderColor, BorderThickness),
+							ShadowStyle: GreyButtonShadow
+						);
+
+					Layout.ButtonStyle RedButton =
+						new(
+							BackgroundColor: RedButtonColor,
+							PressedColor: RedButtonPressedColor,
+							HoveredColor: RedButtonHoveredColor,
+							new(RedButtonBorderColor, BorderThickness),
+							ShadowStyle: RedButtonShadow
+						);
+
+					Layout.ButtonStyle GreenButton =
+						new(
+							BackgroundColor: GreenButtonColor,
+							PressedColor: GreenButtonPressedColor,
+							HoveredColor: GreenButtonHoveredColor,
+							new(GreenButtonBorderColor, BorderThickness),
+							ShadowStyle: GreenButtonShadow
+						);
+
 					switch (CurrentScene)
 					{
 						case Scene.Calculator:
 							// Draw buttons
 							{
-								Layout.ShadowStyle GreyButtonShadow =
-									new(
-										ButtonShadowColor,
-										ShadowDistance,
-										Layout.ShadowKind.Pillar
-									);
-								Layout.ShadowStyle RedButtonShadow =
-									new(
-										RedButtonShadowColor,
-										ShadowDistance,
-										Layout.ShadowKind.Pillar
-									);
-								Layout.ShadowStyle GreenButtonShadow =
-									new(
-										GreenButtonShadowColor,
-										ShadowDistance,
-										Layout.ShadowKind.Pillar
-									);
-
-								Layout.ButtonStyle GreyButton =
-									new(
-										BackgroundColor: ButtonBackgroundColor,
-										PressedColor: ButtonPressedColor,
-										HoveredColor: ButtonHoverColor,
-										new(BorderColor, BorderThickness),
-										ShadowStyle: GreyButtonShadow
-									);
-
-								Layout.ButtonStyle RedButton =
-									new(
-										BackgroundColor: RedButtonColor,
-										PressedColor: RedButtonPressedColor,
-										HoveredColor: RedButtonHoveredColor,
-										new(RedButtonBorderColor, BorderThickness),
-										ShadowStyle: RedButtonShadow
-									);
-
-								Layout.ButtonStyle GreenButton =
-									new(
-										BackgroundColor: GreenButtonColor,
-										PressedColor: GreenButtonPressedColor,
-										HoveredColor: GreenButtonHoveredColor,
-										new(GreenButtonBorderColor, BorderThickness),
-										ShadowStyle: GreenButtonShadow
-									);
-
 								int rowAmount = 7;
 								int heightPercentage = 100 / rowAmount;
 
@@ -722,7 +710,6 @@ public readonly struct CalculatorUI
 							// Draw Calculator Display
 							{
 								bool error = ErrorMessage == "";
-								string displayedExpression = Expression.Insert(TypingIndex, "|");
 
 								Layout.DrawButton(
 									DisplayX,
@@ -762,7 +749,7 @@ public readonly struct CalculatorUI
 									DisplayWidth,
 									DisplayHeight,
 									new(
-										displayedExpression,
+										Expression.Insert(TypingIndex, "|"),
 										FontSize,
 										ForegroundColor,
 										Layout.TextAlignment.Center,
@@ -786,101 +773,101 @@ public readonly struct CalculatorUI
 									Layout.TextAlignment.BottomLeft,
 									Layout.OverflowMode.Shrink
 								);
-							}
 
-							int keycode = Raylib.GetCharPressed();
+								int keycode = Raylib.GetCharPressed();
 
-							if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
-							{
-								Equal();
-								ButtonPressedTime = 0;
-							}
-							if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
-							{
-								TypingIndex = Math.Max(0, TypingIndex - 1);
-								ButtonPressedTime = 0;
-							}
-							if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
-							{
-								TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
-								ButtonPressedTime = 0;
-							}
-							else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
-							{
-								if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+								{
+									Equal();
+									ButtonPressedTime = 0;
+								}
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
 								{
 									TypingIndex = Math.Max(0, TypingIndex - 1);
+									ButtonPressedTime = 0;
 								}
-
-								ButtonPressedTime += Raylib.GetFrameTime();
-							}
-							else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
-							{
-								if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
 								{
 									TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
+									ButtonPressedTime = 0;
 								}
-
-								ButtonPressedTime += Raylib.GetFrameTime();
-							}
-							else if (
-								(
-									Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-									|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-								) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
-							)
-							{
-								Clipboard.Set(Expression);
-								ButtonPressedTime = 0;
-							}
-							else if (
-								(
-									Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-									|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-								) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
-							)
-							{
-								Paste();
-								ButtonPressedTime = 0;
-							}
-							else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
-							{
-								Backspace();
-								ButtonPressedTime = 0;
-							}
-							else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
-							{
-								if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+								else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
 								{
-									Backspace();
-								}
+									if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+									{
+										TypingIndex = Math.Max(0, TypingIndex - 1);
+									}
 
-								ButtonPressedTime += Raylib.GetFrameTime();
-							}
-							else if (keycode != 0)
-							{
-								if (
-									char.IsAsciiLetterOrDigit((char)keycode)
-									|| (char)keycode
-										is ' '
-											or '('
-											or ')'
-											or ','
-											or '^'
-											or '!'
-											or '%'
-											or '/'
-											or '+'
-											or '-'
-											or '*'
-											or '.'
+									ButtonPressedTime += Raylib.GetFrameTime();
+								}
+								else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+								{
+									if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+									{
+										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
+									}
+
+									ButtonPressedTime += Raylib.GetFrameTime();
+								}
+								else if (
+									(
+										Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+										|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
+									) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
 								)
 								{
-									InsertExpression(
-										TypingIndex,
-										((char)keycode).ToString().ToLowerInvariant()
-									);
+									Clipboard.Set(Expression);
 									ButtonPressedTime = 0;
+								}
+								else if (
+									(
+										Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+										|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
+									) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
+								)
+								{
+									Paste();
+									ButtonPressedTime = 0;
+								}
+								else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+								{
+									Backspace();
+									ButtonPressedTime = 0;
+								}
+								else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+								{
+									if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+									{
+										Backspace();
+									}
+
+									ButtonPressedTime += Raylib.GetFrameTime();
+								}
+								else if (keycode != 0)
+								{
+									if (
+										char.IsAsciiLetterOrDigit((char)keycode)
+										|| (char)keycode
+											is ' '
+												or '('
+												or ')'
+												or ','
+												or '^'
+												or '!'
+												or '%'
+												or '/'
+												or '+'
+												or '-'
+												or '*'
+												or '.'
+									)
+									{
+										InsertExpression(
+											TypingIndex,
+											((char)keycode).ToString().ToLowerInvariant()
+										);
+										ButtonPressedTime = 0;
+									}
 								}
 							}
 
