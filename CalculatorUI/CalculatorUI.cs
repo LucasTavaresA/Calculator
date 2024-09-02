@@ -387,13 +387,18 @@ public readonly struct CalculatorUI
 							ShadowStyle: GreyButtonShadow
 						);
 
-					Layout.ButtonStyle RedButton =
+					Layout.ButtonStyle BackspaceButton =
 						new(
 							BackgroundColor: RedButtonColor,
 							PressedColor: RedButtonPressedColor,
 							HoveredColor: RedButtonHoveredColor,
 							new(RedButtonBorderColor, BorderThickness),
-							ShadowStyle: RedButtonShadow
+							ShadowStyle: RedButtonShadow,
+							Icon: new(
+								Resources["backspace_icon.png"],
+								ForegroundColor,
+								(int)FontTextSize.Y
+							)
 						);
 
 					Layout.ButtonStyle GreenButton =
@@ -607,9 +612,9 @@ public readonly struct CalculatorUI
 										),
 										new Layout.Button(
 											25,
-											new("<-", FontSize, ForegroundColor),
+											null,
 											Backspace,
-											RedButton,
+											BackspaceButton,
 											Layout.ButtonPressMode.HoldToRepeat
 										),
 										new Layout.Button(
