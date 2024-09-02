@@ -313,7 +313,7 @@ public readonly struct CalculatorUI
 				{
 					ScreenWidth = Raylib.GetScreenWidth();
 					ScreenHeight = Raylib.GetScreenHeight();
-					FontSize = (ScreenWidth < ScreenHeight ? ScreenWidth : ScreenHeight) / 15;
+					FontSize = (ScreenWidth + ScreenHeight) / 38;
 					BorderThickness = Math.Max(
 						(ScreenWidth > ScreenHeight ? ScreenWidth : ScreenHeight) / 500,
 						1
