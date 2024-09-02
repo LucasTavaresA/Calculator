@@ -96,7 +96,10 @@ main() {
     dotnet publish $BUILD_FLAGS "${PROGRAM}Android" /p:DefineConstants="\"$CONSTANTS\""
 
     if [ "$RUN" = 1 ]; then
-      echo "Can't run after building on android!"
+			# FIXME(LucasTA): This weird name comes from Raylib_cs generated AssemblyManifest.xml
+			# maybe just do my own stuff for raylib
+			adb install -r build/com.lucasta.calculator-Signed.apk
+			adb shell am start -n com.lucasta.calculator/crc6480e6caa1236d905b.MainActivity
     fi
   fi
 }
