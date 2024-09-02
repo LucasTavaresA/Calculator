@@ -34,6 +34,8 @@ internal readonly struct Layout
 		TopRight,
 		Right,
 		BottomRight,
+		Top,
+		Bottom,
 	}
 
 	internal enum ButtonPressMode
@@ -229,6 +231,14 @@ internal readonly struct Layout
 				break;
 			case TextAlignment.BottomRight:
 				textX = x + (width - (int)textSize.X);
+				textY = y + (height - (int)textSize.Y);
+				break;
+			case TextAlignment.Top:
+				textX = x + (width - (int)textSize.X) / 2;
+				textY = y;
+				break;
+			case TextAlignment.Bottom:
+				textX = x + (width - (int)textSize.X) / 2;
 				textY = y + (height - (int)textSize.Y);
 				break;
 			default:
