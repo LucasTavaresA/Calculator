@@ -1273,7 +1273,8 @@ public readonly struct CalculatorUI
 							);
 							break;
 						default:
-							throw new UnreachableException("Unknown scene");
+							Log.Halt("Unknown scene");
+							break;
 					}
 
 					if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
