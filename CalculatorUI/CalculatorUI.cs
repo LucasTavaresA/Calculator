@@ -631,16 +631,16 @@ public readonly struct CalculatorUI
 										heightPercentage,
 										new Layout.Button(
 											25,
+											new(".", FontSize, ForegroundColor),
+											() => InsertExpression("."),
+											GreyButton
+										),
+										new Layout.Button(
+											25,
 											new("0", FontSize, ForegroundColor),
 											() => InsertExpression("0"),
 											GreyButton,
 											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new(".", FontSize, ForegroundColor),
-											() => InsertExpression("."),
-											GreyButton
 										),
 										new Layout.Button(
 											25,
