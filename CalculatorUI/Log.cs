@@ -57,11 +57,42 @@ internal readonly struct Log
 
 	/// <summary>Appends the given **message** to the logged message if **condition** is true</summary>
 	[Conditional("DEBUG")]
-	internal static void IfTrue(bool condition, string message)
+	internal static void If(bool condition, string message)
 	{
 		if (condition)
 		{
 			Message += message;
+		}
+	}
+
+	/// <summary>Appends the given **message** to the logged message if **condition** is true and draws circle on the error location</summary>
+	[Conditional("DEBUG")]
+	internal static void IfDrawPoint(bool condition, string message, int x, int y)
+	{
+		if (condition)
+		{
+			Message += message;
+
+			Raylib.DrawCircle(x, y, 5, Color.RED);
+		}
+	}
+
+	/// <summary>Appends the given **message** to the logged message if **condition** is true and draws a border on the error location</summary>
+	[Conditional("DEBUG")]
+	internal static void IfDrawBorder(
+		bool condition,
+		string message,
+		int x,
+		int y,
+		int width,
+		int height
+	)
+	{
+		if (condition)
+		{
+			Message += message;
+
+			Raylib.DrawRectangleLinesEx(new(x, y, width, height), 5, Color.RED);
 		}
 	}
 }

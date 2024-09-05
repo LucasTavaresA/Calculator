@@ -169,14 +169,18 @@ internal readonly struct Layout
 			CalculatorUI.FONT_SPACING
 		);
 
-		Log.IfTrue(
+		Log.IfDrawPoint(
 			overflow == OverflowMode.Overflow && (textSize.X > width || textSize.Y > height),
-			$"ERROR: The text at the {x},{y} text box does not fit its box!\n"
+			$"ERROR: The text at the {x},{y} text box does not fit its box!\n",
+			x,
+			y
 		);
 
-		Log.IfTrue(
+		Log.IfDrawPoint(
 			IsBadContrast(backgroundColor, textColor),
-			$"ERROR: The text at the {x},{y} text box is not visible!\n"
+			$"ERROR: The text at the {x},{y} text box is not visible!\n",
+			x,
+			y
 		);
 
 		switch (overflow)
@@ -753,14 +757,18 @@ internal readonly struct Layout
 		params ButtonRow[] rows
 	)
 	{
-		Log.IfTrue(
+		Log.IfDrawBorder(
 			x < 0
 				|| y < 0
 				|| width <= 0
 				|| height <= 0
 				|| x + width > CalculatorUI.ScreenWidth
 				|| y + height > CalculatorUI.ScreenHeight,
-			"ERROR: Button grid is outside of the screen!\n"
+			"ERROR: Button grid is outside of the screen!\n",
+			x,
+			y,
+			width,
+			height
 		);
 
 		int availableHeight = height - (padding * (rows.Length - 1));
@@ -798,18 +806,26 @@ internal readonly struct Layout
 				curX += colLength + padding;
 				takenWidth += colLength;
 
-				Log.IfTrue(
+				Log.IfDrawBorder(
 					takenWidth > availableWidth,
-					$"ERROR: Button grid {j + 1} column takes more than the available width!\n"
+					$"ERROR: Button grid {j + 1} column takes more than the available width!\n",
+					x,
+					y,
+					width,
+					rowLength
 				);
 			}
 
 			curY += rowLength + padding;
 			takenHeight += rowLength;
 
-			Log.IfTrue(
+			Log.IfDrawBorder(
 				takenHeight > availableHeight,
-				$"ERROR: Button grid {i + 1} row takes more than the available height!\n"
+				$"ERROR: Button grid {i + 1} row takes more than the available height!\n",
+				x,
+				y,
+				width,
+				height
 			);
 		}
 	}
