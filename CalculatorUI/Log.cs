@@ -7,9 +7,6 @@ namespace Calculator;
 
 internal readonly struct Log
 {
-	/// <summary>Tolerable difference between colors</summary>
-	private const int CONTRAST_LIMIT = 85;
-
 	/// <summary>The last message logged, used to not show the same message twice</summary>
 	private static string OldMessage = "";
 
@@ -63,20 +60,6 @@ internal readonly struct Log
 	internal static void IfTrue(bool condition, string message)
 	{
 		if (condition)
-		{
-			Message += message;
-		}
-	}
-
-	/// <summary>Appends the given **message** to the logged message if the contrast between the background and text colors is too low</summary>
-	[Conditional("DEBUG")]
-	internal static void IfBadContrast(Color backgroundColor, Color textColor, string message)
-	{
-		int rDiff = Math.Abs(backgroundColor.R - textColor.R);
-		int gDiff = Math.Abs(backgroundColor.G - textColor.G);
-		int bDiff = Math.Abs(backgroundColor.B - textColor.B);
-
-		if ((rDiff + gDiff + bDiff) / 3 < CONTRAST_LIMIT)
 		{
 			Message += message;
 		}

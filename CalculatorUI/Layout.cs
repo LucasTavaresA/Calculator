@@ -16,6 +16,9 @@ internal readonly struct Layout
 	internal static (int, int, int, int)? LastHotButton = null;
 	internal static readonly Rectangle ICON_RECTANGLE = new(0, 0, 160, 160);
 
+	/// <summary>Tolerable difference between colors</summary>
+	private const int CONTRAST_LIMIT = 70;
+
 	internal enum ShadowKind
 	{
 		Float = 0,
@@ -89,6 +92,22 @@ internal readonly struct Layout
 
 	internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
+	internal static bool IsBadContrast(Color backgroundColor, Color textColor)
+	{
+		int rDiff = Math.Abs(backgroundColor.R - textColor.R);
+		int gDiff = Math.Abs(backgroundColor.G - textColor.G);
+		int bDiff = Math.Abs(backgroundColor.B - textColor.B);
+
+		if ((rDiff + gDiff + bDiff) / 3 < CONTRAST_LIMIT)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
 	internal static bool IsPointInsideRect(
 		int x,
 		int y,
@@ -155,9 +174,8 @@ internal readonly struct Layout
 			$"ERROR: The text at the {x},{y} text box does not fit its box!\n"
 		);
 
-		Log.IfBadContrast(
-			backgroundColor,
-			textColor,
+		Log.IfTrue(
+			IsBadContrast(backgroundColor, textColor),
 			$"ERROR: The text at the {x},{y} text box is not visible!\n"
 		);
 
