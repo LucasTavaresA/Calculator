@@ -198,6 +198,17 @@ public readonly struct CalculatorUI
 	private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
 	private static readonly Dictionary<string, Texture2D> Resources = new();
 
+	private static Texture2D GetResource(string resource)
+	{
+		if (Resources.TryGetValue(resource, out Texture2D texture))
+		{
+			return texture;
+		}
+
+		Log.Halt($"Resource '{resource}' not found");
+		return Resources["not_found.png"];
+	}
+
 	internal enum Scene
 	{
 		Calculator,
@@ -305,7 +316,7 @@ public readonly struct CalculatorUI
 			}
 
 			// TODO(LucasTA): make a nicer icon for the app, that matches how buttons look in it
-			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(Resources["plus_icon.png"]));
+			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(GetResource("plus_icon.png")));
 
 			while (!Raylib.WindowShouldClose())
 			{
@@ -395,7 +406,7 @@ public readonly struct CalculatorUI
 							new(RedButtonBorderColor, BorderThickness),
 							ShadowStyle: RedButtonShadow,
 							Icon: new(
-								Resources["backspace_icon.png"],
+								GetResource("backspace_icon.png"),
 								ForegroundColor,
 								(int)FontTextSize.Y
 							)
@@ -459,7 +470,7 @@ public readonly struct CalculatorUI
 												new(BorderColor, BorderThickness),
 												ShadowStyle: GreyButtonShadow,
 												Icon: new(
-													Resources["pi_icon.png"],
+													GetResource("pi_icon.png"),
 													ForegroundColor,
 													(int)FontTextSize.Y
 												)
@@ -692,7 +703,7 @@ public readonly struct CalculatorUI
 										TypingIndex = Math.Max(0, TypingIndex - 1);
 									},
 									pressMode: Layout.ButtonPressMode.HoldToRepeat,
-									icon: new(Resources["arrow_left.png"], DisplayBackgroundColor)
+									icon: new(GetResource("arrow_left.png"), DisplayBackgroundColor)
 								);
 
 								Layout.DrawButton(
@@ -708,7 +719,10 @@ public readonly struct CalculatorUI
 										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
 									},
 									pressMode: Layout.ButtonPressMode.HoldToRepeat,
-									icon: new(Resources["arrow_right.png"], DisplayBackgroundColor)
+									icon: new(
+										GetResource("arrow_right.png"),
+										DisplayBackgroundColor
+									)
 								);
 
 								Layout.DrawTextBox(
@@ -849,7 +863,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => CurrentScene = Scene.Settings,
-									icon: new(Resources["settings_icon.png"], ForegroundColor)
+									icon: new(GetResource("settings_icon.png"), ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -861,7 +875,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => CurrentScene = Scene.History,
-									icon: new(Resources["history_icon.png"], ForegroundColor)
+									icon: new(GetResource("history_icon.png"), ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -873,7 +887,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => Clipboard.Set(Expression),
-									icon: new(Resources["copy_icon.png"], ForegroundColor)
+									icon: new(GetResource("copy_icon.png"), ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -885,7 +899,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									Paste,
-									icon: new(Resources["paste_icon.png"], ForegroundColor)
+									icon: new(GetResource("paste_icon.png"), ForegroundColor)
 								);
 
 								Layout.DrawButton(
@@ -897,7 +911,7 @@ public readonly struct CalculatorUI
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => History.Add(Expression),
-									icon: new(Resources["bookmark_add_icon.png"], ForegroundColor)
+									icon: new(GetResource("bookmark_add_icon.png"), ForegroundColor)
 								);
 							}
 							break;
@@ -976,7 +990,7 @@ public readonly struct CalculatorUI
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => CurrentScene = Scene.Calculator,
-								icon: new(Resources["close_icon.png"], ForegroundColor)
+								icon: new(GetResource("close_icon.png"), ForegroundColor)
 							);
 
 							Layout.DrawButton(
@@ -991,7 +1005,7 @@ public readonly struct CalculatorUI
 								{
 									History.Clear();
 								},
-								icon: new(Resources["trash_all_icon.png"], RedButtonColor),
+								icon: new(GetResource("trash_all_icon.png"), RedButtonColor),
 								pressMode: Layout.ButtonPressMode.HoldToPress
 							);
 
@@ -1031,7 +1045,7 @@ public readonly struct CalculatorUI
 										{
 											History.Remove(expressions[i]);
 										},
-										icon: new(Resources["trash_icon.png"], RedButtonColor),
+										icon: new(GetResource("trash_icon.png"), RedButtonColor),
 										pressMode: Layout.ButtonPressMode.HoldToPress
 									);
 
@@ -1046,7 +1060,7 @@ public readonly struct CalculatorUI
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() => Clipboard.Set(expressions[i]),
-										icon: new(Resources["copy_icon.png"], ForegroundColor)
+										icon: new(GetResource("copy_icon.png"), ForegroundColor)
 									);
 
 									int pickX = copyX - topIconSize - Padding;
@@ -1078,7 +1092,7 @@ public readonly struct CalculatorUI
 											TypingIndex = Expression.Length;
 											CurrentScene = Scene.Calculator;
 										},
-										icon: new(Resources["open_icon.png"], ForegroundColor)
+										icon: new(GetResource("open_icon.png"), ForegroundColor)
 									);
 
 									int pinX = pickX - topIconSize - Padding;
@@ -1107,8 +1121,8 @@ public readonly struct CalculatorUI
 										},
 										icon: new(
 											pinned
-												? Resources["unpin_icon.png"]
-												: Resources["pin_icon.png"],
+												? GetResource("unpin_icon.png")
+												: GetResource("pin_icon.png"),
 											ForegroundColor
 										)
 									);
@@ -1130,7 +1144,7 @@ public readonly struct CalculatorUI
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => CurrentScene = Scene.Calculator,
-								icon: new(Resources["close_icon.png"], ForegroundColor)
+								icon: new(GetResource("close_icon.png"), ForegroundColor)
 							);
 
 							Layout.DrawBox(
@@ -1157,8 +1171,8 @@ public readonly struct CalculatorUI
 								},
 								icon: new(
 									Settings.BookmarkOnEval
-										? Resources["toggle_on_icon.png"]
-										: Resources["toggle_off_icon.png"],
+										? GetResource("toggle_on_icon.png")
+										: GetResource("toggle_off_icon.png"),
 									Settings.BookmarkOnEval ? ToggleOnColor : ToggleOffColor
 								)
 							);
@@ -1255,7 +1269,7 @@ public readonly struct CalculatorUI
 								ButtonPressedColor,
 								TransparentButtonHoverColor,
 								() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
-								icon: new(Resources["github_icon.png"], Color.WHITE)
+								icon: new(GetResource("github_icon.png"), Color.WHITE)
 							);
 
 							Layout.DrawText(
