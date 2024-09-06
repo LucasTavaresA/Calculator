@@ -311,7 +311,6 @@ public readonly struct CalculatorUI
 				}
 			}
 
-			// TODO(LucasTA): make a nicer icon for the app, that matches how buttons look in it
 			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(GetResource("appicon.png")));
 
 			while (!Raylib.WindowShouldClose())
