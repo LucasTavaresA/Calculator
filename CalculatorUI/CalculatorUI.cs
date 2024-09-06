@@ -194,7 +194,6 @@ public readonly struct CalculatorUI
 
 	internal static Font Fonte;
 
-	private const string ASSEMBLY_PREFIX = "CalculatorUI.Resources.";
 	private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
 	private static readonly Dictionary<string, Texture2D> Resources = new();
 
@@ -300,10 +299,7 @@ public readonly struct CalculatorUI
 			{
 				if (resource.EndsWith(".png"))
 				{
-					Resources.Add(
-						resource.Substring(ASSEMBLY_PREFIX.Length),
-						LoadTextureFromResource(resource)
-					);
+					Resources.Add(resource, LoadTextureFromResource(resource));
 				}
 				else if (resource.EndsWith(".ttf"))
 				{
@@ -316,7 +312,7 @@ public readonly struct CalculatorUI
 			}
 
 			// TODO(LucasTA): make a nicer icon for the app, that matches how buttons look in it
-			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(GetResource("plus_icon.png")));
+			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(GetResource("appicon.png")));
 
 			while (!Raylib.WindowShouldClose())
 			{
