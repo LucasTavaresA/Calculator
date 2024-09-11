@@ -75,7 +75,7 @@ public readonly struct CalculatorUI
 
 		try
 		{
-			Result = Evaluator.Evaluate(Expression).ToString("G", CultureInfo.InvariantCulture);
+			Result = Evaluator.Evaluate(Expression).ToString(CultureInfo.InvariantCulture);
 		}
 		catch (Exception)
 		{
@@ -102,7 +102,7 @@ public readonly struct CalculatorUI
 
 		try
 		{
-			Result = Evaluator.Evaluate(Expression).ToString("G", CultureInfo.InvariantCulture);
+			Result = Evaluator.Evaluate(Expression).ToString(CultureInfo.InvariantCulture);
 		}
 		catch (Exception)
 		{
@@ -122,7 +122,7 @@ public readonly struct CalculatorUI
 			{
 				string result = Evaluator
 					.Evaluate(Expression)
-					.ToString("G", CultureInfo.InvariantCulture);
+					.ToString(CultureInfo.InvariantCulture);
 				ErrorMessage = "";
 
 				if (Settings.BookmarkOnEval)
@@ -1077,7 +1077,7 @@ public readonly struct CalculatorUI
 											{
 												Result = Evaluator
 													.Evaluate(Expression)
-													.ToString("G", CultureInfo.InvariantCulture);
+													.ToString(CultureInfo.InvariantCulture);
 											}
 											catch (Exception)
 											{
