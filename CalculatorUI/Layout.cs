@@ -50,9 +50,9 @@ internal readonly struct Layout
 
 	internal enum OverflowMode
 	{
+		Shrink,
 		Overflow,
 		Truncate,
-		Shrink,
 	}
 
 	internal readonly record struct TextFormat(
@@ -60,7 +60,7 @@ internal readonly struct Layout
 		int FontSize,
 		Color TextColor,
 		TextAlignment Alignment = TextAlignment.Center,
-		OverflowMode Overflow = OverflowMode.Overflow
+		OverflowMode Overflow = OverflowMode.Shrink
 	);
 
 	internal readonly record struct ShadowStyle(
@@ -154,7 +154,7 @@ internal readonly struct Layout
 		Color backgroundColor,
 		int fontSize,
 		TextAlignment alignment = TextAlignment.Center,
-		OverflowMode overflow = OverflowMode.Overflow
+		OverflowMode overflow = OverflowMode.Shrink
 	)
 	{
 		x += padding;
@@ -167,13 +167,6 @@ internal readonly struct Layout
 			text,
 			(int)fontSize,
 			CalculatorUI.FONT_SPACING
-		);
-
-		Log.IfDrawPoint(
-			overflow == OverflowMode.Overflow && (textSize.X > width || textSize.Y > height),
-			$"ERROR: The text at the {x},{y} text box does not fit its box!\n",
-			x,
-			y
 		);
 
 		Log.IfDrawPoint(
@@ -212,7 +205,7 @@ internal readonly struct Layout
 				break;
 			case OverflowMode.Shrink:
 				// HACK(LucasTA): This will blow up someday
-				while (textSize.X > width)
+				while (textSize.X > width || textSize.Y > height)
 				{
 					fontSize -= 1;
 
@@ -225,6 +218,13 @@ internal readonly struct Layout
 				}
 				break;
 		}
+
+		Log.IfDrawPoint(
+			textSize.X > width || textSize.Y > height,
+			$"ERROR: The text at the {x},{y} text box does not fit its box!\n",
+			x,
+			y
+		);
 
 		int textX;
 		int textY;

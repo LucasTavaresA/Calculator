@@ -729,8 +729,7 @@ public readonly struct CalculatorUI
 										Expression.Insert(TypingIndex, "|"),
 										FontSize,
 										ForegroundColor,
-										Layout.TextAlignment.Center,
-										Layout.OverflowMode.Shrink
+										Layout.TextAlignment.Center
 									),
 									// NOTE(LucasTA): so that the arrows draw behind are visible
 									TransparentButtonHoverColor,
@@ -747,8 +746,7 @@ public readonly struct CalculatorUI
 									error ? DarkForegroundColor : ErrorColor,
 									DisplayBackgroundColor,
 									FontSize,
-									Layout.TextAlignment.BottomLeft,
-									Layout.OverflowMode.Shrink
+									Layout.TextAlignment.BottomLeft
 								);
 
 								int keycode = Raylib.GetCharPressed();
@@ -1182,8 +1180,7 @@ public readonly struct CalculatorUI
 								ForegroundColor,
 								MenuEntryBackgroundColor,
 								FontSize,
-								Layout.TextAlignment.Left,
-								Layout.OverflowMode.Shrink
+								Layout.TextAlignment.Left
 							);
 
 							Layout.DrawTextBox(
@@ -1195,8 +1192,7 @@ public readonly struct CalculatorUI
 									"Version:",
 									FontSize,
 									ForegroundColor,
-									Layout.TextAlignment.Left,
-									Layout.OverflowMode.Shrink
+									Layout.TextAlignment.Left
 								),
 								MenuEntryBackgroundColor,
 								new(BorderColor, BorderThickness)
@@ -1212,8 +1208,7 @@ public readonly struct CalculatorUI
 								ForegroundColor,
 								MenuEntryBackgroundColor,
 								FontSize,
-								Layout.TextAlignment.Right,
-								Layout.OverflowMode.Shrink
+								Layout.TextAlignment.Right
 							);
 
 							Layout.DrawTextBox(
@@ -1225,8 +1220,7 @@ public readonly struct CalculatorUI
 									"License:",
 									FontSize,
 									ForegroundColor,
-									Layout.TextAlignment.Left,
-									Layout.OverflowMode.Shrink
+									Layout.TextAlignment.Left
 								),
 								MenuEntryBackgroundColor,
 								new(BorderColor, BorderThickness)
@@ -1242,8 +1236,7 @@ public readonly struct CalculatorUI
 								ForegroundColor,
 								MenuEntryBackgroundColor,
 								FontSize,
-								Layout.TextAlignment.Right,
-								Layout.OverflowMode.Shrink
+								Layout.TextAlignment.Right
 							);
 
 							Layout.DrawBox(
@@ -1277,8 +1270,7 @@ public readonly struct CalculatorUI
 								ForegroundColor,
 								MenuEntryBackgroundColor,
 								FontSize,
-								Layout.TextAlignment.Left,
-								Layout.OverflowMode.Shrink
+								Layout.TextAlignment.Left
 							);
 							break;
 						default:
