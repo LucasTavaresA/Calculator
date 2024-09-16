@@ -292,7 +292,6 @@ public readonly struct CalculatorUI
 			Raylib.SetTargetFPS(TARGET_FPS);
 			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
-			History.Load();
 			Settings.Load();
 
 			foreach (string resource in Assembly.GetManifestResourceNames())
