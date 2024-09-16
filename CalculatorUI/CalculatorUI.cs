@@ -691,8 +691,8 @@ public readonly struct CalculatorUI
 									displayWidth / 2,
 									displayHeight,
 									Transparent,
-									ButtonPressedColor,
 									TransparentButtonHoverColor,
+									Transparent,
 									() =>
 									{
 										TypingIndex = Math.Max(0, TypingIndex - 1);
@@ -707,8 +707,8 @@ public readonly struct CalculatorUI
 									displayWidth / 2,
 									displayHeight,
 									Transparent,
-									ButtonPressedColor,
 									TransparentButtonHoverColor,
+									Transparent,
 									() =>
 									{
 										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
