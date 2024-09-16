@@ -1,4 +1,5 @@
-﻿#if LINUX || MACOS || WINDOWS
+﻿using System;
+#if LINUX || MACOS || WINDOWS
 using System.IO;
 #elif ANDROID
 using Xamarin.Essentials;
@@ -26,39 +27,44 @@ internal readonly struct Settings
 	internal static void Load()
 	{
 #if LINUX || MACOS || WINDOWS
-		if (File.Exists(SettingsFilePath))
-		{
-			foreach (string line in File.ReadAllLines(SettingsFilePath))
-			{
-				if (string.IsNullOrWhiteSpace(line))
-				{
-					continue;
-				}
-				else if (line.StartsWith("BookmarkOnEval="))
-				{
-					string value = line.Split('=')[1];
+		string filePath = Data.DataFolder + "CalculatorSettings";
+		string settings = "";
 
-					if (bool.TryParse(value, out bool b))
+		if (File.Exists(filePath))
+		{
+			settings = File.ReadAllText(filePath);
+		}
+#elif ANDROID
+		string settings = Preferences.Get("CalculatorSettings", string.Empty);
+#endif
+
+		foreach (
+			string setting in settings.Split(
+				Environment.NewLine,
+				StringSplitOptions.RemoveEmptyEntries
+			)
+		)
+		{
+			string[] split = setting.Split('=');
+
+			if (split.Length != 2 || split[0] == string.Empty || split[1] == string.Empty)
+			{
+				continue;
+			}
+
+			switch (split[0].Trim())
+			{
+				case "BookmarkOnEval":
+					if (bool.TryParse(split[1].Trim(), out bool b))
 					{
 						BookmarkOnEval = b;
 					}
 					else
 					{
-						throw new InvalidDataException(
-							"Invalid settings file! Wrong value for BookmarkOnEval, it can only be true or false."
-						);
+						BookmarkOnEval = true;
 					}
-				}
-				else
-				{
-					throw new InvalidDataException(
-						$"Invalid settings file! '{line}' is an invalid setting."
-					);
-				}
+					break;
 			}
 		}
-#elif ANDROID
-		BookmarkOnEval = Preferences.Get("BookmarkOnEval", bool.TrueString) == bool.TrueString;
-#endif
 	}
 }
