@@ -33,6 +33,10 @@
 		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
 	</ItemGroup>
 
+	<PropertyGroup Condition="'$(DEBUG)' != ''">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
 		<DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
 	</PropertyGroup>
@@ -45,5 +49,9 @@
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
 		<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-macos'">
+		<DefineConstants>$(DefineConstants);MACOS</DefineConstants>
 	</PropertyGroup>
 </Project>

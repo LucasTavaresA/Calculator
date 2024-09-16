@@ -10,7 +10,6 @@ ANDROID=0
 MACOS=0
 PROGRAM="Calculator"
 BUILD_FLAGS="-o build"
-CONSTANTS=""
 PWD="$(pwd)"
 
 print_help() {
@@ -26,22 +25,18 @@ main() {
   case "$1" in
   "android")
     ANDROID=1
-    CONSTANTS="ANDROID"
     ;;
   "linux")
     LINUX=1
-    CONSTANTS="LINUX"
     BUILD_FLAGS="$BUILD_FLAGS -f net8.0"
     ;;
   "windows")
     WINDOWS=1
-    CONSTANTS="WINDOWS"
     BUILD_FLAGS="$BUILD_FLAGS -f net8.0-windows -r win-x64"
     ;;
   "macos")
     MACOS=1
-    CONSTANTS="MACOS"
-    BUILD_FLAGS="$BUILD_FLAGS -r osx-x64"
+    BUILD_FLAGS="$BUILD_FLAGS -f net8.0-macos -r osx-x64"
     ;;
   *)
     echo "'$1' is not a valid platform!"
@@ -81,11 +76,11 @@ main() {
   done
 
   if [ "$RELEASE" = 0 ]; then
-    CONSTANTS="$CONSTANTS DEBUG"
+    DEBUG="1"
   fi
 
   if [ "$LINUX" = 1 ] || [ "$WINDOWS" = 1 ] || [ "$MACOS" = 1 ]; then
-    dotnet publish $BUILD_FLAGS "${PROGRAM}Desktop" /p:DefineConstants="\"$CONSTANTS\""
+		dotnet publish $BUILD_FLAGS "${PROGRAM}Desktop" /p:DEBUG="\"$DEBUG\""
 
     if [ "$RUN" = 1 ]; then
       ./build/${PROGRAM}Desktop
@@ -93,7 +88,7 @@ main() {
   elif [ "$ANDROID" = 1 ]; then
     rm -rf ./**/bin/ ./**/obj/ ./build/
 
-    dotnet publish $BUILD_FLAGS "${PROGRAM}Android" /p:DefineConstants="\"$CONSTANTS\""
+    dotnet publish $BUILD_FLAGS "${PROGRAM}Android" /p:DEBUG="\"$DEBUG\""
 
     if [ "$RUN" = 1 ]; then
 			# FIXME(LucasTA): This weird name comes from Raylib_cs generated AssemblyManifest.xml
