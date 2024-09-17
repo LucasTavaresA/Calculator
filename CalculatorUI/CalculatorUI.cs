@@ -9,14 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Numerics;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
 using Eval;
 
 using Raylib_cs;
+
+using static Calculator.Resource;
 #if ANDROID
 using Android.Content;
 #endif
@@ -194,20 +193,6 @@ public readonly struct CalculatorUI
 
 	internal static Font Fonte;
 
-	private static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
-	private static readonly Dictionary<string, Texture2D> Resources = new();
-
-	private static Texture2D GetResource(string resource)
-	{
-		if (Resources.TryGetValue(resource, out Texture2D texture))
-		{
-			return texture;
-		}
-
-		Log.Halt($"Resource '{resource}' not found");
-		return Resources["not_found.png"];
-	}
-
 	internal enum Scene
 	{
 		Calculator,
@@ -216,65 +201,6 @@ public readonly struct CalculatorUI
 	}
 
 	internal static Scene CurrentScene = Scene.Calculator;
-
-	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-	static extern Image LoadImageFromMemory(string fileType, byte[] fileData, int dataSize);
-
-	public static Texture2D LoadTextureFromResource(string resource)
-	{
-		Texture2D texture;
-
-		using (Stream stream = Assembly.GetManifestResourceStream(resource)!)
-		{
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				stream.CopyTo(memoryStream);
-
-				Image image = LoadImageFromMemory(
-					".png",
-					memoryStream.ToArray(),
-					(int)memoryStream.Length
-				);
-				texture = Raylib.LoadTextureFromImage(image);
-				Raylib.UnloadImage(image);
-			}
-		}
-
-		return texture;
-	}
-
-	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-	static extern unsafe Font LoadFontFromMemory(
-		string fileType,
-		byte[] fileData,
-		int dataSize,
-		int fontSize,
-		int* codepoints,
-		int codepointCount
-	);
-
-	public static unsafe Font LoadFontFromResource(string resource, int fontSize)
-	{
-		Font font;
-
-		using (Stream stream = Assembly.GetManifestResourceStream(resource)!)
-		{
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				stream.CopyTo(memoryStream);
-				font = LoadFontFromMemory(
-					".ttf",
-					memoryStream.ToArray(),
-					(int)memoryStream.Length,
-					fontSize,
-					null,
-					256
-				);
-			}
-		}
-
-		return font;
-	}
 
 	public static void MainLoop()
 	{
@@ -298,14 +224,14 @@ public readonly struct CalculatorUI
 			{
 				if (resource.EndsWith(".png"))
 				{
-					Resources.Add(resource, LoadTextureFromResource(resource));
+					Resources.Add(resource, LoadTextureFromAssembly(resource));
 				}
 				else if (resource.EndsWith(".ttf"))
 				{
 					// NOTE(LucasTA): Without HIGHDPI the font has artifacts, so we load
 					// it realy big and then scale it down
 					// just the filter is really blurry
-					Fonte = LoadFontFromResource(resource, 64);
+					Fonte = LoadFontFromAssembly(resource, 64);
 					Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
 				}
 			}
