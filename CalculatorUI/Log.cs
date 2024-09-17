@@ -17,7 +17,8 @@ internal readonly struct Log
 	[Conditional("DEBUG")]
 	internal static void Halt(string message)
 	{
-		throw new InvalidOperationException(message);
+		Console.WriteLine(message);
+		Environment.Exit(1);
 	}
 
 	/// <summary>Halts the program if **condition** fails, does nothing in release builds</summary>

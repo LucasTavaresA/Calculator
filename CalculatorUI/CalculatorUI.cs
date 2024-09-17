@@ -349,7 +349,7 @@ public readonly struct CalculatorUI
 								int rowAmount = 7;
 								int heightPercentage = 100 / rowAmount;
 
-								Layout.ButtonRow[] buttonGrid = new Layout.ButtonRow[]
+								Layout.ButtonRow[] calculatorButtons = new Layout.ButtonRow[]
 								{
 									new Layout.ButtonRow(
 										heightPercentage,
@@ -602,7 +602,7 @@ public readonly struct CalculatorUI
 									ScreenWidth - (Padding * 2),
 									ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
 									Padding,
-									buttonGrid
+									calculatorButtons
 								);
 							}
 
