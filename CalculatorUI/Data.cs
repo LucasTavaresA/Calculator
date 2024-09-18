@@ -58,4 +58,14 @@ internal readonly struct Data
 
 		return list;
 	}
+
+	internal static void SaveString(string str, string fileName)
+	{
+#if LINUX || MACOS || WINDOWS
+		Directory.CreateDirectory(Data.DataFolder);
+		File.WriteAllText(Data.DataFolder + fileName, str);
+#elif ANDROID
+		Preferences.Set(fileName, str);
+#endif
+	}
 }

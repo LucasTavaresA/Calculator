@@ -10,11 +10,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
+using System.Text;
 
 using Eval;
 
 using Raylib_cs;
 
+using static Calculator.Conversion;
+using static Calculator.Currency;
 using static Calculator.Resource;
 #if ANDROID
 using Android.Content;
@@ -43,6 +46,8 @@ public readonly struct CalculatorUI
 	private static readonly Color ButtonHoverColor = BorderColor;
 	private static readonly Color ButtonBackgroundColor = Color.DARKGRAY;
 	private static readonly Color ButtonPressedColor = DarkerGray;
+	private static readonly Color ButtonSelectedColor = ForegroundColor;
+	private static readonly Color ButtonDeselectedColor = Color.LIGHTGRAY;
 	private static readonly Color ButtonShadowColor = ButtonPressedColor;
 
 	private static readonly Color Transparent = Color.BLANK;
@@ -168,6 +173,7 @@ public readonly struct CalculatorUI
 	internal static float ButtonPressedTime;
 	internal static float KeyRepeatInterval = INITIAL_REPEAT_INTERVAL;
 	internal static float HistoryScrollOffset = 0;
+	internal static float DropDownScrollOffset = 0;
 	internal static float ButtonHoldToPressTime = 0.5f;
 	internal static bool ButtonWasPressed = false;
 	internal static bool ButtonWasHeldPressed = false;
@@ -198,9 +204,19 @@ public readonly struct CalculatorUI
 		Calculator,
 		History,
 		Settings,
+		Converters,
+		Conversions,
 	}
 
 	internal static Scene CurrentScene = Scene.Calculator;
+
+	internal enum DropDown
+	{
+		From,
+		To,
+	}
+
+	private static DropDown CurrentDropDown;
 
 	public static void MainLoop()
 	{
@@ -219,6 +235,39 @@ public readonly struct CalculatorUI
 			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
 
 			Settings.Load();
+
+			if ((DateTime.Now.Date - Settings.LastAPICallTime).TotalDays >= 1)
+			{
+				try
+				{
+					Dictionary<string, double> rates = GetCurrencyRates();
+					Settings.LastAPICallTime = DateTime.Now.Date;
+					Settings.Save();
+					Converters[0].Conversions.Clear();
+					StringBuilder ratesString = new();
+
+					for (int i = 0; i < Currencies.Length; i++)
+					{
+						Currency currency = Currencies[i];
+
+						if (rates.TryGetValue(currency.Code, out double rate))
+						{
+							Converters[0].Conversions.Add(new(currency.Name, rate));
+							ratesString.AppendLine(
+								currency.Name + "," + rate.ToString(CultureInfo.InvariantCulture)
+							);
+						}
+					}
+
+					Data.SaveString(ratesString.ToString(), "CurrencyRates");
+				}
+				catch (Exception) { }
+			}
+
+			if (Converters[0].Conversions.Count == 0)
+			{
+				Converters[0].Conversions.Add(new("United States Dollar [USD]", 1));
+			}
 
 			foreach (string resource in Assembly.GetManifestResourceNames())
 			{
@@ -301,6 +350,9 @@ public readonly struct CalculatorUI
 					int menuEntryX = 0;
 					int menuEntryWidth = ScreenWidth - menuSidePadding;
 					int menuVisibleEntries = ScreenHeight / menuEntryHeight;
+
+					int dropDownVisibleEntries = 16;
+					int dropDownEntryHeight = ScreenHeight / dropDownVisibleEntries;
 
 					Layout.ShadowStyle greyButtonShadow =
 						new(ButtonShadowColor, ShadowDistance, Layout.ShadowKind.Pillar);
@@ -785,6 +837,18 @@ public readonly struct CalculatorUI
 								);
 
 								Layout.DrawButton(
+									topIconSize + Padding,
+									0,
+									topIconSize,
+									topIconSize,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() => CurrentScene = Scene.Converters,
+									icon: new(GetResource("ruler_icon.png"), ForegroundColor)
+								);
+
+								Layout.DrawButton(
 									ScreenWidth - topIconSize,
 									0,
 									topIconSize,
@@ -1197,6 +1261,660 @@ public readonly struct CalculatorUI
 								FontSize,
 								Layout.TextAlignment.Left
 							);
+							break;
+						case Scene.Converters:
+							{
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								{
+									CurrentScene = Scene.Calculator;
+								}
+
+								int converterAmount = Converters.Length;
+								int leftButtonSize = ScreenHeight / (converterAmount + 1);
+
+								Layout.DrawButton(
+									0,
+									0,
+									leftButtonSize,
+									leftButtonSize,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() => CurrentScene = Scene.Calculator,
+									icon: new(GetResource("close_icon.png"), ForegroundColor)
+								);
+
+								for (int i = 0; i < converterAmount; i++)
+								{
+									Layout.DrawButton(
+										0,
+										(i + 1) * leftButtonSize,
+										leftButtonSize,
+										leftButtonSize,
+										CurrentConverter == i
+											? ButtonPressedColor
+											: MenuEntryBackgroundColor,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() =>
+										{
+											CurrentConverter = i;
+											ConverterFromIndex = 0;
+											ConverterToIndex = 0;
+											ConverterExpression = "";
+											ConverterResult = "";
+											ConverterTypingIndex = 0;
+										},
+										borderStyle: new(
+											CurrentConverter == i
+												? ButtonSelectedColor
+												: Transparent,
+											BorderThickness
+										),
+										icon: new(
+											GetResource(Converters[i].Icon),
+											CurrentConverter == i
+												? ButtonSelectedColor
+												: ButtonDeselectedColor,
+											leftButtonSize
+										)
+									);
+								}
+
+								int converterBoxHeight = (int)textSize.Y * 3;
+
+								// converter display and buttons
+								{
+									int converterBoxWidth = ScreenWidth - leftButtonSize;
+									int gridButtonSize = (int)textSize.Y;
+
+									// From display and buttons
+									{
+										string convertingFrom = Converters[CurrentConverter]
+											.Conversions[ConverterFromIndex]
+											.Name;
+										int gridCols = 4;
+										int gridWidthPercentage = 100 / gridCols;
+										int gridWidth = gridButtonSize * gridCols;
+
+										Layout.DrawBox(
+											leftButtonSize,
+											leftButtonSize,
+											converterBoxWidth,
+											converterBoxHeight,
+											MenuEntryBackgroundColor,
+											new(BorderColor, BorderThickness)
+										);
+
+										Layout.DrawButton(
+											leftButtonSize,
+											leftButtonSize,
+											converterBoxWidth,
+											gridButtonSize,
+											Transparent,
+											ButtonPressedColor,
+											TransparentButtonHoverColor,
+											() =>
+											{
+												CurrentDropDown = DropDown.From;
+												CurrentScene = Scene.Conversions;
+												DropDownScrollOffset = -(
+													dropDownEntryHeight
+													* (
+														ConverterFromIndex
+														- dropDownVisibleEntries / 2
+													)
+												);
+											},
+											borderStyle: new(BorderColor, BorderThickness)
+										);
+
+										Layout.DrawText(
+											leftButtonSize,
+											leftButtonSize,
+											converterBoxWidth - gridButtonSize,
+											gridButtonSize,
+											0,
+											convertingFrom,
+											ForegroundColor,
+											Transparent,
+											FontSize,
+											Layout.TextAlignment.Left
+										);
+
+										Raylib.DrawTexturePro(
+											GetResource("down_arrow_icon.png"),
+											Layout.ICON_RECTANGLE,
+											new(
+												leftButtonSize + converterBoxWidth - gridButtonSize,
+												leftButtonSize,
+												gridButtonSize,
+												gridButtonSize
+											),
+											new(0, 0),
+											0,
+											ForegroundColor
+										);
+
+										Layout.DrawText(
+											leftButtonSize,
+											leftButtonSize,
+											converterBoxWidth,
+											converterBoxHeight,
+											0,
+											ConverterExpression.Insert(ConverterTypingIndex, "|"),
+											ForegroundColor,
+											MenuEntryBackgroundColor,
+											FontSize,
+											Layout.TextAlignment.Left
+										);
+
+										Layout.ButtonRow[] converterButtons = new Layout.ButtonRow[]
+										{
+											new Layout.ButtonRow(
+												100,
+												new Layout.Button(
+													gridWidthPercentage,
+													null,
+													() =>
+													{
+														(ConverterFromIndex, ConverterToIndex) = (
+															ConverterToIndex,
+															ConverterFromIndex
+														);
+														(ConverterExpression, ConverterResult) = (
+															ConverterResult,
+															ConverterExpression
+														);
+														ConverterTypingIndex =
+															ConverterExpression.Length;
+														Convert();
+													},
+													new(
+														BackgroundColor: ButtonBackgroundColor,
+														PressedColor: ButtonPressedColor,
+														HoveredColor: ButtonHoverColor,
+														new(BorderColor, BorderThickness),
+														Icon: new(
+															GetResource("vertical_swap_icon.png"),
+															ForegroundColor
+														)
+													)
+												),
+												new Layout.Button(
+													gridWidthPercentage,
+													null,
+													() =>
+														InsertConverterExpression(Clipboard.Get()),
+													new(
+														BackgroundColor: ButtonBackgroundColor,
+														PressedColor: ButtonPressedColor,
+														HoveredColor: ButtonHoverColor,
+														new(BorderColor, BorderThickness),
+														Icon: new(
+															GetResource("paste_icon.png"),
+															ForegroundColor
+														)
+													)
+												),
+												new Layout.Button(
+													gridWidthPercentage,
+													null,
+													() => Clipboard.Set(ConverterExpression),
+													new(
+														BackgroundColor: ButtonBackgroundColor,
+														PressedColor: ButtonPressedColor,
+														HoveredColor: ButtonHoverColor,
+														new(BorderColor, BorderThickness),
+														Icon: new(
+															GetResource("copy_icon.png"),
+															ForegroundColor
+														)
+													)
+												),
+												new Layout.Button(
+													gridWidthPercentage,
+													new("C", FontSize, ForegroundColor),
+													() =>
+													{
+														ConverterExpression = "";
+														ConverterResult = "";
+														ConverterTypingIndex = 0;
+													},
+													new(
+														BackgroundColor: ButtonBackgroundColor,
+														PressedColor: ButtonPressedColor,
+														HoveredColor: ButtonHoverColor,
+														new(BorderColor, BorderThickness)
+													)
+												)
+											),
+										};
+
+										Layout.DrawButtonGrid(
+											ScreenWidth - gridButtonSize * gridCols,
+											leftButtonSize + converterBoxHeight - gridButtonSize,
+											gridWidth,
+											gridButtonSize - BorderThickness,
+											BorderThickness,
+											converterButtons
+										);
+									}
+
+									// To display and buttons
+									{
+										string convertingTo = Converters[CurrentConverter]
+											.Conversions[ConverterToIndex]
+											.Name;
+
+										Layout.DrawBox(
+											leftButtonSize,
+											converterBoxHeight + leftButtonSize,
+											converterBoxWidth,
+											converterBoxHeight,
+											MenuEntryBackgroundColor,
+											new(BorderColor, BorderThickness)
+										);
+
+										Layout.DrawButton(
+											leftButtonSize,
+											converterBoxHeight + leftButtonSize,
+											converterBoxWidth,
+											gridButtonSize,
+											Transparent,
+											ButtonPressedColor,
+											TransparentButtonHoverColor,
+											() =>
+											{
+												CurrentDropDown = DropDown.To;
+												CurrentScene = Scene.Conversions;
+												DropDownScrollOffset = -(
+													dropDownEntryHeight
+													* (
+														ConverterToIndex
+														- dropDownVisibleEntries / 2
+													)
+												);
+											},
+											borderStyle: new(BorderColor, BorderThickness)
+										);
+
+										Layout.DrawText(
+											leftButtonSize,
+											converterBoxHeight + leftButtonSize,
+											converterBoxWidth - gridButtonSize,
+											gridButtonSize,
+											0,
+											convertingTo,
+											ForegroundColor,
+											Transparent,
+											FontSize,
+											Layout.TextAlignment.Left
+										);
+
+										Raylib.DrawTexturePro(
+											GetResource("down_arrow_icon.png"),
+											Layout.ICON_RECTANGLE,
+											new(
+												leftButtonSize + converterBoxWidth - gridButtonSize,
+												converterBoxHeight + leftButtonSize,
+												gridButtonSize,
+												gridButtonSize
+											),
+											new(0, 0),
+											0,
+											ForegroundColor
+										);
+
+										Layout.DrawText(
+											leftButtonSize,
+											converterBoxHeight + leftButtonSize,
+											converterBoxWidth,
+											converterBoxHeight,
+											0,
+											ConverterResult,
+											ForegroundColor,
+											MenuEntryBackgroundColor,
+											FontSize,
+											Layout.TextAlignment.Left
+										);
+
+										Layout.DrawButton(
+											ScreenWidth - gridButtonSize,
+											(leftButtonSize + converterBoxHeight * 2)
+												- gridButtonSize,
+											gridButtonSize - BorderThickness,
+											gridButtonSize - BorderThickness,
+											ButtonBackgroundColor,
+											ButtonPressedColor,
+											ButtonHoverColor,
+											() => Clipboard.Set(ConverterResult),
+											borderStyle: new(BorderColor, BorderThickness),
+											icon: new(GetResource("copy_icon.png"), ForegroundColor)
+										);
+									}
+								}
+
+								Layout.DrawText(
+									leftButtonSize,
+									0,
+									ScreenWidth - leftButtonSize,
+									ScreenHeight,
+									0,
+									$"{Converters[CurrentConverter].Title}",
+									ForegroundColor,
+									Transparent,
+									FontSize,
+									Layout.TextAlignment.Top
+								);
+
+								// keyboard/inputs
+								{
+									int rowAmount = 4;
+									int colAmount = 3;
+									int heightPercentage = 100 / rowAmount;
+									int widthPercentage = 100 / colAmount;
+
+									Layout.ButtonRow[] converterKeyboardButtons =
+										new Layout.ButtonRow[]
+										{
+											new Layout.ButtonRow(
+												heightPercentage,
+												new Layout.Button(
+													widthPercentage,
+													new("7", FontSize, ForegroundColor),
+													() => InsertConverterExpression("7"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("8", FontSize, ForegroundColor),
+													() => InsertConverterExpression("8"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("9", FontSize, ForegroundColor),
+													() => InsertConverterExpression("9"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												)
+											),
+											new Layout.ButtonRow(
+												heightPercentage,
+												new Layout.Button(
+													widthPercentage,
+													new("4", FontSize, ForegroundColor),
+													() => InsertConverterExpression("4"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("5", FontSize, ForegroundColor),
+													() => InsertConverterExpression("5"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("6", FontSize, ForegroundColor),
+													() => InsertConverterExpression("6"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												)
+											),
+											new Layout.ButtonRow(
+												heightPercentage,
+												new Layout.Button(
+													widthPercentage,
+													new("1", FontSize, ForegroundColor),
+													() => InsertConverterExpression("1"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("2", FontSize, ForegroundColor),
+													() => InsertConverterExpression("2"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("3", FontSize, ForegroundColor),
+													() => InsertConverterExpression("3"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												)
+											),
+											new Layout.ButtonRow(
+												heightPercentage,
+												new Layout.Button(
+													widthPercentage,
+													new(".", FontSize, ForegroundColor),
+													() => InsertConverterExpression("."),
+													greyButton
+												),
+												new Layout.Button(
+													widthPercentage,
+													new("0", FontSize, ForegroundColor),
+													() => InsertConverterExpression("0"),
+													greyButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												),
+												new Layout.Button(
+													widthPercentage,
+													null,
+													ConverterBackspace,
+													backspaceButton,
+													Layout.ButtonPressMode.HoldToRepeat
+												)
+											),
+										};
+
+									int converterKeyboardY =
+										converterBoxHeight * 2 + leftButtonSize + Padding;
+
+									Layout.DrawButtonGrid(
+										leftButtonSize + Padding,
+										converterKeyboardY,
+										ScreenWidth - leftButtonSize - Padding,
+										ScreenHeight - converterKeyboardY - Padding,
+										Padding,
+										converterKeyboardButtons
+									);
+
+									// TODO(LucasTA): remove repetition when handling inputs
+									int keycode = Raylib.GetCharPressed();
+
+									if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
+									{
+										ConverterTypingIndex = Math.Max(
+											0,
+											ConverterTypingIndex - 1
+										);
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
+									{
+										ConverterTypingIndex = Math.Min(
+											ConverterExpression.Length,
+											ConverterTypingIndex + 1
+										);
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+									{
+										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+										{
+											ConverterTypingIndex = Math.Max(
+												0,
+												ConverterTypingIndex - 1
+											);
+										}
+
+										ButtonPressedTime += Raylib.GetFrameTime();
+									}
+									else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+									{
+										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+										{
+											ConverterTypingIndex = Math.Min(
+												ConverterExpression.Length,
+												ConverterTypingIndex + 1
+											);
+										}
+
+										ButtonPressedTime += Raylib.GetFrameTime();
+									}
+									else if (
+										(
+											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
+										) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
+									)
+									{
+										Clipboard.Set(ConverterExpression);
+										ButtonPressedTime = 0;
+									}
+									else if (
+										(
+											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
+										) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
+									)
+									{
+										InsertConverterExpression(Clipboard.Get());
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+									{
+										ConverterBackspace();
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+									{
+										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+										{
+											ConverterBackspace();
+										}
+
+										ButtonPressedTime += Raylib.GetFrameTime();
+									}
+									else if (keycode != 0)
+									{
+										if (
+											char.IsAsciiDigit((char)keycode)
+											|| (char)keycode == '.'
+										)
+										{
+											InsertConverterExpression(((char)keycode).ToString());
+											ButtonPressedTime = 0;
+										}
+									}
+								}
+							}
+							break;
+						case Scene.Conversions:
+							{
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								{
+									CurrentScene = Scene.Converters;
+								}
+
+								int conversionsAmount = Converters[CurrentConverter]
+									.Conversions
+									.Count;
+
+#if ANDROID
+								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+								{
+									StartTouchPosition = Raylib.GetTouchPosition(0);
+								}
+
+								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+								{
+									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
+
+									float touchMoveDistance = Math.Abs(
+										currentTouchPosition.Y - StartTouchPosition.Y
+									);
+
+									if (touchMoveDistance > 2)
+									{
+										Dragging = true;
+
+										DropDownScrollOffset = Math.Clamp(
+											DropDownScrollOffset
+												+ currentTouchPosition.Y
+												- StartTouchPosition.Y,
+											Math.Max(0, conversionsAmount - dropDownVisibleEntries)
+												* -dropDownEntryHeight,
+											0
+										);
+
+										StartTouchPosition = currentTouchPosition;
+									}
+								}
+#else
+								if (MouseScroll > 0)
+								{
+									Dragging = true;
+								}
+
+								DropDownScrollOffset = Math.Clamp(
+									DropDownScrollOffset + MouseScroll,
+									Math.Max(0, conversionsAmount - dropDownVisibleEntries)
+										* -dropDownEntryHeight,
+									0
+								);
+#endif
+
+								for (int i = 0; i < conversionsAmount; i++)
+								{
+									string converter = Converters[CurrentConverter]
+										.Conversions[i]
+										.Name;
+									int selectedIndex =
+										CurrentDropDown == DropDown.From
+											? ConverterFromIndex
+											: ConverterToIndex;
+
+									Layout.DrawButton(
+										0,
+										(int)DropDownScrollOffset + i * dropDownEntryHeight,
+										ScreenWidth,
+										dropDownEntryHeight,
+										selectedIndex == i
+											? ButtonPressedColor
+											: MenuEntryBackgroundColor,
+										MenuEntryBackgroundColor,
+										MenuEntryBackgroundColor,
+										() =>
+										{
+											if (CurrentDropDown == DropDown.From)
+											{
+												ConverterFromIndex = i;
+											}
+											else if (CurrentDropDown == DropDown.To)
+											{
+												ConverterToIndex = i;
+											}
+
+											Conversion.Convert();
+											CurrentScene = Scene.Converters;
+										},
+										textFormat: new(converter, FontSize, ForegroundColor),
+										borderStyle: new(
+											selectedIndex == i ? ButtonSelectedColor : BorderColor,
+											BorderThickness
+										)
+									);
+								}
+							}
 							break;
 						default:
 							Log.Halt("Unknown scene");

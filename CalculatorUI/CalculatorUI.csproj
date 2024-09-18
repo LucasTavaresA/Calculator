@@ -54,4 +54,16 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-macos'">
 		<DefineConstants>$(DefineConstants);MACOS</DefineConstants>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="Exists('APIKEY')">
+		<DefineConstants>$(DefineConstants);HAS_APIKEY</DefineConstants>
+	</PropertyGroup>
+
+	<Target Name="WarnIfMissingResource" BeforeTargets="BeforeBuild">
+		<Warning Condition="!Exists('APIKEY')" Text="Warning: You need a file named 'APIKEY' in the CalculatorUI folder with an api key to use the openexchangerates.org API." />
+	</Target>
+
+	<ItemGroup Condition="Exists('APIKEY')">
+		<EmbeddedResource Include="./APIKEY" />
+	</ItemGroup>
 </Project>

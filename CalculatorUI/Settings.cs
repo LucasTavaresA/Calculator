@@ -13,14 +13,29 @@ internal readonly struct Settings
 	private static readonly string SettingsFilePath = Data.DataFolder + "CalculatorSettings";
 #endif
 	internal static bool BookmarkOnEval = true;
+	internal static DateTime LastAPICallTime = DateTime.MinValue.Date;
 
 	internal static void Save()
 	{
 #if LINUX || MACOS || WINDOWS
 		Directory.CreateDirectory(Data.DataFolder);
-		File.WriteAllText(SettingsFilePath, $"BookmarkOnEval={BookmarkOnEval}");
+		File.WriteAllText(
+			SettingsFilePath,
+			string.Join(
+				Environment.NewLine,
+				$"BookmarkOnEval={BookmarkOnEval}",
+				$"LastAPICallTime={LastAPICallTime}"
+			)
+		);
 #elif ANDROID
-		Preferences.Set("BookmarkOnEval", BookmarkOnEval.ToString());
+		Preferences.Set(
+			"CalculatorSettings",
+			string.Join(
+				Environment.NewLine,
+				$"BookmarkOnEval={BookmarkOnEval}",
+				$"LastAPICallTime={LastAPICallTime}"
+			)
+		);
 #endif
 	}
 
@@ -62,6 +77,16 @@ internal readonly struct Settings
 					else
 					{
 						BookmarkOnEval = true;
+					}
+					break;
+				case "LastAPICallTime":
+					if (DateTime.TryParse(split[1].Trim(), out DateTime dt))
+					{
+						LastAPICallTime = dt;
+					}
+					else
+					{
+						LastAPICallTime = DateTime.MinValue.Date;
 					}
 					break;
 			}
