@@ -50,6 +50,8 @@ public readonly struct CalculatorUI
 	private static readonly Color ButtonDeselectedColor = Color.LIGHTGRAY;
 	private static readonly Color ButtonShadowColor = ButtonPressedColor;
 
+	private static readonly Color ScrollbarBackgroundColor = DarkerGray;
+
 	private static readonly Color Transparent = Color.BLANK;
 	private static readonly Color TransparentButtonHoverColor = new(100, 100, 100, 128);
 
@@ -184,6 +186,7 @@ public readonly struct CalculatorUI
 	internal static int Padding = 0;
 	internal static int BorderThickness = 0;
 	internal static int ShadowDistance = 0;
+	internal static int ScrollbarWidth = 0;
 	internal static int FontSize = 0;
 
 	internal static int MouseX;
@@ -299,6 +302,7 @@ public readonly struct CalculatorUI
 						1
 					);
 					ShadowDistance = BorderThickness * 4;
+					ScrollbarWidth = BorderThickness * 4;
 					Padding = BorderThickness * 8;
 
 #if ANDROID
@@ -921,6 +925,10 @@ public readonly struct CalculatorUI
 									CurrentScene = Scene.Calculator;
 								}
 
+								float maxScrollOffset =
+									Math.Max(0, expressions.Count - menuVisibleEntries)
+									* -menuEntryHeight;
+
 #if ANDROID
 								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
 								{
@@ -956,8 +964,7 @@ public readonly struct CalculatorUI
 											HistoryScrollOffset
 												+ currentTouchPosition.Y
 												- StartTouchPosition.Y,
-											Math.Max(0, expressions.Count - menuVisibleEntries)
-												* -menuEntryHeight,
+											maxScrollOffset,
 											0
 										);
 
@@ -972,8 +979,7 @@ public readonly struct CalculatorUI
 
 								HistoryScrollOffset = Math.Clamp(
 									HistoryScrollOffset + MouseScroll,
-									Math.Max(0, expressions.Count - menuVisibleEntries)
-										* -menuEntryHeight,
+									maxScrollOffset,
 									0
 								);
 #endif
@@ -1007,6 +1013,28 @@ public readonly struct CalculatorUI
 								);
 
 								{
+									Raylib.DrawRectangle(
+										0,
+										0,
+										ScreenWidth - menuSidePadding,
+										ScreenHeight,
+										ScrollbarBackgroundColor
+									);
+
+									Layout.DrawScrollbar(
+										ScreenWidth - menuSidePadding,
+										0,
+										ScrollbarWidth,
+										ScreenHeight,
+										expressions.Count,
+										HistoryScrollOffset,
+										maxScrollOffset,
+										BorderThickness,
+										ButtonBackgroundColor,
+										BorderColor,
+										ScrollbarBackgroundColor
+									);
+
 									for (int i = 0; i < expressions.Count; i++)
 									{
 										int menuEntryY =
@@ -1381,11 +1409,14 @@ public readonly struct CalculatorUI
 											{
 												CurrentDropDown = DropDown.From;
 												CurrentScene = Scene.Conversions;
-												DropDownScrollOffset = -(
-													dropDownEntryHeight
-													* (
-														ConverterFromIndex
-														- dropDownVisibleEntries / 2
+												DropDownScrollOffset = Math.Min(
+													0,
+													-(
+														dropDownEntryHeight
+														* (
+															ConverterFromIndex
+															- dropDownVisibleEntries / 2
+														)
 													)
 												);
 											},
@@ -1551,11 +1582,14 @@ public readonly struct CalculatorUI
 											{
 												CurrentDropDown = DropDown.To;
 												CurrentScene = Scene.Conversions;
-												DropDownScrollOffset = -(
-													dropDownEntryHeight
-													* (
-														ConverterToIndex
-														- dropDownVisibleEntries / 2
+												DropDownScrollOffset = Math.Min(
+													0,
+													-(
+														dropDownEntryHeight
+														* (
+															ConverterToIndex
+															- dropDownVisibleEntries / 2
+														)
 													)
 												);
 											},
@@ -1852,6 +1886,10 @@ public readonly struct CalculatorUI
 									.Conversions
 									.Count;
 
+								float maxScrollOffset =
+									Math.Max(0, conversionsAmount - dropDownVisibleEntries)
+									* -dropDownEntryHeight;
+
 #if ANDROID
 								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
 								{
@@ -1874,8 +1912,7 @@ public readonly struct CalculatorUI
 											DropDownScrollOffset
 												+ currentTouchPosition.Y
 												- StartTouchPosition.Y,
-											Math.Max(0, conversionsAmount - dropDownVisibleEntries)
-												* -dropDownEntryHeight,
+											maxScrollOffset,
 											0
 										);
 
@@ -1890,11 +1927,32 @@ public readonly struct CalculatorUI
 
 								DropDownScrollOffset = Math.Clamp(
 									DropDownScrollOffset + MouseScroll,
-									Math.Max(0, conversionsAmount - dropDownVisibleEntries)
-										* -dropDownEntryHeight,
+									maxScrollOffset,
 									0
 								);
 #endif
+
+								Raylib.DrawRectangle(
+									0,
+									0,
+									ScreenWidth,
+									ScreenHeight,
+									ScrollbarBackgroundColor
+								);
+
+								Layout.DrawScrollbar(
+									ScreenWidth - ScrollbarWidth,
+									0,
+									ScrollbarWidth,
+									ScreenHeight,
+									conversionsAmount,
+									DropDownScrollOffset,
+									maxScrollOffset,
+									BorderThickness,
+									ButtonBackgroundColor,
+									BorderColor,
+									ScrollbarBackgroundColor
+								);
 
 								for (int i = 0; i < conversionsAmount; i++)
 								{
@@ -1909,7 +1967,7 @@ public readonly struct CalculatorUI
 									Layout.DrawButton(
 										0,
 										(int)DropDownScrollOffset + i * dropDownEntryHeight,
-										ScreenWidth,
+										ScreenWidth - ScrollbarWidth,
 										dropDownEntryHeight,
 										selectedIndex == i
 											? ButtonPressedColor

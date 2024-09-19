@@ -748,6 +748,42 @@ internal readonly struct Layout
 		}
 	}
 
+	// NOTE(LucasTA): only using this as an indicator for the scroll cause i need way more work on this
+	// TODO(LucasTA): add mouse and touch scroll
+	// TODO(LucasTA): handle scrollbar height correctly, it should be based on the amount of screens to scroll
+	internal static void DrawScrollbar(
+		int x,
+		int y,
+		int width,
+		int height,
+		int itemAmount,
+		float offset,
+		float maxOffset,
+		int borderThickness,
+		Color handleColor,
+		Color borderColor,
+		Color backgroundColor
+	)
+	{
+		int handleHeight = Math.Max(width, height / Math.Max(1, itemAmount));
+		int handleY = Math.Clamp(
+			(int)(Math.Abs(offset / maxOffset) * height),
+			0,
+			height - handleHeight
+		);
+
+		Raylib.DrawRectangle(x, y, width, height, backgroundColor);
+
+		Layout.DrawBox(
+			x,
+			handleY,
+			width,
+			handleHeight,
+			handleColor,
+			new(borderColor, borderThickness)
+		);
+	}
+
 	internal static void DrawButtonGrid(
 		int x,
 		int y,
