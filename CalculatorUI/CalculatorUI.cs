@@ -396,457 +396,587 @@ public readonly struct CalculatorUI
 					switch (CurrentScene)
 					{
 						case Scene.Calculator:
-							// Draw buttons
 							{
-								int rowAmount = 7;
-								int heightPercentage = 100 / rowAmount;
-
-								Layout.ButtonRow[] calculatorButtons = new Layout.ButtonRow[]
+								// Draw buttons
 								{
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											20,
-											new("(", FontSize, ForegroundColor),
-											() => InsertExpression("("),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											20,
-											new(")", FontSize, ForegroundColor),
-											() => InsertExpression(")"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											20,
-											new(",", FontSize, ForegroundColor),
-											() => InsertExpression(","),
-											greyButton
-										),
-										new Layout.Button(
-											20,
-											new("^", FontSize, ForegroundColor),
-											() => InsertExpression("^"),
-											greyButton
-										),
-										new Layout.Button(
-											20,
-											null,
-											() => InsertExpression("pi"),
-											new(
-												BackgroundColor: ButtonBackgroundColor,
-												PressedColor: ButtonPressedColor,
-												HoveredColor: ButtonHoverColor,
-												new(BorderColor, BorderThickness),
-												ShadowStyle: greyButtonShadow,
-												Icon: new(
-													GetResource("pi_icon.png"),
-													ForegroundColor,
-													(int)textSize.Y
+									int rowAmount = 7;
+									int heightPercentage = 100 / rowAmount;
+
+									Layout.ButtonRow[] calculatorButtons = new Layout.ButtonRow[]
+									{
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												20,
+												new("(", FontSize, ForegroundColor),
+												() => InsertExpression("("),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												20,
+												new(")", FontSize, ForegroundColor),
+												() => InsertExpression(")"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												20,
+												new(",", FontSize, ForegroundColor),
+												() => InsertExpression(","),
+												greyButton
+											),
+											new Layout.Button(
+												20,
+												new("^", FontSize, ForegroundColor),
+												() => InsertExpression("^"),
+												greyButton
+											),
+											new Layout.Button(
+												20,
+												null,
+												() => InsertExpression("pi"),
+												new(
+													BackgroundColor: ButtonBackgroundColor,
+													PressedColor: ButtonPressedColor,
+													HoveredColor: ButtonHoverColor,
+													new(BorderColor, BorderThickness),
+													ShadowStyle: greyButtonShadow,
+													Icon: new(
+														GetResource("pi_icon.png"),
+														ForegroundColor,
+														(int)textSize.Y
+													)
 												)
 											)
-										)
-									),
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											20,
-											new("!", FontSize, ForegroundColor),
-											() => InsertExpression("!"),
-											greyButton
 										),
-										new Layout.Button(
-											20,
-											new("e", FontSize, ForegroundColor),
-											() => InsertExpression("e"),
-											greyButton
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												20,
+												new("!", FontSize, ForegroundColor),
+												() => InsertExpression("!"),
+												greyButton
+											),
+											new Layout.Button(
+												20,
+												new("e", FontSize, ForegroundColor),
+												() => InsertExpression("e"),
+												greyButton
+											),
+											new Layout.Button(
+												20,
+												new("%", FontSize, ForegroundColor),
+												() => InsertExpression("%"),
+												greyButton
+											),
+											new Layout.Button(
+												20,
+												new("/", FontSize, ForegroundColor),
+												() => InsertExpression("/"),
+												greyButton
+											),
+											new Layout.Button(
+												20,
+												new("C", FontSize, ForegroundColor),
+												() =>
+												{
+													Expression = "";
+													ErrorMessage = "";
+													Result = "";
+													TypingIndex = 0;
+												},
+												greyButton
+											)
 										),
-										new Layout.Button(
-											20,
-											new("%", FontSize, ForegroundColor),
-											() => InsertExpression("%"),
-											greyButton
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												25,
+												new("7", FontSize, ForegroundColor),
+												() => InsertExpression("7"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("8", FontSize, ForegroundColor),
+												() => InsertExpression("8"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("9", FontSize, ForegroundColor),
+												() => InsertExpression("9"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("*", FontSize, ForegroundColor),
+												() => InsertExpression("*"),
+												greyButton
+											)
 										),
-										new Layout.Button(
-											20,
-											new("/", FontSize, ForegroundColor),
-											() => InsertExpression("/"),
-											greyButton
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												25,
+												new("4", FontSize, ForegroundColor),
+												() => InsertExpression("4"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("5", FontSize, ForegroundColor),
+												() => InsertExpression("5"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("6", FontSize, ForegroundColor),
+												() => InsertExpression("6"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("-", FontSize, ForegroundColor),
+												() => InsertExpression("-"),
+												greyButton
+											)
 										),
-										new Layout.Button(
-											20,
-											new("C", FontSize, ForegroundColor),
-											() =>
-											{
-												Expression = "";
-												ErrorMessage = "";
-												Result = "";
-												TypingIndex = 0;
-											},
-											greyButton
-										)
-									),
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											25,
-											new("7", FontSize, ForegroundColor),
-											() => InsertExpression("7"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												25,
+												new("1", FontSize, ForegroundColor),
+												() => InsertExpression("1"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("2", FontSize, ForegroundColor),
+												() => InsertExpression("2"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("3", FontSize, ForegroundColor),
+												() => InsertExpression("3"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("+", FontSize, ForegroundColor),
+												() => InsertExpression("+"),
+												greyButton
+											)
 										),
-										new Layout.Button(
-											25,
-											new("8", FontSize, ForegroundColor),
-											() => InsertExpression("8"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												25,
+												new(".", FontSize, ForegroundColor),
+												() => InsertExpression("."),
+												greyButton
+											),
+											new Layout.Button(
+												25,
+												new("0", FontSize, ForegroundColor),
+												() => InsertExpression("0"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												null,
+												Backspace,
+												backspaceButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												25,
+												new("=", FontSize, ForegroundColor),
+												Equal,
+												greenButton
+											)
 										),
-										new Layout.Button(
-											25,
-											new("9", FontSize, ForegroundColor),
-											() => InsertExpression("9"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												17,
+												new("sqrt", FontSize, ForegroundColor),
+												() => InsertExpression("sqrt("),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new("mod", FontSize, ForegroundColor),
+												() => InsertExpression("mod("),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new("sin", FontSize, ForegroundColor),
+												() => InsertExpression("sin("),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new("cos", FontSize, ForegroundColor),
+												() => InsertExpression("cos("),
+												greyButton
+											),
+											new Layout.Button(
+												16,
+												new("tan", FontSize, ForegroundColor),
+												() => InsertExpression("tan("),
+												greyButton
+											),
+											new Layout.Button(
+												16,
+												new("log", FontSize, ForegroundColor),
+												() => InsertExpression("log("),
+												greyButton
+											)
 										),
-										new Layout.Button(
-											25,
-											new("*", FontSize, ForegroundColor),
-											() => InsertExpression("*"),
-											greyButton
-										)
-									),
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											25,
-											new("4", FontSize, ForegroundColor),
-											() => InsertExpression("4"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("5", FontSize, ForegroundColor),
-											() => InsertExpression("5"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("6", FontSize, ForegroundColor),
-											() => InsertExpression("6"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("-", FontSize, ForegroundColor),
-											() => InsertExpression("-"),
-											greyButton
-										)
-									),
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											25,
-											new("1", FontSize, ForegroundColor),
-											() => InsertExpression("1"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("2", FontSize, ForegroundColor),
-											() => InsertExpression("2"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("3", FontSize, ForegroundColor),
-											() => InsertExpression("3"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("+", FontSize, ForegroundColor),
-											() => InsertExpression("+"),
-											greyButton
-										)
-									),
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											25,
-											new(".", FontSize, ForegroundColor),
-											() => InsertExpression("."),
-											greyButton
-										),
-										new Layout.Button(
-											25,
-											new("0", FontSize, ForegroundColor),
-											() => InsertExpression("0"),
-											greyButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											null,
-											Backspace,
-											backspaceButton,
-											Layout.ButtonPressMode.HoldToRepeat
-										),
-										new Layout.Button(
-											25,
-											new("=", FontSize, ForegroundColor),
-											Equal,
-											greenButton
-										)
-									),
-									new Layout.ButtonRow(
-										heightPercentage,
-										new Layout.Button(
-											17,
-											new("sqrt", FontSize, ForegroundColor),
-											() => InsertExpression("sqrt("),
-											greyButton
-										),
-										new Layout.Button(
-											17,
-											new("mod", FontSize, ForegroundColor),
-											() => InsertExpression("mod("),
-											greyButton
-										),
-										new Layout.Button(
-											17,
-											new("sin", FontSize, ForegroundColor),
-											() => InsertExpression("sin("),
-											greyButton
-										),
-										new Layout.Button(
-											17,
-											new("cos", FontSize, ForegroundColor),
-											() => InsertExpression("cos("),
-											greyButton
-										),
-										new Layout.Button(
-											16,
-											new("tan", FontSize, ForegroundColor),
-											() => InsertExpression("tan("),
-											greyButton
-										),
-										new Layout.Button(
-											16,
-											new("log", FontSize, ForegroundColor),
-											() => InsertExpression("log("),
-											greyButton
-										)
-									),
-								};
+									};
 
-								Layout.DrawButtonGrid(
-									Padding,
-									Padding + (ScreenHeight / 6),
-									ScreenWidth - (Padding * 2),
-									ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
-									Padding,
-									calculatorButtons
-								);
-							}
+									Layout.DrawButtonGrid(
+										Padding,
+										Padding + (ScreenHeight / 6),
+										ScreenWidth - (Padding * 2),
+										ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
+										Padding,
+										calculatorButtons
+									);
+								}
 
-							// Draw Calculator Display
-							{
-								bool error = ErrorMessage == "";
+								// Draw Calculator Display
+								{
+									bool error = ErrorMessage == "";
 
-								Layout.DrawButton(
-									displayX,
-									displayY,
-									displayWidth / 2,
-									displayHeight,
-									Transparent,
-									TransparentButtonHoverColor,
-									Transparent,
-									() =>
-									{
-										TypingIndex = Math.Max(0, TypingIndex - 1);
-									},
-									pressMode: Layout.ButtonPressMode.HoldToRepeat,
-									icon: new(GetResource("arrow_left.png"), DisplayBackgroundColor)
-								);
+									Layout.DrawButton(
+										displayX,
+										displayY,
+										displayWidth / 2,
+										displayHeight,
+										Transparent,
+										TransparentButtonHoverColor,
+										Transparent,
+										() =>
+										{
+											TypingIndex = Math.Max(0, TypingIndex - 1);
+										},
+										pressMode: Layout.ButtonPressMode.HoldToRepeat,
+										icon: new(
+											GetResource("arrow_left.png"),
+											DisplayBackgroundColor
+										)
+									);
 
-								Layout.DrawButton(
-									displayX + displayWidth / 2,
-									displayY,
-									displayWidth / 2,
-									displayHeight,
-									Transparent,
-									TransparentButtonHoverColor,
-									Transparent,
-									() =>
-									{
-										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
-									},
-									pressMode: Layout.ButtonPressMode.HoldToRepeat,
-									icon: new(
-										GetResource("arrow_right.png"),
-										DisplayBackgroundColor
-									)
-								);
+									Layout.DrawButton(
+										displayX + displayWidth / 2,
+										displayY,
+										displayWidth / 2,
+										displayHeight,
+										Transparent,
+										TransparentButtonHoverColor,
+										Transparent,
+										() =>
+										{
+											TypingIndex = Math.Min(
+												Expression.Length,
+												TypingIndex + 1
+											);
+										},
+										pressMode: Layout.ButtonPressMode.HoldToRepeat,
+										icon: new(
+											GetResource("arrow_right.png"),
+											DisplayBackgroundColor
+										)
+									);
 
-								Layout.DrawTextBox(
-									displayX,
-									displayY,
-									displayWidth,
-									displayHeight,
-									new(
-										Expression.Insert(TypingIndex, "|"),
+									Layout.DrawTextBox(
+										displayX,
+										displayY,
+										displayWidth,
+										displayHeight,
+										new(
+											Expression.Insert(TypingIndex, "|"),
+											FontSize,
+											ForegroundColor,
+											Layout.TextAlignment.Center
+										),
+										// NOTE(LucasTA): so that the arrows draw behind are visible
+										TransparentButtonHoverColor,
+										new(error ? BorderColor : ErrorColor, BorderThickness * 2)
+									);
+
+									Layout.DrawText(
+										displayX,
+										displayY + BorderThickness * 2,
+										displayWidth,
+										displayHeight,
+										BorderThickness * 2,
+										error ? Result : ErrorMessage,
+										error ? DarkForegroundColor : ErrorColor,
+										DisplayBackgroundColor,
 										FontSize,
-										ForegroundColor,
-										Layout.TextAlignment.Center
-									),
-									// NOTE(LucasTA): so that the arrows draw behind are visible
-									TransparentButtonHoverColor,
-									new(error ? BorderColor : ErrorColor, BorderThickness * 2)
-								);
+										Layout.TextAlignment.BottomLeft
+									);
 
-								Layout.DrawText(
-									displayX,
-									displayY + BorderThickness * 2,
-									displayWidth,
-									displayHeight,
-									BorderThickness * 2,
-									error ? Result : ErrorMessage,
-									error ? DarkForegroundColor : ErrorColor,
-									DisplayBackgroundColor,
-									FontSize,
-									Layout.TextAlignment.BottomLeft
-								);
+									int keycode = Raylib.GetCharPressed();
 
-								int keycode = Raylib.GetCharPressed();
-
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
-								{
-									Equal();
-									ButtonPressedTime = 0;
-								}
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
-								{
-									TypingIndex = Math.Max(0, TypingIndex - 1);
-									ButtonPressedTime = 0;
-								}
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
-								{
-									TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
-									ButtonPressedTime = 0;
-								}
-								else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
-								{
-									if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+									if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
 									{
-										TypingIndex = Math.Max(0, TypingIndex - 1);
-									}
-
-									ButtonPressedTime += Raylib.GetFrameTime();
-								}
-								else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
-								{
-									if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
-									{
-										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
-									}
-
-									ButtonPressedTime += Raylib.GetFrameTime();
-								}
-								else if (
-									(
-										Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-										|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-									) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
-								)
-								{
-									Clipboard.Set(Expression);
-									ButtonPressedTime = 0;
-								}
-								else if (
-									(
-										Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-										|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-									) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
-								)
-								{
-									Paste();
-									ButtonPressedTime = 0;
-								}
-								else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
-								{
-									Backspace();
-									ButtonPressedTime = 0;
-								}
-								else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
-								{
-									if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
-									{
-										Backspace();
-									}
-
-									ButtonPressedTime += Raylib.GetFrameTime();
-								}
-								else if (keycode != 0)
-								{
-									if (
-										char.IsAsciiLetterOrDigit((char)keycode)
-										|| (char)keycode
-											is ' '
-												or '('
-												or ')'
-												or ','
-												or '^'
-												or '!'
-												or '%'
-												or '/'
-												or '+'
-												or '-'
-												or '*'
-												or '.'
-									)
-									{
-										InsertExpression(
-											((char)keycode).ToString().ToLowerInvariant()
-										);
+										Equal();
 										ButtonPressedTime = 0;
 									}
+									if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
+									{
+										TypingIndex = Math.Max(0, TypingIndex - 1);
+										ButtonPressedTime = 0;
+									}
+									if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
+									{
+										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+									{
+										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+										{
+											TypingIndex = Math.Max(0, TypingIndex - 1);
+										}
+
+										ButtonPressedTime += Raylib.GetFrameTime();
+									}
+									else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+									{
+										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+										{
+											TypingIndex = Math.Min(
+												Expression.Length,
+												TypingIndex + 1
+											);
+										}
+
+										ButtonPressedTime += Raylib.GetFrameTime();
+									}
+									else if (
+										(
+											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
+										) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
+									)
+									{
+										Clipboard.Set(Expression);
+										ButtonPressedTime = 0;
+									}
+									else if (
+										(
+											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
+											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
+										) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
+									)
+									{
+										Paste();
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+									{
+										Backspace();
+										ButtonPressedTime = 0;
+									}
+									else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+									{
+										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
+										{
+											Backspace();
+										}
+
+										ButtonPressedTime += Raylib.GetFrameTime();
+									}
+									else if (keycode != 0)
+									{
+										if (
+											char.IsAsciiLetterOrDigit((char)keycode)
+											|| (char)keycode
+												is ' '
+													or '('
+													or ')'
+													or ','
+													or '^'
+													or '!'
+													or '%'
+													or '/'
+													or '+'
+													or '-'
+													or '*'
+													or '.'
+										)
+										{
+											InsertExpression(
+												((char)keycode).ToString().ToLowerInvariant()
+											);
+											ButtonPressedTime = 0;
+										}
+									}
+								}
+
+								// top buttons
+								{
+									Layout.DrawButton(
+										0,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() => CurrentScene = Scene.Settings,
+										icon: new(GetResource("settings_icon.png"), ForegroundColor)
+									);
+
+									Layout.DrawButton(
+										topIconSize + Padding,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() => CurrentScene = Scene.Converters,
+										icon: new(GetResource("ruler_icon.png"), ForegroundColor)
+									);
+
+									Layout.DrawButton(
+										ScreenWidth - topIconSize,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() => CurrentScene = Scene.History,
+										icon: new(GetResource("history_icon.png"), ForegroundColor)
+									);
+
+									Layout.DrawButton(
+										ScreenWidth - (topIconSize) * 2 - Padding,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() => Clipboard.Set(Expression),
+										icon: new(GetResource("copy_icon.png"), ForegroundColor)
+									);
+
+									Layout.DrawButton(
+										ScreenWidth - topIconSize * 3 - Padding * 2,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										Paste,
+										icon: new(GetResource("paste_icon.png"), ForegroundColor)
+									);
+
+									Layout.DrawButton(
+										ScreenWidth - topIconSize * 4 - Padding * 3,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() => History.Add(Expression),
+										icon: new(
+											GetResource("bookmark_add_icon.png"),
+											ForegroundColor
+										)
+									);
 								}
 							}
-
-							// top buttons
+							break;
+						case Scene.History:
 							{
-								Layout.DrawButton(
-									0,
-									0,
-									topIconSize,
-									topIconSize,
-									Transparent,
-									ButtonPressedColor,
-									TransparentButtonHoverColor,
-									() => CurrentScene = Scene.Settings,
-									icon: new(GetResource("settings_icon.png"), ForegroundColor)
-								);
+								List<string> expressions = new(History.PinnedExpressions);
+								expressions.AddRange(History.ExpressionHistory);
 
-								Layout.DrawButton(
-									topIconSize + Padding,
-									0,
-									topIconSize,
-									topIconSize,
-									Transparent,
-									ButtonPressedColor,
-									TransparentButtonHoverColor,
-									() => CurrentScene = Scene.Converters,
-									icon: new(GetResource("ruler_icon.png"), ForegroundColor)
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								{
+									CurrentScene = Scene.Calculator;
+								}
+
+#if ANDROID
+								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+								{
+									StartTouchPosition = Raylib.GetTouchPosition(0);
+								}
+
+								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+								{
+									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
+
+									float touchMoveDistance = Math.Abs(
+										currentTouchPosition.Y - StartTouchPosition.Y
+									);
+
+									if (
+										touchMoveDistance > 2
+										&&
+										// NOTE(LucasTA): Don't scroll if touch starts outside the
+										// list
+										Layout.IsPointInsideRect(
+											MousePressedX,
+											MousePressedY,
+											0,
+											0,
+											ScreenWidth - menuSidePadding,
+											ScreenHeight
+										)
+									)
+									{
+										Dragging = true;
+
+										HistoryScrollOffset = Math.Clamp(
+											HistoryScrollOffset
+												+ currentTouchPosition.Y
+												- StartTouchPosition.Y,
+											Math.Max(0, expressions.Count - menuVisibleEntries)
+												* -menuEntryHeight,
+											0
+										);
+
+										StartTouchPosition = currentTouchPosition;
+									}
+								}
+#else
+								if (MouseScroll > 0)
+								{
+									Dragging = true;
+								}
+
+								HistoryScrollOffset = Math.Clamp(
+									HistoryScrollOffset + MouseScroll,
+									Math.Max(0, expressions.Count - menuVisibleEntries)
+										* -menuEntryHeight,
+									0
 								);
+#endif
 
 								Layout.DrawButton(
 									ScreenWidth - topIconSize,
@@ -856,411 +986,304 @@ public readonly struct CalculatorUI
 									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
-									() => CurrentScene = Scene.History,
-									icon: new(GetResource("history_icon.png"), ForegroundColor)
+									() => CurrentScene = Scene.Calculator,
+									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
 
 								Layout.DrawButton(
-									ScreenWidth - (topIconSize) * 2 - Padding,
-									0,
+									ScreenWidth - topIconSize,
+									ScreenHeight - topIconSize,
 									topIconSize,
 									topIconSize,
 									Transparent,
-									ButtonPressedColor,
+									RedButtonPressedColor,
 									TransparentButtonHoverColor,
-									() => Clipboard.Set(Expression),
-									icon: new(GetResource("copy_icon.png"), ForegroundColor)
+									() =>
+									{
+										History.Clear();
+									},
+									icon: new(GetResource("trash_all_icon.png"), RedButtonColor),
+									pressMode: Layout.ButtonPressMode.HoldToPress
 								);
 
-								Layout.DrawButton(
-									ScreenWidth - topIconSize * 3 - Padding * 2,
-									0,
-									topIconSize,
-									topIconSize,
-									Transparent,
-									ButtonPressedColor,
-									TransparentButtonHoverColor,
-									Paste,
-									icon: new(GetResource("paste_icon.png"), ForegroundColor)
-								);
-
-								Layout.DrawButton(
-									ScreenWidth - topIconSize * 4 - Padding * 3,
-									0,
-									topIconSize,
-									topIconSize,
-									Transparent,
-									ButtonPressedColor,
-									TransparentButtonHoverColor,
-									() => History.Add(Expression),
-									icon: new(GetResource("bookmark_add_icon.png"), ForegroundColor)
-								);
-							}
-							break;
-						case Scene.History:
-							List<string> expressions = new(History.PinnedExpressions);
-							expressions.AddRange(History.ExpressionHistory);
-
-							if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
-							{
-								CurrentScene = Scene.Calculator;
-							}
-
-#if ANDROID
-							if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
-							{
-								StartTouchPosition = Raylib.GetTouchPosition(0);
-							}
-
-							if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
-							{
-								Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
-
-								float touchMoveDistance = Math.Abs(
-									currentTouchPosition.Y - StartTouchPosition.Y
-								);
-
-								if (
-									touchMoveDistance > 2
-									&&
-									// NOTE(LucasTA): Don't scroll if touch starts outside the
-									// list
-									Layout.IsPointInsideRect(
-										MousePressedX,
-										MousePressedY,
-										0,
-										0,
-										ScreenWidth - menuSidePadding,
-										ScreenHeight
-									)
-								)
 								{
-									Dragging = true;
+									for (int i = 0; i < expressions.Count; i++)
+									{
+										int menuEntryY =
+											(int)HistoryScrollOffset + i * menuEntryHeight;
 
-									HistoryScrollOffset = Math.Clamp(
-										HistoryScrollOffset
-											+ currentTouchPosition.Y
-											- StartTouchPosition.Y,
-										Math.Max(0, expressions.Count - menuVisibleEntries)
-											* -menuEntryHeight,
-										0
-									);
+										Layout.DrawTextBox(
+											menuEntryX,
+											menuEntryY,
+											menuEntryWidth,
+											menuEntryHeight,
+											new(
+												expressions[i],
+												FontSize,
+												ForegroundColor,
+												Layout.TextAlignment.BottomLeft,
+												Layout.OverflowMode.Truncate
+											),
+											MenuEntryBackgroundColor,
+											new(BorderColor, BorderThickness)
+										);
 
-									StartTouchPosition = currentTouchPosition;
-								}
-							}
-#else
-							if (MouseScroll > 0)
-							{
-								Dragging = true;
-							}
+										int deleteX =
+											menuEntryX + menuEntryWidth - topIconSize - Padding;
 
-							HistoryScrollOffset = Math.Clamp(
-								HistoryScrollOffset + MouseScroll,
-								Math.Max(0, expressions.Count - menuVisibleEntries)
-									* -menuEntryHeight,
-								0
-							);
-#endif
-
-							Layout.DrawButton(
-								ScreenWidth - topIconSize,
-								0,
-								topIconSize,
-								topIconSize,
-								Transparent,
-								ButtonPressedColor,
-								TransparentButtonHoverColor,
-								() => CurrentScene = Scene.Calculator,
-								icon: new(GetResource("close_icon.png"), ForegroundColor)
-							);
-
-							Layout.DrawButton(
-								ScreenWidth - topIconSize,
-								ScreenHeight - topIconSize,
-								topIconSize,
-								topIconSize,
-								Transparent,
-								RedButtonPressedColor,
-								TransparentButtonHoverColor,
-								() =>
-								{
-									History.Clear();
-								},
-								icon: new(GetResource("trash_all_icon.png"), RedButtonColor),
-								pressMode: Layout.ButtonPressMode.HoldToPress
-							);
-
-							{
-								for (int i = 0; i < expressions.Count; i++)
-								{
-									int menuEntryY = (int)HistoryScrollOffset + i * menuEntryHeight;
-
-									Layout.DrawTextBox(
-										menuEntryX,
-										menuEntryY,
-										menuEntryWidth,
-										menuEntryHeight,
-										new(
-											expressions[i],
-											FontSize,
-											ForegroundColor,
-											Layout.TextAlignment.BottomLeft,
-											Layout.OverflowMode.Truncate
-										),
-										MenuEntryBackgroundColor,
-										new(BorderColor, BorderThickness)
-									);
-
-									int deleteX =
-										menuEntryX + menuEntryWidth - topIconSize - Padding;
-
-									Layout.DrawButton(
-										deleteX,
-										menuEntryY + BorderThickness,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										RedButtonPressedColor,
-										TransparentButtonHoverColor,
-										() =>
-										{
-											History.Remove(expressions[i]);
-										},
-										icon: new(GetResource("trash_icon.png"), RedButtonColor),
-										pressMode: Layout.ButtonPressMode.HoldToPress
-									);
-
-									int copyX = deleteX - topIconSize - Padding;
-
-									Layout.DrawButton(
-										copyX,
-										menuEntryY + BorderThickness,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() => Clipboard.Set(expressions[i]),
-										icon: new(GetResource("copy_icon.png"), ForegroundColor)
-									);
-
-									int pickX = copyX - topIconSize - Padding;
-
-									Layout.DrawButton(
-										pickX,
-										menuEntryY + BorderThickness,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() =>
-										{
-											Expression = expressions[i];
-											ErrorMessage = "";
-
-											try
+										Layout.DrawButton(
+											deleteX,
+											menuEntryY + BorderThickness,
+											topIconSize,
+											topIconSize,
+											Transparent,
+											RedButtonPressedColor,
+											TransparentButtonHoverColor,
+											() =>
 											{
-												Result = Evaluator
-													.Evaluate(Expression)
-													.ToString(CultureInfo.InvariantCulture);
-											}
-											catch (Exception)
-											{
-												Result = "";
-											}
+												History.Remove(expressions[i]);
+											},
+											icon: new(
+												GetResource("trash_icon.png"),
+												RedButtonColor
+											),
+											pressMode: Layout.ButtonPressMode.HoldToPress
+										);
 
-											TypingIndex = Expression.Length;
-											CurrentScene = Scene.Calculator;
-										},
-										icon: new(GetResource("open_icon.png"), ForegroundColor)
-									);
+										int copyX = deleteX - topIconSize - Padding;
 
-									int pinX = pickX - topIconSize - Padding;
-									bool pinned = History.PinnedExpressions.Contains(
-										expressions[i]
-									);
+										Layout.DrawButton(
+											copyX,
+											menuEntryY + BorderThickness,
+											topIconSize,
+											topIconSize,
+											Transparent,
+											ButtonPressedColor,
+											TransparentButtonHoverColor,
+											() => Clipboard.Set(expressions[i]),
+											icon: new(GetResource("copy_icon.png"), ForegroundColor)
+										);
 
-									Layout.DrawButton(
-										pinX,
-										menuEntryY + BorderThickness,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() =>
-										{
-											if (pinned)
+										int pickX = copyX - topIconSize - Padding;
+
+										Layout.DrawButton(
+											pickX,
+											menuEntryY + BorderThickness,
+											topIconSize,
+											topIconSize,
+											Transparent,
+											ButtonPressedColor,
+											TransparentButtonHoverColor,
+											() =>
 											{
-												History.Unpin(expressions[i]);
-											}
-											else
+												Expression = expressions[i];
+												ErrorMessage = "";
+
+												try
+												{
+													Result = Evaluator
+														.Evaluate(Expression)
+														.ToString(CultureInfo.InvariantCulture);
+												}
+												catch (Exception)
+												{
+													Result = "";
+												}
+
+												TypingIndex = Expression.Length;
+												CurrentScene = Scene.Calculator;
+											},
+											icon: new(GetResource("open_icon.png"), ForegroundColor)
+										);
+
+										int pinX = pickX - topIconSize - Padding;
+										bool pinned = History.PinnedExpressions.Contains(
+											expressions[i]
+										);
+
+										Layout.DrawButton(
+											pinX,
+											menuEntryY + BorderThickness,
+											topIconSize,
+											topIconSize,
+											Transparent,
+											ButtonPressedColor,
+											TransparentButtonHoverColor,
+											() =>
 											{
-												History.Pin(expressions[i]);
-											}
-										},
-										icon: new(
-											pinned
-												? GetResource("unpin_icon.png")
-												: GetResource("pin_icon.png"),
-											ForegroundColor
-										)
-									);
+												if (pinned)
+												{
+													History.Unpin(expressions[i]);
+												}
+												else
+												{
+													History.Pin(expressions[i]);
+												}
+											},
+											icon: new(
+												pinned
+													? GetResource("unpin_icon.png")
+													: GetResource("pin_icon.png"),
+												ForegroundColor
+											)
+										);
+									}
 								}
 							}
 							break;
 						case Scene.Settings:
-							if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 							{
-								CurrentScene = Scene.Calculator;
-							}
-
-							Layout.DrawButton(
-								0,
-								0,
-								topIconSize,
-								topIconSize,
-								Transparent,
-								ButtonPressedColor,
-								TransparentButtonHoverColor,
-								() => CurrentScene = Scene.Calculator,
-								icon: new(GetResource("close_icon.png"), ForegroundColor)
-							);
-
-							Layout.DrawBox(
-								menuEntryX + menuSidePadding,
-								0,
-								menuEntryWidth,
-								menuEntryHeight,
-								MenuEntryBackgroundColor,
-								new(BorderColor, BorderThickness)
-							);
-
-							Layout.DrawButton(
-								ScreenWidth - menuSidePadding + BorderThickness,
-								BorderThickness,
-								menuSidePadding - BorderThickness * 2,
-								menuEntryHeight - BorderThickness * 2,
-								Transparent,
-								ButtonPressedColor,
-								TransparentButtonHoverColor,
-								() =>
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 								{
-									Settings.BookmarkOnEval = !Settings.BookmarkOnEval;
-									Settings.Save();
-								},
-								icon: new(
-									Settings.BookmarkOnEval
-										? GetResource("toggle_on_icon.png")
-										: GetResource("toggle_off_icon.png"),
-									Settings.BookmarkOnEval ? ToggleOnColor : ToggleOffColor
-								)
-							);
+									CurrentScene = Scene.Calculator;
+								}
 
-							Layout.DrawText(
-								menuEntryX + menuSidePadding,
-								0,
-								menuEntryWidth - menuSidePadding,
-								menuEntryHeight,
-								BorderThickness,
-								"Add to history with '='",
-								ForegroundColor,
-								MenuEntryBackgroundColor,
-								FontSize,
-								Layout.TextAlignment.Left
-							);
+								Layout.DrawButton(
+									0,
+									0,
+									topIconSize,
+									topIconSize,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() => CurrentScene = Scene.Calculator,
+									icon: new(GetResource("close_icon.png"), ForegroundColor)
+								);
 
-							Layout.DrawTextBox(
-								menuEntryX + menuSidePadding,
-								menuEntryHeight,
-								menuEntryWidth,
-								menuEntryHeight,
-								new(
-									"Version:",
-									FontSize,
+								Layout.DrawBox(
+									menuEntryX + menuSidePadding,
+									0,
+									menuEntryWidth,
+									menuEntryHeight,
+									MenuEntryBackgroundColor,
+									new(BorderColor, BorderThickness)
+								);
+
+								Layout.DrawButton(
+									ScreenWidth - menuSidePadding + BorderThickness,
+									BorderThickness,
+									menuSidePadding - BorderThickness * 2,
+									menuEntryHeight - BorderThickness * 2,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() =>
+									{
+										Settings.BookmarkOnEval = !Settings.BookmarkOnEval;
+										Settings.Save();
+									},
+									icon: new(
+										Settings.BookmarkOnEval
+											? GetResource("toggle_on_icon.png")
+											: GetResource("toggle_off_icon.png"),
+										Settings.BookmarkOnEval ? ToggleOnColor : ToggleOffColor
+									)
+								);
+
+								Layout.DrawText(
+									menuEntryX + menuSidePadding,
+									0,
+									menuEntryWidth - menuSidePadding,
+									menuEntryHeight,
+									BorderThickness,
+									"Add to history with '='",
 									ForegroundColor,
-									Layout.TextAlignment.Left
-								),
-								MenuEntryBackgroundColor,
-								new(BorderColor, BorderThickness)
-							);
-
-							Layout.DrawText(
-								menuEntryX + menuSidePadding,
-								menuEntryHeight,
-								menuEntryWidth,
-								menuEntryHeight,
-								BorderThickness,
-								APP_VERSION,
-								ForegroundColor,
-								MenuEntryBackgroundColor,
-								FontSize,
-								Layout.TextAlignment.Right
-							);
-
-							Layout.DrawTextBox(
-								menuEntryX + menuSidePadding,
-								menuEntryHeight * 2,
-								menuEntryWidth,
-								menuEntryHeight,
-								new(
-									"License:",
+									MenuEntryBackgroundColor,
 									FontSize,
-									ForegroundColor,
 									Layout.TextAlignment.Left
-								),
-								MenuEntryBackgroundColor,
-								new(BorderColor, BorderThickness)
-							);
+								);
 
-							Layout.DrawText(
-								menuEntryX + menuSidePadding,
-								menuEntryHeight * 2,
-								menuEntryWidth,
-								menuEntryHeight,
-								BorderThickness,
-								APP_LICENSE,
-								ForegroundColor,
-								MenuEntryBackgroundColor,
-								FontSize,
-								Layout.TextAlignment.Right
-							);
+								Layout.DrawTextBox(
+									menuEntryX + menuSidePadding,
+									menuEntryHeight,
+									menuEntryWidth,
+									menuEntryHeight,
+									new(
+										"Version:",
+										FontSize,
+										ForegroundColor,
+										Layout.TextAlignment.Left
+									),
+									MenuEntryBackgroundColor,
+									new(BorderColor, BorderThickness)
+								);
 
-							Layout.DrawBox(
-								menuEntryX + menuSidePadding,
-								menuEntryHeight * 3,
-								menuEntryWidth,
-								menuEntryHeight,
-								MenuEntryBackgroundColor,
-								new(BorderColor, BorderThickness)
-							);
+								Layout.DrawText(
+									menuEntryX + menuSidePadding,
+									menuEntryHeight,
+									menuEntryWidth,
+									menuEntryHeight,
+									BorderThickness,
+									APP_VERSION,
+									ForegroundColor,
+									MenuEntryBackgroundColor,
+									FontSize,
+									Layout.TextAlignment.Right
+								);
 
-							Layout.DrawButton(
-								ScreenWidth - menuSidePadding + BorderThickness,
-								menuEntryHeight * 3 + BorderThickness,
-								menuSidePadding - BorderThickness * 2,
-								menuEntryHeight - BorderThickness * 2,
-								Transparent,
-								ButtonPressedColor,
-								TransparentButtonHoverColor,
-								() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
-								icon: new(GetResource("github_icon.png"), Color.WHITE)
-							);
+								Layout.DrawTextBox(
+									menuEntryX + menuSidePadding,
+									menuEntryHeight * 2,
+									menuEntryWidth,
+									menuEntryHeight,
+									new(
+										"License:",
+										FontSize,
+										ForegroundColor,
+										Layout.TextAlignment.Left
+									),
+									MenuEntryBackgroundColor,
+									new(BorderColor, BorderThickness)
+								);
 
-							Layout.DrawText(
-								menuEntryX + menuSidePadding,
-								menuEntryHeight * 3,
-								menuEntryWidth - menuSidePadding,
-								menuEntryHeight,
-								BorderThickness,
-								"Source code:",
-								ForegroundColor,
-								MenuEntryBackgroundColor,
-								FontSize,
-								Layout.TextAlignment.Left
-							);
+								Layout.DrawText(
+									menuEntryX + menuSidePadding,
+									menuEntryHeight * 2,
+									menuEntryWidth,
+									menuEntryHeight,
+									BorderThickness,
+									APP_LICENSE,
+									ForegroundColor,
+									MenuEntryBackgroundColor,
+									FontSize,
+									Layout.TextAlignment.Right
+								);
+
+								Layout.DrawBox(
+									menuEntryX + menuSidePadding,
+									menuEntryHeight * 3,
+									menuEntryWidth,
+									menuEntryHeight,
+									MenuEntryBackgroundColor,
+									new(BorderColor, BorderThickness)
+								);
+
+								Layout.DrawButton(
+									ScreenWidth - menuSidePadding + BorderThickness,
+									menuEntryHeight * 3 + BorderThickness,
+									menuSidePadding - BorderThickness * 2,
+									menuEntryHeight - BorderThickness * 2,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() =>
+										OpenBrowser("https://github.com/lucastavaresa/Calculator"),
+									icon: new(GetResource("github_icon.png"), Color.WHITE)
+								);
+
+								Layout.DrawText(
+									menuEntryX + menuSidePadding,
+									menuEntryHeight * 3,
+									menuEntryWidth - menuSidePadding,
+									menuEntryHeight,
+									BorderThickness,
+									"Source code:",
+									ForegroundColor,
+									MenuEntryBackgroundColor,
+									FontSize,
+									Layout.TextAlignment.Left
+								);
+							}
 							break;
 						case Scene.Converters:
 							{
@@ -1917,7 +1940,9 @@ public readonly struct CalculatorUI
 							}
 							break;
 						default:
-							Log.Halt("Unknown scene");
+							{
+								Log.Halt("Unknown scene");
+							}
 							break;
 					}
 
