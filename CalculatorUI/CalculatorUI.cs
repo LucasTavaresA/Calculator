@@ -21,6 +21,7 @@ using static Calculator.Currency;
 using static Calculator.Resource;
 #if ANDROID
 using Android.Content;
+using Android.App;
 #endif
 
 namespace Calculator;
@@ -91,11 +92,6 @@ public readonly struct CalculatorUI
 		TypingIndex += value.Length;
 	}
 
-	internal static readonly Action Paste = () =>
-	{
-		InsertExpression(Clipboard.Get());
-	};
-
 	internal static readonly Action Backspace = () =>
 	{
 		if (Expression == "" || TypingIndex == 0)
@@ -156,13 +152,14 @@ public readonly struct CalculatorUI
 		var uri = Android.Net.Uri.Parse(url);
 		var intent = new Intent(Intent.ActionView, uri);
 		intent.SetFlags(ActivityFlags.NewTask);
-		Android.App.Application.Context.StartActivity(intent);
+		Context.StartActivity(intent);
 #elif MACOS
 		Process.Start("open", url);
 #endif
 	}
 
 #if ANDROID
+	internal static Context Context = Application.Context;
 	internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
 	internal static int TouchCount = 0;
 	internal static Vector2 StartTouchPosition;
@@ -305,9 +302,7 @@ public readonly struct CalculatorUI
 					ScrollbarWidth = BorderThickness * 4;
 					Padding = BorderThickness * 8;
 
-#if ANDROID
-					TouchCount = Raylib.GetTouchPointCount();
-#else
+#if !ANDROID
 					MouseScroll = Raylib.GetMouseWheelMove() * 32;
 #endif
 				}
@@ -792,7 +787,7 @@ public readonly struct CalculatorUI
 										) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
 									)
 									{
-										Paste();
+										InsertExpression(Clipboard.Get());
 										ButtonPressedTime = 0;
 									}
 									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
@@ -894,7 +889,10 @@ public readonly struct CalculatorUI
 										Transparent,
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
-										Paste,
+										() =>
+										{
+											InsertExpression(Clipboard.Get());
+										},
 										icon: new(GetResource("paste_icon.png"), ForegroundColor)
 									);
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed under the GPL3 or later versions of the GPL license.
+// See the LICENSE file in the project root for more information.
+
+using System;
 #if LINUX || MACOS
 using System.Diagnostics;
 #elif ANDROID

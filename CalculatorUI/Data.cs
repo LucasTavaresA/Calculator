@@ -33,10 +33,9 @@ internal readonly struct Data
 
 	internal static List<string> LoadList(string fileName)
 	{
-		List<string> list = new();
-
 #if LINUX || MACOS || WINDOWS
 		string filePath = Data.DataFolder + fileName;
+		List<string> list = new();
 
 		if (File.Exists(filePath))
 		{
@@ -48,15 +47,15 @@ internal readonly struct Data
 				}
 			}
 		}
+
+		return list;
 #elif ANDROID
-		list = new(
+		return new(
 			Preferences
 				.Get(fileName, string.Empty)
 				.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
 		);
 #endif
-
-		return list;
 	}
 
 	internal static void SaveString(string str, string fileName)

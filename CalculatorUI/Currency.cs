@@ -15,7 +15,6 @@ namespace Calculator;
 
 internal readonly record struct Currency
 {
-	// TODO(LucasTA): try to add and set the rates here
 	internal readonly string Code = "";
 	internal readonly string Name = "";
 
@@ -71,15 +70,9 @@ internal readonly record struct Currency
 		return conversions;
 	}
 
-	private readonly record struct Response(Dictionary<string, double> rates);
-
-	private static readonly HttpClient HttpClient = new();
-
-	// TODO(LucasTA): check perf for getting the currency info
-	// TODO(LucasTA): try different json libs
 	internal static Dictionary<string, double> GetCurrencyRates()
 	{
-		string responseBody = HttpClient
+		string responseBody = new HttpClient()
 			.GetStringAsync(
 				"https://openexchangerates.org/api/latest.json?app_id="
 					+ Resource.LoadStringFromAssembly("CalculatorUI.APIKEY")

@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Licensed under the GPL3 or later versions of the GPL license.
+// See the LICENSE file in the project root for more information.
+
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -25,9 +28,9 @@ internal readonly struct Resource
 
 	internal static string LoadStringFromAssembly(string resource)
 	{
-		using (Stream s = Assembly.GetManifestResourceStream(resource))
-		using (StreamReader sr = new(s))
-			return sr.ReadToEnd();
+		using Stream s = Assembly.GetManifestResourceStream(resource);
+		using StreamReader sr = new(s);
+		return sr.ReadToEnd();
 	}
 
 	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
