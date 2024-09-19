@@ -16,7 +16,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Eval.cs" Version="0.10.0" />
+		<PackageReference Include="Eval.cs" Version="0.11.0" />
 		<PackageReference Include="Raylib-cs" Version="4.5.0.4" />
 		<EmbeddedResource Include="Resources/*.png">
 			<LogicalName>$([System.String]::new('%(FileName)%(Extension)'))</LogicalName>
