@@ -2,25 +2,18 @@
 // See the LICENSE file in the project root for more information.
 
 using System;
-#if LINUX || MACOS || WINDOWS
 using System.IO;
-#elif ANDROID
-using Xamarin.Essentials;
-#endif
 
 namespace Calculator;
 
 internal readonly struct Settings
 {
-#if !ANDROID
 	private static readonly string SettingsFilePath = Data.DataFolder + "CalculatorSettings";
-#endif
 	internal static bool BookmarkOnEval = true;
 	internal static DateTime LastAPICallTime = DateTime.MinValue.Date;
 
 	internal static void Save()
 	{
-#if LINUX || MACOS || WINDOWS
 		Directory.CreateDirectory(Data.DataFolder);
 		File.WriteAllText(
 			SettingsFilePath,
@@ -30,31 +23,16 @@ internal readonly struct Settings
 				$"LastAPICallTime={LastAPICallTime}"
 			)
 		);
-#elif ANDROID
-		Preferences.Set(
-			"CalculatorSettings",
-			string.Join(
-				Environment.NewLine,
-				$"BookmarkOnEval={BookmarkOnEval}",
-				$"LastAPICallTime={LastAPICallTime}"
-			)
-		);
-#endif
 	}
 
 	internal static void Load()
 	{
-#if LINUX || MACOS || WINDOWS
-		string filePath = Data.DataFolder + "CalculatorSettings";
 		string settings = "";
 
-		if (File.Exists(filePath))
+		if (File.Exists(SettingsFilePath))
 		{
-			settings = File.ReadAllText(filePath);
+			settings = File.ReadAllText(SettingsFilePath);
 		}
-#elif ANDROID
-		string settings = Preferences.Get("CalculatorSettings", string.Empty);
-#endif
 
 		foreach (
 			string setting in settings.Split(

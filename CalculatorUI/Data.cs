@@ -2,38 +2,34 @@
 // See the LICENSE file in the project root for more information.
 using System;
 using System.Collections.Generic;
-#if LINUX || MACOS || WINDOWS
 using System.IO;
-#elif ANDROID
-using Xamarin.Essentials;
-#endif
 
 namespace Calculator;
 
 internal readonly struct Data
 {
+#if WINDOWS || LINUX || MACOS
 	internal static readonly string UserFolder = Environment.GetFolderPath(
 		Environment.SpecialFolder.UserProfile
 	);
+#endif
+
 #if WINDOWS
 	internal static readonly string DataFolder = UserFolder + "/AppData/Local/Calculator/";
 #elif LINUX || MACOS
 	internal static readonly string DataFolder = UserFolder + "/.local/share/Calculator/";
+#elif ANDROID
+	internal static readonly string DataFolder = CalculatorUI.Context.FilesDir.AbsolutePath;
 #endif
 
 	internal static void SaveList(List<string> list, string fileName)
 	{
-#if LINUX || MACOS || WINDOWS
 		Directory.CreateDirectory(Data.DataFolder);
 		File.WriteAllText(Data.DataFolder + fileName, string.Join(Environment.NewLine, list));
-#elif ANDROID
-		Preferences.Set(fileName, string.Join(Environment.NewLine, list));
-#endif
 	}
 
 	internal static List<string> LoadList(string fileName)
 	{
-#if LINUX || MACOS || WINDOWS
 		string filePath = Data.DataFolder + fileName;
 		List<string> list = new();
 
@@ -49,22 +45,11 @@ internal readonly struct Data
 		}
 
 		return list;
-#elif ANDROID
-		return new(
-			Preferences
-				.Get(fileName, string.Empty)
-				.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
-		);
-#endif
 	}
 
 	internal static void SaveString(string str, string fileName)
 	{
-#if LINUX || MACOS || WINDOWS
 		Directory.CreateDirectory(Data.DataFolder);
 		File.WriteAllText(Data.DataFolder + fileName, str);
-#elif ANDROID
-		Preferences.Set(fileName, str);
-#endif
 	}
 }

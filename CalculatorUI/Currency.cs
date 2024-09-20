@@ -3,18 +3,15 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net.Http;
 using System.Text.Json;
-#if LINUX || MACOS || WINDOWS
-using System.IO;
-#elif ANDROID
-using Xamarin.Essentials;
-#endif
 
 namespace Calculator;
 
 internal readonly record struct Currency
 {
+	private static readonly string CurrenciesFilePath = Data.DataFolder + "CurrencyRates";
 	internal readonly string Code = "";
 	internal readonly string Name = "";
 
@@ -28,17 +25,12 @@ internal readonly record struct Currency
 	{
 		List<Conversion.Currency> conversions = new();
 
-#if LINUX || MACOS || WINDOWS
-		string filePath = Data.DataFolder + "CurrencyRates";
 		string rates = "";
 
-		if (File.Exists(filePath))
+		if (File.Exists(CurrenciesFilePath))
 		{
-			rates = File.ReadAllText(filePath);
+			rates = File.ReadAllText(CurrenciesFilePath);
 		}
-#elif ANDROID
-		string rates = Preferences.Get("CurrencyRates", string.Empty);
-#endif
 
 		foreach (
 			string currency in rates.Split(
