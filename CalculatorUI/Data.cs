@@ -18,7 +18,7 @@ internal readonly struct Data
 #if WINDOWS
 	internal static readonly string DataFolder = UserFolder + "/AppData/Local/Calculator/";
 #elif LINUX || MACOS
-	internal static readonly string DataFolder = UserFolder + "/.cache/";
+	internal static readonly string DataFolder = UserFolder + "/.local/share/Calculator/";
 #endif
 
 	internal static void SaveList(List<string> list, string fileName)
