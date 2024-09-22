@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
+		<TargetFrameworks>net8.0;net8.0-windows;net8.0-macos</TargetFrameworks>
 		<OutputType>WinExe</OutputType>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
@@ -13,14 +14,12 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
-		<TargetFramework>net8.0-windows</TargetFramework>
 		<UseWindowsForms>true</UseWindowsForms>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<PublishTrimmed>false</PublishTrimmed>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
-		<TargetFramework>net8.0</TargetFramework>
 		<PublishTrimmed>true</PublishTrimmed>
 	</PropertyGroup>
 

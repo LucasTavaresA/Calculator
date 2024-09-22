@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net8.0-android;net8.0-windows</TargetFrameworks>
+		<TargetFrameworks>net8.0;net8.0-android;net8.0-windows;net8.0-macos</TargetFrameworks>
 		<OutputType>Library</OutputType>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
