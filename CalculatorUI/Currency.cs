@@ -62,37 +62,22 @@ internal readonly record struct Currency
 		return conversions;
 	}
 
+	internal readonly record struct Response(Dictionary<string, double> rates);
+
+	internal static readonly HttpClient HttpClient = new();
+
 	internal static Dictionary<string, double> GetCurrencyRates()
 	{
-		string responseBody = new HttpClient()
-			.GetStringAsync(
-				"https://openexchangerates.org/api/latest.json?app_id="
-					+ Resource.LoadStringFromAssembly("CalculatorUI.APIKEY")
+		return JsonSerializer
+			.Deserialize<Response>(
+				HttpClient
+					.GetStringAsync(
+						"https://openexchangerates.org/api/latest.json?app_id="
+							+ Resource.LoadStringFromAssembly("CalculatorUI.APIKEY")
+					)
+					.Result
 			)
-			.Result;
-
-		Dictionary<string, double> rates = new();
-
-		using (JsonDocument doc = JsonDocument.Parse(responseBody))
-		{
-			JsonElement root = doc.RootElement;
-
-			if (
-				root.TryGetProperty("rates", out JsonElement ratesElement)
-				&& ratesElement.ValueKind == JsonValueKind.Object
-			)
-			{
-				foreach (JsonProperty element in ratesElement.EnumerateObject())
-				{
-					if (element.Value.TryGetDouble(out double rate))
-					{
-						rates.Add(element.Name, rate);
-					}
-				}
-			}
-		}
-
-		return rates;
+			.rates;
 	}
 
 	internal static readonly Currency[] Currencies =
