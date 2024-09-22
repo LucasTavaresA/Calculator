@@ -16,11 +16,7 @@
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
 		<UseWindowsForms>true</UseWindowsForms>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<PublishTrimmed>false</PublishTrimmed>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
-		<PublishTrimmed>true</PublishTrimmed>
+		<UseWPF>false</UseWPF>
 	</PropertyGroup>
 
 	<ItemGroup>

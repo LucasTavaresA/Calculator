@@ -13,9 +13,12 @@
 		<SelfContained>true</SelfContained>
 		<PublishSelfContained>true</PublishSelfContained>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimmerRootAssembly>Calculator</TrimmerRootAssembly>
 	</PropertyGroup>
 
 	<ItemGroup>
+		<TrimmerRootNamespace Include="System.Windows.Forms.Clipboard" />
 		<PackageReference Include="Eval.cs" Version="0.11.0" />
 		<PackageReference Include="Raylib-cs" Version="4.5.0.4" />
 		<EmbeddedResource Include="Resources/*.png">
@@ -55,6 +58,7 @@
 		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
 		<UseWindowsForms>true</UseWindowsForms>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+		<UseWPF>false</UseWPF>
 	</PropertyGroup>
 
 	<!-- LINUX -->
