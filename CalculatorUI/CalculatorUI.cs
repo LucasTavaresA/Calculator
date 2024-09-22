@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
-using System.Text;
 
 using Eval;
 
@@ -240,26 +239,7 @@ public readonly struct CalculatorUI
 			{
 				Log.Ignore(() =>
 				{
-					Dictionary<string, double> rates = GetCurrencyRates();
-					Settings.LastAPICallTime = DateTime.Now.Date;
-					Settings.Save();
-					Converters[0].Conversions.Clear();
-					StringBuilder ratesString = new();
-
-					for (int i = 0; i < Currencies.Length; i++)
-					{
-						Currency currency = Currencies[i];
-
-						if (rates.TryGetValue(currency.Code, out double rate))
-						{
-							Converters[0].Conversions.Add(new(currency.Name, rate));
-							ratesString.AppendLine(
-								currency.Name + "," + rate.ToString(CultureInfo.InvariantCulture)
-							);
-						}
-					}
-
-					Data.SaveString(ratesString.ToString(), "CurrencyRates");
+					GetCurrencyRatesAsync();
 				});
 			}
 
