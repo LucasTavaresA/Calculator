@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace Calculator;
 
-internal readonly struct Conversion
+internal readonly struct Conversions
 {
 	internal static int CurrentConverter = 0;
 	internal static int ConverterTypingIndex = 0;
@@ -16,12 +16,12 @@ internal readonly struct Conversion
 	internal static int ConverterFromIndex = 0;
 	internal static int ConverterToIndex = 0;
 
-	internal readonly record struct Currency(string Name, double Rate);
+	internal readonly record struct Conversion(string Name, double Rate);
 
 	internal readonly record struct Converter(
 		string Title,
 		string Icon,
-		List<Currency> Conversions
+		List<Conversion> Conversions
 	);
 
 	internal static void Convert()

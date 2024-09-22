@@ -15,7 +15,7 @@ using Eval;
 
 using Raylib_cs;
 
-using static Calculator.Conversion;
+using static Calculator.Conversions;
 using static Calculator.Currency;
 using static Calculator.Resource;
 #if ANDROID
@@ -1962,7 +1962,7 @@ public readonly struct CalculatorUI
 												ConverterToIndex = i;
 											}
 
-											Conversion.Convert();
+											Convert();
 											CurrentScene = Scene.Converters;
 										},
 										textFormat: new(converter, FontSize, ForegroundColor),

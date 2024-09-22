@@ -11,21 +11,13 @@ using System.Text.Json;
 
 namespace Calculator;
 
-internal readonly record struct Currency
+internal readonly struct Currency
 {
 	private static readonly string CurrenciesFilePath = Data.DataFolder + "CurrencyRates";
-	internal readonly string Code = "";
-	internal readonly string Name = "";
 
-	internal Currency(string code, string name)
+	internal static List<Conversions.Conversion> Load()
 	{
-		Code = code;
-		Name = name;
-	}
-
-	internal static List<Conversion.Currency> Load()
-	{
-		List<Conversion.Currency> conversions = new();
+		List<Conversions.Conversion> conversions = new();
 
 		string rates = "";
 
@@ -90,13 +82,13 @@ internal readonly record struct Currency
 
 		Settings.LastAPICallTime = DateTime.Now.Date;
 		Settings.Save();
-		Conversion.Converters[0].Conversions.Clear();
+		Conversions.Converters[0].Conversions.Clear();
 		StringBuilder ratesString = new();
 
 		foreach ((string code, string name) in currencies)
 		{
 			string title = $"{name} [{code}]";
-			Conversion.Converters[0].Conversions.Add(new(title, rates[code]));
+			Conversions.Converters[0].Conversions.Add(new(title, rates[code]));
 			ratesString.AppendLine(
 				title + "," + rates[code].ToString(CultureInfo.InvariantCulture)
 			);
