@@ -16,6 +16,22 @@ internal readonly struct Log
 	/// <summary>The current message logged</summary>
 	internal static string Message = "";
 
+	/// <summary>Ignores exceptions when not in Debug mode</summary>
+	internal static void Ignore(Action action)
+	{
+#if DEBUG
+			action();
+#else
+			try
+			{
+				action();
+			}
+			catch (Exception)
+			{
+			}
+#endif
+	}
+
 	/// <summary>Halts the program with the given message, does nothing in release builds</summary>
 	[Conditional("DEBUG")]
 	internal static void Halt(string message)

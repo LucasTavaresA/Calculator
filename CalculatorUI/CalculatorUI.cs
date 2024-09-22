@@ -238,7 +238,7 @@ public readonly struct CalculatorUI
 
 			if ((DateTime.Now.Date - Settings.LastAPICallTime).TotalDays >= 1)
 			{
-				try
+				Log.Ignore(() =>
 				{
 					Dictionary<string, double> rates = GetCurrencyRates();
 					Settings.LastAPICallTime = DateTime.Now.Date;
@@ -260,8 +260,7 @@ public readonly struct CalculatorUI
 					}
 
 					Data.SaveString(ratesString.ToString(), "CurrencyRates");
-				}
-				catch (Exception) { }
+				});
 			}
 
 			if (Converters[0].Conversions.Count == 0)

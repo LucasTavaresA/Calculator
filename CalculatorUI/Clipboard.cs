@@ -36,7 +36,7 @@ internal readonly struct Clipboard
 		args = string.Empty;
 #endif
 
-		try
+		Log.Ignore(() =>
 		{
 			Process process =
 				new()
@@ -53,11 +53,7 @@ internal readonly struct Clipboard
 			process.StandardInput.Write(text);
 			process.StandardInput.Close();
 			process.WaitForExit();
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine($"Failed to set text to clipboard: {e.Message}");
-		}
+		});
 #elif WINDOWS
 		System.Windows.Forms.Clipboard.SetText(text);
 #elif ANDROID
@@ -88,7 +84,7 @@ internal readonly struct Clipboard
 		args = string.Empty;
 #endif
 
-		try
+		Log.Ignore(() =>
 		{
 			Process process =
 				new()
@@ -105,11 +101,7 @@ internal readonly struct Clipboard
 			process.Start();
 			output = process.StandardOutput.ReadToEnd().Trim();
 			process.WaitForExit();
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine($"Failed to get text from clipboard: {e.Message}");
-		}
+		});
 
 		return output;
 #elif WINDOWS
