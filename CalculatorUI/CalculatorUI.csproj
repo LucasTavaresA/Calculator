@@ -27,33 +27,7 @@
 		<EmbeddedResource Include="Resources/iosevka-regular.ttf" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-		<PackageReference Include="Raylib-cs.Android" Version="4.5.0.4" />
-		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
-	</ItemGroup>
-
-	<PropertyGroup Condition="'$(DEBUG)' != ''">
-		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-		<DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
-		<UseWindowsForms>true</UseWindowsForms>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-		<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-macos'">
-		<DefineConstants>$(DefineConstants);MACOS</DefineConstants>
-	</PropertyGroup>
-
+	<!-- APIKEY -->
 	<PropertyGroup Condition="Exists('APIKEY')">
 		<DefineConstants>$(DefineConstants);HAS_APIKEY</DefineConstants>
 	</PropertyGroup>
@@ -65,4 +39,36 @@
 	<ItemGroup Condition="Exists('APIKEY')">
 		<EmbeddedResource Include="./APIKEY" />
 	</ItemGroup>
+
+	<!-- ANDROID -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+		<DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+		<PackageReference Include="Raylib-cs.Android" Version="4.5.0.4" />
+		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
+	</ItemGroup>
+
+	<!-- WINDOWS -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+		<UseWindowsForms>true</UseWindowsForms>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+	</PropertyGroup>
+
+	<!-- LINUX -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
+		<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
+	</PropertyGroup>
+
+	<!-- MACOS -->
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-macos'">
+		<DefineConstants>$(DefineConstants);MACOS</DefineConstants>
+	</PropertyGroup>
+
+	<!-- DEBUG -->
+	<PropertyGroup Condition="'$(DEBUG)' != ''">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+	</PropertyGroup>
 </Project>
