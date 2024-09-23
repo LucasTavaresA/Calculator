@@ -55,6 +55,12 @@ internal readonly struct Clipboard
 			process.WaitForExit();
 		});
 #elif WINDOWS
+		// NOTE(LucasTA): Why SetText fucking crashes on ""? WTF!
+		if (string.IsNullOrEmpty(text))
+		{
+			return;
+		}
+
 		System.Windows.Forms.Clipboard.SetText(text);
 #elif ANDROID
 		CrossClipboard.Current.SetText(text);
