@@ -228,7 +228,7 @@ public readonly struct CalculatorUI
 #if ANDROID
 			Raylib.InitWindow(0, 0, APP_NAME);
 #else
-			Raylib.InitWindow(400, 400, APP_NAME);
+			Raylib.InitWindow(400, 500, APP_NAME);
 #endif
 			Raylib.SetTargetFPS(TARGET_FPS);
 			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
