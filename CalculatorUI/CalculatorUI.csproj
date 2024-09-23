@@ -42,7 +42,7 @@
 	</Target>
 
 	<ItemGroup Condition="Exists('APIKEY')">
-		<EmbeddedResource Include="./APIKEY" />
+		<EmbeddedResource Include="APIKEY" />
 	</ItemGroup>
 
 	<!-- ANDROID -->
