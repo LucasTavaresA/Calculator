@@ -88,10 +88,12 @@ internal readonly struct Currency
 		foreach ((string code, string name) in currencies)
 		{
 			string title = $"{name} [{code}]";
-			Conversions.Converters[0].Conversions.Add(new(title, rates[code]));
-			ratesString.AppendLine(
-				title + "," + rates[code].ToString(CultureInfo.InvariantCulture)
-			);
+
+			if (rates.TryGetValue(code, out double rate))
+			{
+				Conversions.Converters[0].Conversions.Add(new(title, rate));
+				ratesString.AppendLine(title + "," + rate.ToString(CultureInfo.InvariantCulture));
+			}
 		}
 
 		Data.SaveString(ratesString.ToString(), "CurrencyRates");
