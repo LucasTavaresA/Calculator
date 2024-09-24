@@ -1623,6 +1623,22 @@ public readonly struct CalculatorUI
 											borderStyle: new(BorderColor, BorderThickness),
 											icon: new(GetResource("copy_icon.png"), ForegroundColor)
 										);
+
+										if (Converters[CurrentConverter].Title == "Currency")
+										{
+											Layout.DrawText(
+												leftButtonSize,
+												converterBoxHeight + leftButtonSize,
+												converterBoxWidth - gridButtonSize,
+												converterBoxHeight,
+												1,
+												$"Updated {Settings.LastAPICallTime}",
+												DarkForegroundColor,
+												DisplayBackgroundColor,
+												(int)(FontSize / 1.5f),
+												Layout.TextAlignment.BottomLeft
+											);
+										}
 									}
 								}
 
