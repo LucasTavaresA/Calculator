@@ -1367,7 +1367,7 @@ public readonly struct CalculatorUI
 											leftButtonSize,
 											converterBoxWidth,
 											converterBoxHeight,
-											MenuEntryBackgroundColor,
+											DisplayBackgroundColor,
 											new(BorderColor, BorderThickness)
 										);
 
@@ -1405,7 +1405,7 @@ public readonly struct CalculatorUI
 											0,
 											convertingFrom,
 											ForegroundColor,
-											Transparent,
+											DisplayBackgroundColor,
 											FontSize,
 											Layout.TextAlignment.Left
 										);
@@ -1432,7 +1432,7 @@ public readonly struct CalculatorUI
 											0,
 											ConverterExpression.Insert(ConverterTypingIndex, "|"),
 											ForegroundColor,
-											MenuEntryBackgroundColor,
+											DisplayBackgroundColor,
 											FontSize,
 											Layout.TextAlignment.Left
 										);
@@ -1540,7 +1540,7 @@ public readonly struct CalculatorUI
 											converterBoxHeight + leftButtonSize,
 											converterBoxWidth,
 											converterBoxHeight,
-											MenuEntryBackgroundColor,
+											DisplayBackgroundColor,
 											new(BorderColor, BorderThickness)
 										);
 
@@ -1578,7 +1578,7 @@ public readonly struct CalculatorUI
 											0,
 											convertingTo,
 											ForegroundColor,
-											Transparent,
+											DisplayBackgroundColor,
 											FontSize,
 											Layout.TextAlignment.Left
 										);
@@ -1605,7 +1605,7 @@ public readonly struct CalculatorUI
 											0,
 											ConverterResult,
 											ForegroundColor,
-											MenuEntryBackgroundColor,
+											DisplayBackgroundColor,
 											FontSize,
 											Layout.TextAlignment.Left
 										);
