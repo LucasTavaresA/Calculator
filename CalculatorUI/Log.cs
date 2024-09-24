@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 using Raylib_cs;
 
@@ -16,19 +17,31 @@ internal readonly struct Log
 	/// <summary>The current message logged</summary>
 	internal static string Message = "";
 
+	/// <summary>Ignores exceptions in async functions when not in Debug mode</summary>
+	internal static async void IgnoreAsync(Func<Task> func)
+	{
+#if DEBUG
+		await func();
+#else
+		try
+		{
+			await func();
+		}
+		catch (Exception) { }
+#endif
+	}
+
 	/// <summary>Ignores exceptions when not in Debug mode</summary>
 	internal static void Ignore(Action action)
 	{
 #if DEBUG
-			action();
+		action();
 #else
-			try
-			{
-				action();
-			}
-			catch (Exception)
-			{
-			}
+		try
+		{
+			action();
+		}
+		catch (Exception) { }
 #endif
 	}
 

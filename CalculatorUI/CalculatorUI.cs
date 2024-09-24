@@ -237,10 +237,7 @@ public readonly struct CalculatorUI
 
 			if ((DateTime.Now.Date - Settings.LastAPICallTime).TotalDays >= 1)
 			{
-				Log.Ignore(() =>
-				{
-					GetCurrencyRatesAsync();
-				});
+				Log.IgnoreAsync(GetCurrencyRatesAsync);
 			}
 
 			if (Converters[0].Conversions.Count == 0)

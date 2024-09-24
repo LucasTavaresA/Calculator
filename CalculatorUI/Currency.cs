@@ -8,6 +8,7 @@ using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Calculator;
 
@@ -65,7 +66,7 @@ internal readonly struct Currency
 		"IL2026",
 		Justification = "Trimming is disabled for JSON."
 	)]
-	internal static async void GetCurrencyRatesAsync()
+	internal static async Task GetCurrencyRatesAsync()
 	{
 		Dictionary<string, string> currencies = JsonSerializer.Deserialize<
 			Dictionary<string, string>
