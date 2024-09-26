@@ -237,7 +237,7 @@ public readonly struct CalculatorUI
 
 			if ((DateTime.Now.Date - Settings.LastAPICallTime).TotalDays >= 1)
 			{
-				Log.IgnoreAsync(GetCurrencyRatesAsync);
+				Debug.IgnoreAsync(GetCurrencyRatesAsync);
 			}
 
 			if (Converters[0].Conversions.Count == 0)
@@ -1989,7 +1989,7 @@ public readonly struct CalculatorUI
 							break;
 						default:
 							{
-								Log.Halt("Unknown scene");
+								Debug.Halt("Unknown scene");
 							}
 							break;
 					}
@@ -2002,12 +2002,12 @@ public readonly struct CalculatorUI
 					Layout.LastHotButton = Layout.HotButton;
 					Layout.HotButton = null;
 
-					Log.Message += $"""
+					Debug.Message += $"""
 FPS: {Raylib.GetFPS()}
 """;
 
-					Log.Print();
-					Log.Message = "";
+					Debug.Print();
+					Debug.Message = "";
 
 					Raylib.EndDrawing();
 				}

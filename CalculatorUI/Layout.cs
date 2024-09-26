@@ -172,7 +172,7 @@ internal readonly struct Layout
 			CalculatorUI.FONT_SPACING
 		);
 
-		Log.IfDrawPoint(
+		Debug.IfDrawPoint(
 			IsBadContrast(backgroundColor, textColor),
 			$"ERROR: The text at the {x},{y} text box is not visible!\n",
 			x,
@@ -222,7 +222,7 @@ internal readonly struct Layout
 				break;
 		}
 
-		Log.IfDrawPoint(
+		Debug.IfDrawPoint(
 			textSize.X > width || textSize.Y > height,
 			$"ERROR: The text at the {x},{y} text box does not fit its box!\n",
 			x,
@@ -796,7 +796,7 @@ internal readonly struct Layout
 		params ButtonRow[] rows
 	)
 	{
-		Log.IfDrawBorder(
+		Debug.IfDrawBorder(
 			x < 0
 				|| y < 0
 				|| width <= 0
@@ -845,7 +845,7 @@ internal readonly struct Layout
 				curX += colLength + padding;
 				takenWidth += colLength;
 
-				Log.IfDrawBorder(
+				Debug.IfDrawBorder(
 					takenWidth > availableWidth,
 					$"ERROR: Button grid {j + 1} column takes more than the available width!\n",
 					x,
@@ -858,7 +858,7 @@ internal readonly struct Layout
 			curY += rowLength + padding;
 			takenHeight += rowLength;
 
-			Log.IfDrawBorder(
+			Debug.IfDrawBorder(
 				takenHeight > availableHeight,
 				$"ERROR: Button grid {i + 1} row takes more than the available height!\n",
 				x,

@@ -36,7 +36,7 @@ internal readonly struct Clipboard
 		args = string.Empty;
 #endif
 
-		Log.Ignore(() =>
+		Debug.Ignore(() =>
 		{
 			Process process =
 				new()
@@ -90,7 +90,7 @@ internal readonly struct Clipboard
 		args = string.Empty;
 #endif
 
-		Log.Ignore(() =>
+		Debug.Ignore(() =>
 		{
 			Process process =
 				new()

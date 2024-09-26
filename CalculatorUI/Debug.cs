@@ -9,7 +9,7 @@ using Raylib_cs;
 
 namespace Calculator;
 
-internal readonly struct Log
+internal readonly struct Debug
 {
 	/// <summary>The last message logged, used to not show the same message twice</summary>
 	private static string OldMessage = "";

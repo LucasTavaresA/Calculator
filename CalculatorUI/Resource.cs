@@ -22,7 +22,7 @@ internal readonly struct Resource
 			return texture;
 		}
 
-		Log.Halt($"Resource '{resource}' not found");
+		Debug.Halt($"Resource '{resource}' not found");
 		return Resources["not_found.png"];
 	}
 
