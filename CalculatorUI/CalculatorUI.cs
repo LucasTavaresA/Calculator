@@ -242,7 +242,7 @@ public readonly struct CalculatorUI
 
 			if (Converters[0].Conversions.Count == 0)
 			{
-				Converters[0].Conversions.Add(new("United States Dollar [USD]", 1));
+				Converters[0].Conversions.Add(new("No currency information available", 1));
 			}
 
 			foreach (string resource in Assembly.GetManifestResourceNames())
