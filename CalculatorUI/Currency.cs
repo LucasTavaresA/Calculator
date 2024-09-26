@@ -81,7 +81,7 @@ internal readonly struct Currency
 			)
 			.rates;
 
-		Settings.LastAPICallTime = DateTime.Now.Date;
+		Settings.LastAPICallTime = DateTime.Now;
 		Settings.Save();
 		Conversions.Converters[0].Conversions.Clear();
 		StringBuilder ratesString = new();

@@ -10,7 +10,7 @@ internal readonly struct Settings
 {
 	private static readonly string SettingsFilePath = Data.DataFolder + "CalculatorSettings";
 	internal static bool BookmarkOnEval = true;
-	internal static DateTime LastAPICallTime = DateTime.MinValue.Date;
+	internal static DateTime LastAPICallTime = DateTime.MinValue;
 
 	internal static void Save()
 	{
@@ -67,7 +67,7 @@ internal readonly struct Settings
 					}
 					else
 					{
-						LastAPICallTime = DateTime.MinValue.Date;
+						LastAPICallTime = DateTime.MinValue;
 					}
 					break;
 			}

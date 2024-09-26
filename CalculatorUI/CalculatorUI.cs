@@ -235,7 +235,7 @@ public readonly struct CalculatorUI
 
 			Settings.Load();
 
-			if ((DateTime.Now.Date - Settings.LastAPICallTime).TotalDays >= 1)
+			if ((DateTime.Now - Settings.LastAPICallTime).TotalDays >= 1)
 			{
 				Debug.IgnoreAsync(GetCurrencyRatesAsync);
 			}
