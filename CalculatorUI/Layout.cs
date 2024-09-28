@@ -17,7 +17,6 @@ internal readonly struct Layout
 	// should make so that it uses a PressedButton variable like HotButton below
 	internal static (int, int, int, int)? HotButton = null;
 	internal static (int, int, int, int)? LastHotButton = null;
-	internal static readonly Rectangle ICON_RECTANGLE = new(0, 0, 160, 160);
 
 	/// <summary>Tolerable difference between colors</summary>
 	private const int CONTRAST_LIMIT = 70;
@@ -639,7 +638,7 @@ internal readonly struct Layout
 			// Draw the texture
 			Raylib.DrawTexturePro(
 				i.Texture,
-				ICON_RECTANGLE,
+				new(0, 0, i.Texture.Width, i.Texture.Height),
 				new(
 					x + width / 2 - i.Size / 2 + borderThickness,
 					y + height / 2 - i.Size / 2 + borderThickness,

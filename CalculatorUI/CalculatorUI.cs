@@ -261,6 +261,7 @@ public readonly struct CalculatorUI
 				}
 			}
 
+			Texture2D downArrowIcon = GetResource("down_arrow_icon.png");
 			Raylib.SetWindowIcon(Raylib.LoadImageFromTexture(GetResource("appicon.png")));
 
 			while (!Raylib.WindowShouldClose())
@@ -1411,8 +1412,8 @@ public readonly struct CalculatorUI
 										);
 
 										Raylib.DrawTexturePro(
-											GetResource("down_arrow_icon.png"),
-											Layout.ICON_RECTANGLE,
+											downArrowIcon,
+											new(0, 0, downArrowIcon.Width, downArrowIcon.Height),
 											new(
 												leftButtonSize + converterBoxWidth - gridButtonSize,
 												leftButtonSize,
@@ -1584,8 +1585,8 @@ public readonly struct CalculatorUI
 										);
 
 										Raylib.DrawTexturePro(
-											GetResource("down_arrow_icon.png"),
-											Layout.ICON_RECTANGLE,
+											downArrowIcon,
+											new(0, 0, downArrowIcon.Width, downArrowIcon.Height),
 											new(
 												leftButtonSize + converterBoxWidth - gridButtonSize,
 												converterBoxHeight + leftButtonSize,
