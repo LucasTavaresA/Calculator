@@ -197,7 +197,17 @@ public readonly struct CalculatorUI
 	internal static string Result = "";
 	internal static string ErrorMessage = "";
 
+	private static readonly Random Random = new();
 	internal static Font Fonte;
+
+	private static void CycleEnum<T>(ref T enumValue)
+		where T : Enum
+	{
+		T[] enumValues = (T[])Enum.GetValues(typeof(T));
+		int currentIndex = Array.IndexOf(enumValues, enumValue);
+		int nextIndex = (currentIndex + 1) % enumValues.Length;
+		enumValue = enumValues[nextIndex];
+	}
 
 	private enum Scene
 	{
@@ -214,8 +224,17 @@ public readonly struct CalculatorUI
 		To,
 	}
 
+	private enum TrigonometryModes
+	{
+		Normal,
+		Inverse,
+		Hyperbolic,
+		InverseHyperbolic,
+	}
+
 	private static Scene CurrentScene = Scene.Calculator;
 	private static DropDown CurrentDropDown;
+	private static TrigonometryModes TrigonometryMode = TrigonometryModes.Normal;
 
 	public static void MainLoop()
 	{
@@ -370,11 +389,167 @@ public readonly struct CalculatorUI
 							{
 								// Draw buttons
 								{
-									int rowAmount = 7;
-									int heightPercentage = 100 / rowAmount;
+									int rowAmount;
+									int heightPercentage;
+									Layout.ButtonRow extraButtons;
+									Layout.ButtonRow extraButtons2;
+
+									if (Settings.FunctionsOpened)
+									{
+										rowAmount = 8;
+										heightPercentage = 100 / rowAmount;
+
+										string sin = TrigonometryMode switch
+										{
+											TrigonometryModes.Normal => "sin",
+											TrigonometryModes.Inverse => "asin",
+											TrigonometryModes.Hyperbolic => "sinh",
+											TrigonometryModes.InverseHyperbolic => "asinh",
+											_ => "sin",
+										};
+
+										string cos = TrigonometryMode switch
+										{
+											TrigonometryModes.Normal => "cos",
+											TrigonometryModes.Inverse => "acos",
+											TrigonometryModes.Hyperbolic => "cosh",
+											TrigonometryModes.InverseHyperbolic => "acosh",
+											_ => "cos",
+										};
+
+										string tan = TrigonometryMode switch
+										{
+											TrigonometryModes.Normal => "tan",
+											TrigonometryModes.Inverse => "atan",
+											TrigonometryModes.Hyperbolic => "tanh",
+											TrigonometryModes.InverseHyperbolic => "atanh",
+											_ => "tan",
+										};
+
+										Layout.ButtonStyle trigonometryButtonStyle =
+											new(
+												BackgroundColor: ButtonBackgroundColor,
+												PressedColor: ButtonPressedColor,
+												HoveredColor: ButtonHoverColor,
+												new(ForegroundColor, BorderThickness),
+												ShadowStyle: greyButtonShadow
+											);
+
+										extraButtons = new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												17,
+												new("random", FontSize, ForegroundColor),
+												() =>
+													InsertExpression(
+														Random
+															.NextDouble()
+															.ToString(
+																"0.000",
+																CultureInfo.InvariantCulture
+															)
+													),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new(
+													TrigonometryMode switch
+													{
+														TrigonometryModes.Normal => "normal",
+														TrigonometryModes.Inverse => "inv",
+														TrigonometryModes.Hyperbolic => "hyp",
+														TrigonometryModes.InverseHyperbolic =>
+															"invhyp",
+														_ => "normal",
+													},
+													FontSize,
+													ForegroundColor
+												),
+												() =>
+												{
+													CycleEnum(ref TrigonometryMode);
+												},
+												trigonometryButtonStyle
+											),
+											new Layout.Button(
+												17,
+												new(sin, FontSize, ForegroundColor),
+												() => InsertExpression(sin + "("),
+												trigonometryButtonStyle
+											),
+											new Layout.Button(
+												17,
+												new(cos, FontSize, ForegroundColor),
+												() => InsertExpression(cos + "("),
+												trigonometryButtonStyle
+											),
+											new Layout.Button(
+												16,
+												new(tan, FontSize, ForegroundColor),
+												() => InsertExpression(tan + "("),
+												trigonometryButtonStyle
+											),
+											new Layout.Button(
+												16,
+												new("ln", FontSize, ForegroundColor),
+												() => InsertExpression("log("),
+												greyButton
+											)
+										);
+
+										extraButtons2 = new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												17,
+												new("sqrt", FontSize, ForegroundColor),
+												() => InsertExpression("sqrt("),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new("mod", FontSize, ForegroundColor),
+												() => InsertExpression("mod("),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new("abs", FontSize, ForegroundColor),
+												() => InsertExpression("abs("),
+												greyButton
+											),
+											new Layout.Button(
+												17,
+												new("floor", FontSize, ForegroundColor),
+												() => InsertExpression("floor("),
+												greyButton
+											),
+											new Layout.Button(
+												16,
+												new("ceil", FontSize, ForegroundColor),
+												() => InsertExpression("ceiling("),
+												greyButton
+											),
+											new Layout.Button(
+												16,
+												new("log", FontSize, ForegroundColor),
+												() => InsertExpression("log10("),
+												greyButton
+											)
+										);
+									}
+									else
+									{
+										rowAmount = 6;
+										heightPercentage = 100 / rowAmount;
+										extraButtons = new(0);
+										extraButtons2 = new(0);
+									}
 
 									Layout.ButtonRow[] calculatorButtons =
 									[
+										extraButtons,
+										extraButtons2,
 										new Layout.ButtonRow(
 											heightPercentage,
 											new Layout.Button(
@@ -577,45 +752,6 @@ public readonly struct CalculatorUI
 												new("=", FontSize, ForegroundColor),
 												Equal,
 												greenButton
-											)
-										),
-										new Layout.ButtonRow(
-											heightPercentage,
-											new Layout.Button(
-												17,
-												new("sqrt", FontSize, ForegroundColor),
-												() => InsertExpression("sqrt("),
-												greyButton
-											),
-											new Layout.Button(
-												17,
-												new("mod", FontSize, ForegroundColor),
-												() => InsertExpression("mod("),
-												greyButton
-											),
-											new Layout.Button(
-												17,
-												new("sin", FontSize, ForegroundColor),
-												() => InsertExpression("sin("),
-												greyButton
-											),
-											new Layout.Button(
-												17,
-												new("cos", FontSize, ForegroundColor),
-												() => InsertExpression("cos("),
-												greyButton
-											),
-											new Layout.Button(
-												16,
-												new("tan", FontSize, ForegroundColor),
-												() => InsertExpression("tan("),
-												greyButton
-											),
-											new Layout.Button(
-												16,
-												new("log", FontSize, ForegroundColor),
-												() => InsertExpression("log("),
-												greyButton
 											)
 										),
 									];
@@ -827,6 +963,22 @@ public readonly struct CalculatorUI
 										TransparentButtonHoverColor,
 										() => CurrentScene = Scene.Converters,
 										icon: new(GetResource("ruler_icon.png"), ForegroundColor)
+									);
+
+									Layout.DrawButton(
+										(topIconSize + Padding) * 2,
+										0,
+										topIconSize,
+										topIconSize,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() =>
+										{
+											Settings.FunctionsOpened = !Settings.FunctionsOpened;
+											Settings.Save();
+										},
+										icon: new(GetResource("function_icon.png"), ForegroundColor)
 									);
 
 									Layout.DrawButton(

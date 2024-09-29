@@ -10,6 +10,7 @@ internal readonly struct Settings
 {
 	private static readonly string SettingsFilePath = Data.DataFolder + "CalculatorSettings";
 	internal static bool BookmarkOnEval = true;
+	internal static bool FunctionsOpened = false;
 	internal static DateTime LastAPICallTime = DateTime.MinValue;
 
 	internal static void Save()
@@ -20,6 +21,7 @@ internal readonly struct Settings
 			string.Join(
 				Environment.NewLine,
 				$"BookmarkOnEval={BookmarkOnEval}",
+				$"FunctionsOpened={FunctionsOpened}",
 				$"LastAPICallTime={LastAPICallTime}"
 			)
 		);
@@ -71,6 +73,19 @@ internal readonly struct Settings
 						else
 						{
 							LastAPICallTime = DateTime.MinValue;
+						}
+					}
+					break;
+				case "FunctionsOpened":
+					{
+						LastAPICallTime = DateTime.MinValue;
+						if (bool.TryParse(split[1].Trim(), out bool b))
+						{
+							FunctionsOpened = b;
+						}
+						else
+						{
+							FunctionsOpened = false;
 						}
 					}
 					break;
