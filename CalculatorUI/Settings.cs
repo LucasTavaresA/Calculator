@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -51,23 +51,27 @@ internal readonly struct Settings
 			switch (split[0].Trim())
 			{
 				case "BookmarkOnEval":
-					if (bool.TryParse(split[1].Trim(), out bool b))
 					{
-						BookmarkOnEval = b;
-					}
-					else
-					{
-						BookmarkOnEval = true;
+						if (bool.TryParse(split[1].Trim(), out bool b))
+						{
+							BookmarkOnEval = b;
+						}
+						else
+						{
+							BookmarkOnEval = true;
+						}
 					}
 					break;
 				case "LastAPICallTime":
-					if (DateTime.TryParse(split[1].Trim(), out DateTime dt))
 					{
-						LastAPICallTime = dt;
-					}
-					else
-					{
-						LastAPICallTime = DateTime.MinValue;
+						if (DateTime.TryParse(split[1].Trim(), out DateTime dt))
+						{
+							LastAPICallTime = dt;
+						}
+						else
+						{
+							LastAPICallTime = DateTime.MinValue;
+						}
 					}
 					break;
 			}

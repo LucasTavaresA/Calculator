@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -86,7 +86,7 @@ internal readonly struct Conversions
 
 	private static double ConvertFromBase(double number, double fromBase, double toBase)
 	{
-		return (number * toBase) / fromBase;
+		return number * toBase / fromBase;
 	}
 
 	private static double ConvertTemperature(double number, string from, string to)
@@ -97,7 +97,7 @@ internal readonly struct Conversions
 		}
 		else if (from == "Kelvin")
 		{
-			number = number - 273.15;
+			number -= 273.15;
 		}
 
 		if (to == "Fahrenheit")
@@ -106,24 +106,23 @@ internal readonly struct Conversions
 		}
 		else if (to == "Kelvin")
 		{
-			number = number + 273.15;
+			number += 273.15;
 		}
 
 		return number;
 	}
 
 	internal static readonly Converter[] Converters =
-	{
+	[
 #if HAS_APIKEY
-		new("Currency", "money_icon.png", Calculator.Currency.Load()),
+		new("Currency", "money_icon.png", Currency.Load()),
 #else
 		new("App was not compiled with an openexchangerates.org API key.", "money_icon.png", new()),
 #endif
 		new(
 			"Volume",
 			"flask_icon.png",
-			new()
-			{
+			[
 				new("Liter", 1),
 				new("Milliliter", 0.001),
 				new("Cubic meter", 1000),
@@ -148,13 +147,12 @@ internal readonly struct Conversions
 				new("Cubic yard", 764.55485798),
 				new("Cubic foot", 28.316846592),
 				new("Cubic inch", 0.016387064),
-			}
+			]
 		),
 		new(
 			"Length",
 			"ruler_icon.png",
-			new()
-			{
+			[
 				new("Meter", 1),
 				new("Centimeter", 0.01),
 				new("Kilometer", 1000),
@@ -167,13 +165,12 @@ internal readonly struct Conversions
 				new("Inch", 0.0254),
 				new("Light Year", 9460660000000000),
 				new("Nautical mile", 1852),
-			}
+			]
 		),
 		new(
 			"Weigth/Mass",
 			"weight_icon.png",
-			new()
-			{
+			[
 				new("Kilogram", 1),
 				new("Gram", 0.001),
 				new("Milligram", 0.000001),
@@ -186,18 +183,17 @@ internal readonly struct Conversions
 				new("Carrat", 0.0002),
 				new("Stone", 6.35029),
 				new("Atomic mass unit", 1.660540199e-27),
-			}
+			]
 		),
 		new(
 			"Temperature",
 			"termometer_icon.png",
-			new() { new("Degree Celsius", 1), new("Fahrenheit", -272.15), new("Kelvin", -17.2222) }
+			[new("Degree Celsius", 1), new("Fahrenheit", -272.15), new("Kelvin", -17.2222)]
 		),
 		new(
 			"Energy",
 			"fire_icon.png",
-			new()
-			{
+			[
 				new("Gram calorie", 1),
 				new("Kilocalorie", 1000),
 				new("Watt hour", 860.421),
@@ -208,13 +204,12 @@ internal readonly struct Conversions
 				new("British thermal unit", 252.164),
 				new("US therm", 2.521e+7),
 				new("Foot-pound", 0.324048),
-			}
+			]
 		),
 		new(
 			"Area",
 			"cube_icon.png",
-			new()
-			{
+			[
 				new("Square meter", 1),
 				new("Square kilometer", 1e+6),
 				new("Square centimeter", 0.0001),
@@ -226,13 +221,12 @@ internal readonly struct Conversions
 				new("Square inch", 0.00064516),
 				new("Hectare", 10000),
 				new("Acre", 4046.86),
-			}
+			]
 		),
 		new(
 			"Velocity",
 			"speedometer_icon.png",
-			new()
-			{
+			[
 				new("kilometer/hour [km/h]", 1),
 				new("meter/second [m/s]", 3.6),
 				new("mile/hour [mi/h]", 1.60934),
@@ -265,13 +259,12 @@ internal readonly struct Conversions
 				new("Velocity of sound in sea water (20°C, 10 meter deep)", 5477.76),
 				new("Mach (20°C, 1 atm)", 1236.96),
 				new("Mach (SI standard)", 1062.16704),
-			}
+			]
 		),
 		new(
 			"Time",
 			"clock_icon.png",
-			new()
-			{
+			[
 				new("second [s]", 1),
 				new("milisecond [ms]", 0.001),
 				new("minute [min]", 60),
@@ -305,13 +298,12 @@ internal readonly struct Conversions
 				new("quindecennial", 473040000),
 				new("quinquennial", 157680000),
 				new("Planck time", 5.390559999e-44),
-			}
+			]
 		),
 		new(
 			"Power",
 			"shock_icon.png",
-			new()
-			{
+			[
 				new("watt [W]", 1),
 				new("milliwatt [mW]", 0.001),
 				new("kilowatt [kW]", 1000),
@@ -389,13 +381,12 @@ internal readonly struct Conversions
 				new("joule/minute [J/min]", 0.0166666667),
 				new("kilojoule/hour [kJ/h]", 0.2777777778),
 				new("kilojoule/minute [kJ/min]", 16.666666667),
-			}
+			]
 		),
 		new(
 			"Data",
 			"hard_drive_icon.png",
-			new()
-			{
+			[
 				new("Byte", 1),
 				new("Kilobyte", 1000),
 				new("Megabyte", 1e+6),
@@ -418,25 +409,23 @@ internal readonly struct Conversions
 				new("Gibibit", 1.342e+8),
 				new("Tebibit", 1.374e+11),
 				new("Pebibit", 1.407e+14),
-			}
+			]
 		),
 		new(
 			"Pressure",
 			"air_icon.png",
-			new()
-			{
+			[
 				new("Pascal", 1),
 				new("Bar", 100000),
 				new("Pound per square inch", 6894.76),
 				new("Standard atmosphere", 101325),
 				new("Torr", 133.322),
-			}
+			]
 		),
 		new(
 			"Angle",
 			"angle_icon.png",
-			new()
-			{
+			[
 				new("degree [°]", 1),
 				new("radian [rad]", 57.295779513),
 				new("grad [^g]", 0.9),
@@ -451,7 +440,7 @@ internal readonly struct Conversions
 				new("quadrant", 90),
 				new("right angle", 90),
 				new("sextant", 60),
-			}
+			]
 		),
-	};
+	];
 }

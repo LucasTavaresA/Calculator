@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
 using Android.App;
@@ -19,7 +19,7 @@ namespace Calculator;
 		ScreenOrientation = ScreenOrientation.Portrait,
 		ClearTaskOnLaunch = true
 	),
-	IntentFilter(new[] { Intent.ActionMain, Intent.CategoryLauncher }),
+	IntentFilter([Intent.ActionMain, Intent.CategoryLauncher]),
 	MetaData(MetaDataLibName, Value = "raylib")
 ]
 public class MainActivity : RaylibActivity

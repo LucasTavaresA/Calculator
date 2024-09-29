@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ internal readonly struct Currency
 
 	internal static List<Conversions.Conversion> Load()
 	{
-		List<Conversions.Conversion> conversions = new();
+		List<Conversions.Conversion> conversions = [];
 
 		string rates = "";
 
@@ -28,10 +28,7 @@ internal readonly struct Currency
 		}
 
 		foreach (
-			string currency in rates.Split(
-				Environment.NewLine,
-				StringSplitOptions.RemoveEmptyEntries
-			)
+			string currency in rates.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
 		)
 		{
 			string[] split = currency.Split(',');
@@ -41,14 +38,7 @@ internal readonly struct Currency
 				continue;
 			}
 
-			if (
-				double.TryParse(
-					split[1],
-					NumberStyles.Any,
-					CultureInfo.InvariantCulture,
-					out double r
-				)
-			)
+			if (double.TryParse(split[1], NumberStyles.Any, CultureInfo.InvariantCulture, out double r))
 			{
 				conversions.Add(new(split[0], r));
 			}
@@ -68,9 +58,9 @@ internal readonly struct Currency
 	)]
 	internal static async Task GetCurrencyRatesAsync()
 	{
-		Dictionary<string, string> currencies = JsonSerializer.Deserialize<
-			Dictionary<string, string>
-		>(await HttpClient.GetStringAsync("https://openexchangerates.org/api/currencies.json"));
+		Dictionary<string, string> currencies = JsonSerializer.Deserialize<Dictionary<string, string>>(
+			await HttpClient.GetStringAsync("https://openexchangerates.org/api/currencies.json")
+		);
 
 		Dictionary<string, double> rates = JsonSerializer
 			.Deserialize<RatesResponse>(

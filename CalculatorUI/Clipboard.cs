@@ -1,13 +1,11 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 #if LINUX || MACOS
+using System;
 using System.Diagnostics;
 #elif ANDROID
 using Plugin.Clipboard;
-#elif WINDOWS
-using System.Windows.Forms;
 #endif
 
 namespace Calculator;

@@ -1,5 +1,6 @@
 ﻿// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
+
 #if LINUX || ANDROID || WINDOWS || MACOS
 #else
 #error "Yout need to specify a platform: ANDROID, WINDOWS, MACOS, or LINUX"
@@ -148,8 +149,8 @@ public readonly struct CalculatorUI
 #elif LINUX
 		Process.Start("xdg-open", url);
 #elif ANDROID
-		var uri = Android.Net.Uri.Parse(url);
-		var intent = new Intent(Intent.ActionView, uri);
+		Android.Net.Uri uri = Android.Net.Uri.Parse(url);
+		Intent intent = new(Intent.ActionView, uri);
 		intent.SetFlags(ActivityFlags.NewTask);
 		Context.StartActivity(intent);
 #elif MACOS
@@ -198,7 +199,7 @@ public readonly struct CalculatorUI
 
 	internal static Font Fonte;
 
-	internal enum Scene
+	private enum Scene
 	{
 		Calculator,
 		History,
@@ -207,14 +208,13 @@ public readonly struct CalculatorUI
 		Conversions,
 	}
 
-	internal static Scene CurrentScene = Scene.Calculator;
-
-	internal enum DropDown
+	private enum DropDown
 	{
 		From,
 		To,
 	}
 
+	private static Scene CurrentScene = Scene.Calculator;
 	private static DropDown CurrentDropDown;
 
 	public static void MainLoop()
@@ -298,8 +298,8 @@ public readonly struct CalculatorUI
 
 					if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
 					{
-						CalculatorUI.ButtonWasHeldPressed = false;
-						CalculatorUI.ButtonPressedTime = 0;
+						ButtonWasHeldPressed = false;
+						ButtonPressedTime = 0;
 					}
 				}
 
@@ -313,12 +313,7 @@ public readonly struct CalculatorUI
 					int displayWidth = ScreenWidth - (Padding * 2);
 					int displayHeight = (ScreenHeight / 6) - Padding;
 
-					Vector2 textSize = Raylib.MeasureTextEx(
-						CalculatorUI.Fonte,
-						"0",
-						FontSize,
-						CalculatorUI.FONT_SPACING
-					);
+					Vector2 textSize = Raylib.MeasureTextEx(Fonte, "0", FontSize, FONT_SPACING);
 					int topIconSize = displayY + (int)textSize.Y;
 
 					int menuSidePadding = Padding * 2 + topIconSize;
@@ -378,8 +373,8 @@ public readonly struct CalculatorUI
 									int rowAmount = 7;
 									int heightPercentage = 100 / rowAmount;
 
-									Layout.ButtonRow[] calculatorButtons = new Layout.ButtonRow[]
-									{
+									Layout.ButtonRow[] calculatorButtons =
+									[
 										new Layout.ButtonRow(
 											heightPercentage,
 											new Layout.Button(
@@ -623,7 +618,7 @@ public readonly struct CalculatorUI
 												greyButton
 											)
 										),
-									};
+									];
 
 									Layout.DrawButtonGrid(
 										Padding,
@@ -847,7 +842,7 @@ public readonly struct CalculatorUI
 									);
 
 									Layout.DrawButton(
-										ScreenWidth - (topIconSize) * 2 - Padding,
+										ScreenWidth - topIconSize * 2 - Padding,
 										0,
 										topIconSize,
 										topIconSize,
@@ -979,10 +974,7 @@ public readonly struct CalculatorUI
 									Transparent,
 									RedButtonPressedColor,
 									TransparentButtonHoverColor,
-									() =>
-									{
-										History.Clear();
-									},
+									History.Clear,
 									icon: new(GetResource("trash_all_icon.png"), RedButtonColor),
 									pressMode: Layout.ButtonPressMode.HoldToPress
 								);
@@ -1438,8 +1430,8 @@ public readonly struct CalculatorUI
 											Layout.TextAlignment.Left
 										);
 
-										Layout.ButtonRow[] converterButtons = new Layout.ButtonRow[]
-										{
+										Layout.ButtonRow[] converterButtons =
+										[
 											new Layout.ButtonRow(
 												100,
 												new Layout.Button(
@@ -1518,7 +1510,7 @@ public readonly struct CalculatorUI
 													)
 												)
 											),
-										};
+										];
 
 										Layout.DrawButtonGrid(
 											ScreenWidth - gridButtonSize * gridCols,
@@ -1613,7 +1605,8 @@ public readonly struct CalculatorUI
 
 										Layout.DrawButton(
 											ScreenWidth - gridButtonSize,
-											(leftButtonSize + converterBoxHeight * 2)
+											leftButtonSize
+												+ converterBoxHeight * 2
 												- gridButtonSize,
 											gridButtonSize - BorderThickness,
 											gridButtonSize - BorderThickness,
@@ -1664,104 +1657,103 @@ public readonly struct CalculatorUI
 									int widthPercentage = 100 / colAmount;
 
 									Layout.ButtonRow[] converterKeyboardButtons =
-										new Layout.ButtonRow[]
-										{
-											new Layout.ButtonRow(
-												heightPercentage,
-												new Layout.Button(
-													widthPercentage,
-													new("7", FontSize, ForegroundColor),
-													() => InsertConverterExpression("7"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("8", FontSize, ForegroundColor),
-													() => InsertConverterExpression("8"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("9", FontSize, ForegroundColor),
-													() => InsertConverterExpression("9"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												)
+									[
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												widthPercentage,
+												new("7", FontSize, ForegroundColor),
+												() => InsertConverterExpression("7"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
 											),
-											new Layout.ButtonRow(
-												heightPercentage,
-												new Layout.Button(
-													widthPercentage,
-													new("4", FontSize, ForegroundColor),
-													() => InsertConverterExpression("4"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("5", FontSize, ForegroundColor),
-													() => InsertConverterExpression("5"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("6", FontSize, ForegroundColor),
-													() => InsertConverterExpression("6"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												)
+											new Layout.Button(
+												widthPercentage,
+												new("8", FontSize, ForegroundColor),
+												() => InsertConverterExpression("8"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
 											),
-											new Layout.ButtonRow(
-												heightPercentage,
-												new Layout.Button(
-													widthPercentage,
-													new("1", FontSize, ForegroundColor),
-													() => InsertConverterExpression("1"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("2", FontSize, ForegroundColor),
-													() => InsertConverterExpression("2"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("3", FontSize, ForegroundColor),
-													() => InsertConverterExpression("3"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												)
+											new Layout.Button(
+												widthPercentage,
+												new("9", FontSize, ForegroundColor),
+												() => InsertConverterExpression("9"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											)
+										),
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												widthPercentage,
+												new("4", FontSize, ForegroundColor),
+												() => InsertConverterExpression("4"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
 											),
-											new Layout.ButtonRow(
-												heightPercentage,
-												new Layout.Button(
-													widthPercentage,
-													new(".", FontSize, ForegroundColor),
-													() => InsertConverterExpression("."),
-													greyButton
-												),
-												new Layout.Button(
-													widthPercentage,
-													new("0", FontSize, ForegroundColor),
-													() => InsertConverterExpression("0"),
-													greyButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												),
-												new Layout.Button(
-													widthPercentage,
-													null,
-													ConverterBackspace,
-													backspaceButton,
-													Layout.ButtonPressMode.HoldToRepeat
-												)
+											new Layout.Button(
+												widthPercentage,
+												new("5", FontSize, ForegroundColor),
+												() => InsertConverterExpression("5"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
 											),
-										};
+											new Layout.Button(
+												widthPercentage,
+												new("6", FontSize, ForegroundColor),
+												() => InsertConverterExpression("6"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											)
+										),
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												widthPercentage,
+												new("1", FontSize, ForegroundColor),
+												() => InsertConverterExpression("1"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												widthPercentage,
+												new("2", FontSize, ForegroundColor),
+												() => InsertConverterExpression("2"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												widthPercentage,
+												new("3", FontSize, ForegroundColor),
+												() => InsertConverterExpression("3"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											)
+										),
+										new Layout.ButtonRow(
+											heightPercentage,
+											new Layout.Button(
+												widthPercentage,
+												new(".", FontSize, ForegroundColor),
+												() => InsertConverterExpression("."),
+												greyButton
+											),
+											new Layout.Button(
+												widthPercentage,
+												new("0", FontSize, ForegroundColor),
+												() => InsertConverterExpression("0"),
+												greyButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											),
+											new Layout.Button(
+												widthPercentage,
+												null,
+												ConverterBackspace,
+												backspaceButton,
+												Layout.ButtonPressMode.HoldToRepeat
+											)
+										),
+									];
 
 									int converterKeyboardY =
 										converterBoxHeight * 2 + leftButtonSize + Padding;

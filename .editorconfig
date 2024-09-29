@@ -9,6 +9,7 @@ indent_style = tab
 
 # Code files
 [*.{cs,csx,vb,vbx}]
+indent_size = 2
 insert_final_newline = true
 charset = utf-8-bom
 
@@ -57,7 +58,7 @@ dotnet_style_null_propagation = true:suggestion
 dotnet_style_explicit_tuple_names = true:suggestion
 
 # Whitespace options
-dotnet_style_allow_multiple_blank_lines_experimental = false
+dotnet_style_allow_multiple_blank_lines_experimental = false:suggestion
 
 # Non-private static fields are PascalCase
 dotnet_naming_rule.non_private_static_fields_should_be_pascal_case.severity = suggestion
@@ -91,20 +92,24 @@ dotnet_naming_symbols.constants.required_modifiers = const
 
 dotnet_naming_style.constant_style.capitalization = allupper
 
-# Static fields are camelCase and start with s_
-dotnet_naming_rule.static_fields_should_be_camel_case.severity = suggestion
-dotnet_naming_rule.static_fields_should_be_camel_case.symbols = static_fields
-dotnet_naming_rule.static_fields_should_be_camel_case.style = static_field_style
+# Static fields are PascalCase
+dotnet_naming_rule.static_fields_should_be_pascal_case.severity = suggestion
+dotnet_naming_rule.static_fields_should_be_pascal_case.symbols = static_fields
+dotnet_naming_rule.static_fields_should_be_pascal_case.style = static_field_style
 
 dotnet_naming_symbols.static_fields.applicable_kinds = field
 dotnet_naming_symbols.static_fields.required_modifiers = static
 
-# Instance fields are camelCase and start with _
+dotnet_naming_style.static_field_style.capitalization = pascal_case
+
+# Instance fields are camelCase
 dotnet_naming_rule.instance_fields_should_be_camel_case.severity = suggestion
 dotnet_naming_rule.instance_fields_should_be_camel_case.symbols = instance_fields
 dotnet_naming_rule.instance_fields_should_be_camel_case.style = instance_field_style
 
 dotnet_naming_symbols.instance_fields.applicable_kinds = field
+
+dotnet_naming_style.instance_field_style.capitalization = camel_case
 
 # Locals and parameters are camelCase
 dotnet_naming_rule.locals_should_be_camel_case.severity = suggestion
@@ -131,13 +136,8 @@ dotnet_naming_rule.members_should_be_pascal_case.style = pascal_case_style
 
 dotnet_naming_symbols.all_members.applicable_kinds = *
 
-# allow '_' in member names
-[*.{cs,vb}]
-dotnet_diagnostic.CA1707.severity = none
-
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
 
-dotnet_diagnostic.IDE0073.severity = warning
 file_header_template = Licensed under the GPL3 or later versions of the GPL license.\nSee the LICENSE file in the project root for more information.
 
 # RS0016: Only enable if API files are present
@@ -168,6 +168,11 @@ csharp_style_allow_blank_lines_between_consecutive_braces_experimental = false
 csharp_style_allow_blank_line_after_colon_in_constructor_initializer_experimental = false
 csharp_style_allow_blank_line_after_token_in_conditional_expression_experimental = false
 csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental = false
+
+# Prevent "var"
+csharp_style_var_for_built_in_types = false:suggestion
+csharp_style_var_when_type_is_apparent = false:suggestion
+csharp_style_var_elsewhere = false:suggestion
 
 # Prefer method-like constructs to have a block body
 csharp_style_expression_bodied_methods = false:none
@@ -219,22 +224,15 @@ csharp_preserve_single_line_statements = true
 # IDE0060: Remove unused parameter
 dotnet_diagnostic.IDE0060.severity = warning
 
+# IDE0008: Use explicit type
+dotnet_diagnostic.IDE0008.severity = warning
+
+# IDE0073: File header
+dotnet_diagnostic.IDE0073.severity = warning
+
 # IDE0160/IDE0160: Namespace scopes
-[*.{cs,vb}]
 dotnet_diagnostic.IDE0160.severity = none
 dotnet_diagnostic.IDE0161.severity = none
-
-[src/{Compilers,ExpressionEvaluator,Scripting}/**Test**/*.{cs,vb}]
-
-# IDE0060: Remove unused parameter
-dotnet_diagnostic.IDE0060.severity = none
-
-[src/{Analyzers,CodeStyle,Features,Workspaces,EditorFeatures,VisualStudio}/**/*.{cs,vb}]
-
-# IDE0011: Add braces
-csharp_prefer_braces = when_multiline:warning
-# NOTE: We need the below severity entry for Add Braces due to https://github.com/dotnet/roslyn/issues/44201
-dotnet_diagnostic.IDE0011.severity = warning
 
 # IDE0040: Add accessibility modifiers
 dotnet_diagnostic.IDE0040.severity = warning
@@ -248,14 +246,11 @@ dotnet_diagnostic.IDE0059.severity = warning
 # CA1012: Abstract types should not have public constructors
 dotnet_diagnostic.CA1012.severity = warning
 
+# allow '_' in identifiers
+dotnet_diagnostic.CA1707.severity = none
+
 # CA1822: Make member static
 dotnet_diagnostic.CA1822.severity = warning
-
-# Prevent "var"
-dotnet_diagnostic.IDE0008.severity = warning
-csharp_style_var_for_built_in_types = false:suggestion
-csharp_style_var_when_type_is_apparent = false:suggestion
-csharp_style_var_elsewhere = false:suggestion
 
 # csharp_style_allow_embedded_statements_on_same_line_experimental
 dotnet_diagnostic.IDE2001.severity = warning
@@ -271,8 +266,3 @@ dotnet_diagnostic.IDE2005.severity = warning
 
 # csharp_style_allow_blank_line_after_token_in_arrow_expression_clause_experimental
 dotnet_diagnostic.IDE2006.severity = warning
-
-[src/{VisualStudio}/**/*.{cs,vb}]
-# CA1822: Make member static
-# There is a risk of accidentally breaking an internal API that partners rely on though IVT.
-dotnet_code_quality.CA1822.api_surface = private

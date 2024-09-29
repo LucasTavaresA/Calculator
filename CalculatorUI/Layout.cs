@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
 using System;
@@ -167,7 +167,7 @@ internal readonly struct Layout
 		Vector2 textSize = Raylib.MeasureTextEx(
 			CalculatorUI.Fonte,
 			text,
-			(int)fontSize,
+			fontSize,
 			CalculatorUI.FONT_SPACING
 		);
 
@@ -184,7 +184,7 @@ internal readonly struct Layout
 				Vector2 charSize = Raylib.MeasureTextEx(
 					CalculatorUI.Fonte,
 					"-",
-					(int)fontSize,
+					fontSize,
 					CalculatorUI.FONT_SPACING
 				);
 				int charsLimit = width / (int)Math.Ceiling(charSize.X + CalculatorUI.FONT_SPACING);
@@ -201,7 +201,7 @@ internal readonly struct Layout
 				textSize = Raylib.MeasureTextEx(
 					CalculatorUI.Fonte,
 					text,
-					(int)fontSize,
+					fontSize,
 					CalculatorUI.FONT_SPACING
 				);
 				break;
@@ -214,7 +214,7 @@ internal readonly struct Layout
 					textSize = Raylib.MeasureTextEx(
 						CalculatorUI.Fonte,
 						text,
-						(int)fontSize,
+						fontSize,
 						CalculatorUI.FONT_SPACING
 					);
 				}
@@ -275,7 +275,7 @@ internal readonly struct Layout
 			CalculatorUI.Fonte,
 			text,
 			new(textX, textY),
-			(int)fontSize,
+			fontSize,
 			CalculatorUI.FONT_SPACING,
 			textColor
 		);
@@ -384,7 +384,7 @@ internal readonly struct Layout
 
 					int progress = height;
 
-					if (pressMode == Layout.ButtonPressMode.HoldToPress)
+					if (pressMode == ButtonPressMode.HoldToPress)
 					{
 						progress = (int)(
 							height
@@ -493,7 +493,7 @@ internal readonly struct Layout
 
 					int progress = height;
 
-					if (pressMode == Layout.ButtonPressMode.HoldToPress)
+					if (pressMode == ButtonPressMode.HoldToPress)
 					{
 						progress = (int)(
 							height
@@ -776,7 +776,7 @@ internal readonly struct Layout
 
 		Raylib.DrawRectangle(x, y, width, height, backgroundColor);
 
-		Layout.DrawBox(
+		DrawBox(
 			x,
 			handleY,
 			width,

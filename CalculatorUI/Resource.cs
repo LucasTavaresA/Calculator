@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
 using System.Collections.Generic;
@@ -12,8 +12,23 @@ namespace Calculator;
 
 internal readonly struct Resource
 {
+#pragma warning disable
+	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
+	private static extern unsafe Font LoadFontFromMemory(
+		string fileType,
+		byte[] fileData,
+		int dataSize,
+		int fontSize,
+		int* codepoints,
+		int codepointCount
+	);
+
+	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
+	private static extern Image LoadImageFromMemory(string fileType, byte[] fileData, int dataSize);
+#pragma warning restore
+
 	internal static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
-	internal static readonly Dictionary<string, Texture2D> Resources = new();
+	internal static readonly Dictionary<string, Texture2D> Resources = [];
 
 	internal static Texture2D GetResource(string resource)
 	{
@@ -33,41 +48,23 @@ internal readonly struct Resource
 		return sr.ReadToEnd();
 	}
 
-	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-	static extern Image LoadImageFromMemory(string fileType, byte[] fileData, int dataSize);
-
 	internal static Texture2D LoadTextureFromAssembly(string resource)
 	{
 		Texture2D texture;
 
 		using (Stream stream = Assembly.GetManifestResourceStream(resource)!)
 		{
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				stream.CopyTo(memoryStream);
+			using MemoryStream memoryStream = new();
 
-				Image image = LoadImageFromMemory(
-					".png",
-					memoryStream.ToArray(),
-					(int)memoryStream.Length
-				);
-				texture = Raylib.LoadTextureFromImage(image);
-				Raylib.UnloadImage(image);
-			}
+			stream.CopyTo(memoryStream);
+
+			Image image = LoadImageFromMemory(".png", memoryStream.ToArray(), (int)memoryStream.Length);
+			texture = Raylib.LoadTextureFromImage(image);
+			Raylib.UnloadImage(image);
 		}
 
 		return texture;
 	}
-
-	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-	static extern unsafe Font LoadFontFromMemory(
-		string fileType,
-		byte[] fileData,
-		int dataSize,
-		int fontSize,
-		int* codepoints,
-		int codepointCount
-	);
 
 	internal static unsafe Font LoadFontFromAssembly(string resource, int fontSize)
 	{
@@ -75,18 +72,17 @@ internal readonly struct Resource
 
 		using (Stream stream = Assembly.GetManifestResourceStream(resource)!)
 		{
-			using (MemoryStream memoryStream = new MemoryStream())
-			{
-				stream.CopyTo(memoryStream);
-				font = LoadFontFromMemory(
-					".ttf",
-					memoryStream.ToArray(),
-					(int)memoryStream.Length,
-					fontSize,
-					null,
-					256
-				);
-			}
+			using MemoryStream memoryStream = new();
+
+			stream.CopyTo(memoryStream);
+			font = LoadFontFromMemory(
+				".ttf",
+				memoryStream.ToArray(),
+				(int)memoryStream.Length,
+				fontSize,
+				null,
+				256
+			);
 		}
 
 		return font;
