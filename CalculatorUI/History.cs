@@ -23,13 +23,10 @@ internal readonly struct History
 			return;
 		}
 
-		if (PinnedExpressions.Contains(expression))
+		// NOTE(LucasTA): Pinned expressions keep their order of insertion
+		if (!PinnedExpressions.Contains(expression))
 		{
-			PinnedExpressions.Remove(expression);
-			PinnedExpressions.Insert(0, expression);
-		}
-		else
-		{
+			// NOTE(LucasTA): The history always places the used expressions on the top of the list
 			ExpressionHistory.Remove(expression);
 			ExpressionHistory.Insert(0, expression);
 		}
