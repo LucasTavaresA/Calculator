@@ -1,4 +1,4 @@
-﻿// Licensed under the GPL3 or later versions of the GPL license.
+// Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
 #if LINUX || ANDROID || WINDOWS || MACOS
@@ -122,9 +122,7 @@ public readonly struct CalculatorUI
 		{
 			try
 			{
-				string result = Evaluator
-					.Evaluate(Expression)
-					.ToString(CultureInfo.InvariantCulture);
+				string result = Evaluator.Evaluate(Expression).ToString(CultureInfo.InvariantCulture);
 				ErrorMessage = "";
 
 				if (Settings.BookmarkOnEval)
@@ -241,9 +239,7 @@ public readonly struct CalculatorUI
 		// Raylib context
 		{
 			// NOTE(LucasTA): HIGHDPI stops the window from being scaled as its resized
-			Raylib.SetConfigFlags(
-				ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TOPMOST
-			);
+			Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TOPMOST);
 #if ANDROID
 			Raylib.InitWindow(0, 0, APP_NAME);
 #else
@@ -367,11 +363,7 @@ public readonly struct CalculatorUI
 							HoveredColor: RedButtonHoveredColor,
 							new(RedButtonBorderColor, BorderThickness),
 							ShadowStyle: redButtonShadow,
-							Icon: new(
-								GetResource("backspace_icon.png"),
-								ForegroundColor,
-								(int)textSize.Y
-							)
+							Icon: new(GetResource("backspace_icon.png"), ForegroundColor, (int)textSize.Y)
 						);
 
 					Layout.ButtonStyle greenButton =
@@ -442,12 +434,7 @@ public readonly struct CalculatorUI
 												new("random", FontSize, ForegroundColor),
 												() =>
 													InsertExpression(
-														Random
-															.NextDouble()
-															.ToString(
-																"0.000",
-																CultureInfo.InvariantCulture
-															)
+														Random.NextDouble().ToString("0.000", CultureInfo.InvariantCulture)
 													),
 												greyButton
 											),
@@ -459,8 +446,7 @@ public readonly struct CalculatorUI
 														TrigonometryModes.Normal => "normal",
 														TrigonometryModes.Inverse => "inv",
 														TrigonometryModes.Hyperbolic => "hyp",
-														TrigonometryModes.InverseHyperbolic =>
-															"invhyp",
+														TrigonometryModes.InverseHyperbolic => "invhyp",
 														_ => "normal",
 													},
 													FontSize,
@@ -588,11 +574,7 @@ public readonly struct CalculatorUI
 													HoveredColor: ButtonHoverColor,
 													new(BorderColor, BorderThickness),
 													ShadowStyle: greyButtonShadow,
-													Icon: new(
-														GetResource("pi_icon.png"),
-														ForegroundColor,
-														(int)textSize.Y
-													)
+													Icon: new(GetResource("pi_icon.png"), ForegroundColor, (int)textSize.Y)
 												)
 											)
 										),
@@ -747,12 +729,7 @@ public readonly struct CalculatorUI
 												backspaceButton,
 												Layout.ButtonPressMode.HoldToRepeat
 											),
-											new Layout.Button(
-												25,
-												new("=", FontSize, ForegroundColor),
-												Equal,
-												greenButton
-											)
+											new Layout.Button(25, new("=", FontSize, ForegroundColor), Equal, greenButton)
 										),
 									];
 
@@ -783,10 +760,7 @@ public readonly struct CalculatorUI
 											TypingIndex = Math.Max(0, TypingIndex - 1);
 										},
 										pressMode: Layout.ButtonPressMode.HoldToRepeat,
-										icon: new(
-											GetResource("arrow_left.png"),
-											DisplayBackgroundColor
-										)
+										icon: new(GetResource("arrow_left.png"), DisplayBackgroundColor)
 									);
 
 									Layout.DrawButton(
@@ -799,16 +773,10 @@ public readonly struct CalculatorUI
 										Transparent,
 										() =>
 										{
-											TypingIndex = Math.Min(
-												Expression.Length,
-												TypingIndex + 1
-											);
+											TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
 										},
 										pressMode: Layout.ButtonPressMode.HoldToRepeat,
-										icon: new(
-											GetResource("arrow_right.png"),
-											DisplayBackgroundColor
-										)
+										icon: new(GetResource("arrow_right.png"), DisplayBackgroundColor)
 									);
 
 									Layout.DrawTextBox(
@@ -870,10 +838,7 @@ public readonly struct CalculatorUI
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
-											TypingIndex = Math.Min(
-												Expression.Length,
-												TypingIndex + 1
-											);
+											TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
 										}
 
 										ButtonPressedTime += Raylib.GetFrameTime();
@@ -931,9 +896,7 @@ public readonly struct CalculatorUI
 													or '.'
 										)
 										{
-											InsertExpression(
-												((char)keycode).ToString().ToLowerInvariant()
-											);
+											InsertExpression(((char)keycode).ToString().ToLowerInvariant());
 											ButtonPressedTime = 0;
 										}
 									}
@@ -1029,10 +992,7 @@ public readonly struct CalculatorUI
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() => History.Add(Expression),
-										icon: new(
-											GetResource("bookmark_add_icon.png"),
-											ForegroundColor
-										)
+										icon: new(GetResource("bookmark_add_icon.png"), ForegroundColor)
 									);
 								}
 							}
@@ -1048,8 +1008,7 @@ public readonly struct CalculatorUI
 								}
 
 								float maxScrollOffset =
-									Math.Max(0, expressions.Count - menuVisibleEntries)
-									* -menuEntryHeight;
+									Math.Max(0, expressions.Count - menuVisibleEntries) * -menuEntryHeight;
 
 #if ANDROID
 								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
@@ -1061,9 +1020,7 @@ public readonly struct CalculatorUI
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
 
-									float touchMoveDistance = Math.Abs(
-										currentTouchPosition.Y - StartTouchPosition.Y
-									);
+									float touchMoveDistance = Math.Abs(currentTouchPosition.Y - StartTouchPosition.Y);
 
 									if (
 										touchMoveDistance > 2
@@ -1083,9 +1040,7 @@ public readonly struct CalculatorUI
 										Dragging = true;
 
 										HistoryScrollOffset = Math.Clamp(
-											HistoryScrollOffset
-												+ currentTouchPosition.Y
-												- StartTouchPosition.Y,
+											HistoryScrollOffset + currentTouchPosition.Y - StartTouchPosition.Y,
 											maxScrollOffset,
 											0
 										);
@@ -1156,8 +1111,7 @@ public readonly struct CalculatorUI
 
 									for (int i = 0; i < expressions.Count; i++)
 									{
-										int menuEntryY =
-											(int)HistoryScrollOffset + i * menuEntryHeight;
+										int menuEntryY = (int)HistoryScrollOffset + i * menuEntryHeight;
 
 										Layout.DrawTextBox(
 											menuEntryX,
@@ -1175,8 +1129,7 @@ public readonly struct CalculatorUI
 											new(BorderColor, BorderThickness)
 										);
 
-										int deleteX =
-											menuEntryX + menuEntryWidth - topIconSize - Padding;
+										int deleteX = menuEntryX + menuEntryWidth - topIconSize - Padding;
 
 										Layout.DrawButton(
 											deleteX,
@@ -1190,10 +1143,7 @@ public readonly struct CalculatorUI
 											{
 												History.Remove(expressions[i]);
 											},
-											icon: new(
-												GetResource("trash_icon.png"),
-												RedButtonColor
-											),
+											icon: new(GetResource("trash_icon.png"), RedButtonColor),
 											pressMode: Layout.ButtonPressMode.HoldToPress
 										);
 
@@ -1244,9 +1194,7 @@ public readonly struct CalculatorUI
 										);
 
 										int pinX = pickX - topIconSize - Padding;
-										bool pinned = History.PinnedExpressions.Contains(
-											expressions[i]
-										);
+										bool pinned = History.PinnedExpressions.Contains(expressions[i]);
 
 										Layout.DrawButton(
 											pinX,
@@ -1268,9 +1216,7 @@ public readonly struct CalculatorUI
 												}
 											},
 											icon: new(
-												pinned
-													? GetResource("unpin_icon.png")
-													: GetResource("pin_icon.png"),
+												pinned ? GetResource("unpin_icon.png") : GetResource("pin_icon.png"),
 												ForegroundColor
 											)
 										);
@@ -1345,12 +1291,7 @@ public readonly struct CalculatorUI
 									menuEntryHeight,
 									menuEntryWidth,
 									menuEntryHeight,
-									new(
-										"Version:",
-										FontSize,
-										ForegroundColor,
-										Layout.TextAlignment.Left
-									),
+									new("Version:", FontSize, ForegroundColor, Layout.TextAlignment.Left),
 									MenuEntryBackgroundColor,
 									new(BorderColor, BorderThickness)
 								);
@@ -1373,12 +1314,7 @@ public readonly struct CalculatorUI
 									menuEntryHeight * 2,
 									menuEntryWidth,
 									menuEntryHeight,
-									new(
-										"License:",
-										FontSize,
-										ForegroundColor,
-										Layout.TextAlignment.Left
-									),
+									new("License:", FontSize, ForegroundColor, Layout.TextAlignment.Left),
 									MenuEntryBackgroundColor,
 									new(BorderColor, BorderThickness)
 								);
@@ -1413,8 +1349,7 @@ public readonly struct CalculatorUI
 									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
-									() =>
-										OpenBrowser("https://github.com/lucastavaresa/Calculator"),
+									() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
 									icon: new(GetResource("github_icon.png"), Color.WHITE)
 								);
 
@@ -1461,9 +1396,7 @@ public readonly struct CalculatorUI
 										(i + 1) * leftButtonSize,
 										leftButtonSize,
 										leftButtonSize,
-										CurrentConverter == i
-											? ButtonPressedColor
-											: MenuEntryBackgroundColor,
+										CurrentConverter == i ? ButtonPressedColor : MenuEntryBackgroundColor,
 										ButtonPressedColor,
 										TransparentButtonHoverColor,
 										() =>
@@ -1476,16 +1409,12 @@ public readonly struct CalculatorUI
 											ConverterTypingIndex = 0;
 										},
 										borderStyle: new(
-											CurrentConverter == i
-												? ButtonSelectedColor
-												: Transparent,
+											CurrentConverter == i ? ButtonSelectedColor : Transparent,
 											BorderThickness
 										),
 										icon: new(
 											GetResource(Converters[i].Icon),
-											CurrentConverter == i
-												? ButtonSelectedColor
-												: ButtonDeselectedColor,
+											CurrentConverter == i ? ButtonSelectedColor : ButtonDeselectedColor,
 											leftButtonSize
 										)
 									);
@@ -1530,13 +1459,7 @@ public readonly struct CalculatorUI
 												CurrentScene = Scene.Conversions;
 												DropDownScrollOffset = Math.Min(
 													0,
-													-(
-														dropDownEntryHeight
-														* (
-															ConverterFromIndex
-															- dropDownVisibleEntries / 2
-														)
-													)
+													-(dropDownEntryHeight * (ConverterFromIndex - dropDownVisibleEntries / 2))
 												);
 											},
 											borderStyle: new(BorderColor, BorderThickness)
@@ -1599,8 +1522,7 @@ public readonly struct CalculatorUI
 															ConverterResult,
 															ConverterExpression
 														);
-														ConverterTypingIndex =
-															ConverterExpression.Length;
+														ConverterTypingIndex = ConverterExpression.Length;
 														Convert();
 													},
 													new(
@@ -1608,26 +1530,19 @@ public readonly struct CalculatorUI
 														PressedColor: ButtonPressedColor,
 														HoveredColor: ButtonHoverColor,
 														new(BorderColor, BorderThickness),
-														Icon: new(
-															GetResource("vertical_swap_icon.png"),
-															ForegroundColor
-														)
+														Icon: new(GetResource("vertical_swap_icon.png"), ForegroundColor)
 													)
 												),
 												new Layout.Button(
 													gridWidthPercentage,
 													null,
-													() =>
-														InsertConverterExpression(Clipboard.Get()),
+													() => InsertConverterExpression(Clipboard.Get()),
 													new(
 														BackgroundColor: ButtonBackgroundColor,
 														PressedColor: ButtonPressedColor,
 														HoveredColor: ButtonHoverColor,
 														new(BorderColor, BorderThickness),
-														Icon: new(
-															GetResource("paste_icon.png"),
-															ForegroundColor
-														)
+														Icon: new(GetResource("paste_icon.png"), ForegroundColor)
 													)
 												),
 												new Layout.Button(
@@ -1639,10 +1554,7 @@ public readonly struct CalculatorUI
 														PressedColor: ButtonPressedColor,
 														HoveredColor: ButtonHoverColor,
 														new(BorderColor, BorderThickness),
-														Icon: new(
-															GetResource("copy_icon.png"),
-															ForegroundColor
-														)
+														Icon: new(GetResource("copy_icon.png"), ForegroundColor)
 													)
 												),
 												new Layout.Button(
@@ -1703,13 +1615,7 @@ public readonly struct CalculatorUI
 												CurrentScene = Scene.Conversions;
 												DropDownScrollOffset = Math.Min(
 													0,
-													-(
-														dropDownEntryHeight
-														* (
-															ConverterToIndex
-															- dropDownVisibleEntries / 2
-														)
-													)
+													-(dropDownEntryHeight * (ConverterToIndex - dropDownVisibleEntries / 2))
 												);
 											},
 											borderStyle: new(BorderColor, BorderThickness)
@@ -1757,9 +1663,7 @@ public readonly struct CalculatorUI
 
 										Layout.DrawButton(
 											ScreenWidth - gridButtonSize,
-											leftButtonSize
-												+ converterBoxHeight * 2
-												- gridButtonSize,
+											leftButtonSize + converterBoxHeight * 2 - gridButtonSize,
 											gridButtonSize - BorderThickness,
 											gridButtonSize - BorderThickness,
 											ButtonBackgroundColor,
@@ -1907,8 +1811,7 @@ public readonly struct CalculatorUI
 										),
 									];
 
-									int converterKeyboardY =
-										converterBoxHeight * 2 + leftButtonSize + Padding;
+									int converterKeyboardY = converterBoxHeight * 2 + leftButtonSize + Padding;
 
 									Layout.DrawButtonGrid(
 										leftButtonSize + Padding,
@@ -1924,10 +1827,7 @@ public readonly struct CalculatorUI
 
 									if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
 									{
-										ConverterTypingIndex = Math.Max(
-											0,
-											ConverterTypingIndex - 1
-										);
+										ConverterTypingIndex = Math.Max(0, ConverterTypingIndex - 1);
 										ButtonPressedTime = 0;
 									}
 									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
@@ -1942,10 +1842,7 @@ public readonly struct CalculatorUI
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
-											ConverterTypingIndex = Math.Max(
-												0,
-												ConverterTypingIndex - 1
-											);
+											ConverterTypingIndex = Math.Max(0, ConverterTypingIndex - 1);
 										}
 
 										ButtonPressedTime += Raylib.GetFrameTime();
@@ -1998,10 +1895,7 @@ public readonly struct CalculatorUI
 									}
 									else if (keycode != 0)
 									{
-										if (
-											char.IsAsciiDigit((char)keycode)
-											|| (char)keycode == '.'
-										)
+										if (char.IsAsciiDigit((char)keycode) || (char)keycode == '.')
 										{
 											InsertConverterExpression(((char)keycode).ToString());
 											ButtonPressedTime = 0;
@@ -2017,13 +1911,10 @@ public readonly struct CalculatorUI
 									CurrentScene = Scene.Converters;
 								}
 
-								int conversionsAmount = Converters[CurrentConverter]
-									.Conversions
-									.Count;
+								int conversionsAmount = Converters[CurrentConverter].Conversions.Count;
 
 								float maxScrollOffset =
-									Math.Max(0, conversionsAmount - dropDownVisibleEntries)
-									* -dropDownEntryHeight;
+									Math.Max(0, conversionsAmount - dropDownVisibleEntries) * -dropDownEntryHeight;
 
 #if ANDROID
 								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
@@ -2035,18 +1926,14 @@ public readonly struct CalculatorUI
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
 
-									float touchMoveDistance = Math.Abs(
-										currentTouchPosition.Y - StartTouchPosition.Y
-									);
+									float touchMoveDistance = Math.Abs(currentTouchPosition.Y - StartTouchPosition.Y);
 
 									if (touchMoveDistance > 2)
 									{
 										Dragging = true;
 
 										DropDownScrollOffset = Math.Clamp(
-											DropDownScrollOffset
-												+ currentTouchPosition.Y
-												- StartTouchPosition.Y,
+											DropDownScrollOffset + currentTouchPosition.Y - StartTouchPosition.Y,
 											maxScrollOffset,
 											0
 										);
@@ -2067,13 +1954,7 @@ public readonly struct CalculatorUI
 								);
 #endif
 
-								Raylib.DrawRectangle(
-									0,
-									0,
-									ScreenWidth,
-									ScreenHeight,
-									ScrollbarBackgroundColor
-								);
+								Raylib.DrawRectangle(0, 0, ScreenWidth, ScreenHeight, ScrollbarBackgroundColor);
 
 								Layout.DrawScrollbar(
 									ScreenWidth - ScrollbarWidth,
@@ -2091,22 +1972,16 @@ public readonly struct CalculatorUI
 
 								for (int i = 0; i < conversionsAmount; i++)
 								{
-									string converter = Converters[CurrentConverter]
-										.Conversions[i]
-										.Name;
+									string converter = Converters[CurrentConverter].Conversions[i].Name;
 									int selectedIndex =
-										CurrentDropDown == DropDown.From
-											? ConverterFromIndex
-											: ConverterToIndex;
+										CurrentDropDown == DropDown.From ? ConverterFromIndex : ConverterToIndex;
 
 									Layout.DrawButton(
 										0,
 										(int)DropDownScrollOffset + i * dropDownEntryHeight,
 										ScreenWidth - ScrollbarWidth,
 										dropDownEntryHeight,
-										selectedIndex == i
-											? ButtonPressedColor
-											: MenuEntryBackgroundColor,
+										selectedIndex == i ? ButtonPressedColor : MenuEntryBackgroundColor,
 										MenuEntryBackgroundColor,
 										MenuEntryBackgroundColor,
 										() =>

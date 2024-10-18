@@ -37,10 +37,7 @@ internal readonly struct Settings
 		}
 
 		foreach (
-			string setting in settings.Split(
-				Environment.NewLine,
-				StringSplitOptions.RemoveEmptyEntries
-			)
+			string setting in settings.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
 		)
 		{
 			string[] split = setting.Split('=');

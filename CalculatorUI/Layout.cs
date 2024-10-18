@@ -387,9 +387,7 @@ internal readonly struct Layout
 					if (pressMode == ButtonPressMode.HoldToPress)
 					{
 						progress = (int)(
-							height
-							/ CalculatorUI.ButtonHoldToPressTime
-							* CalculatorUI.ButtonPressedTime
+							height / CalculatorUI.ButtonHoldToPressTime * CalculatorUI.ButtonPressedTime
 						);
 					}
 
@@ -496,9 +494,7 @@ internal readonly struct Layout
 					if (pressMode == ButtonPressMode.HoldToPress)
 					{
 						progress = (int)(
-							height
-							/ CalculatorUI.ButtonHoldToPressTime
-							* CalculatorUI.ButtonPressedTime
+							height / CalculatorUI.ButtonHoldToPressTime * CalculatorUI.ButtonPressedTime
 						);
 					}
 
@@ -776,14 +772,7 @@ internal readonly struct Layout
 
 		Raylib.DrawRectangle(x, y, width, height, backgroundColor);
 
-		DrawBox(
-			x,
-			handleY,
-			width,
-			handleHeight,
-			handleColor,
-			new(borderColor, borderThickness)
-		);
+		DrawBox(x, handleY, width, handleHeight, handleColor, new(borderColor, borderThickness));
 	}
 
 	internal static void DrawButtonGrid(
