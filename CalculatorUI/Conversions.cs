@@ -37,7 +37,7 @@ internal readonly struct Conversions
 		{
 			if (ConverterFromIndex == ConverterToIndex)
 			{
-				ConverterResult = number.ToString(CultureInfo.InvariantCulture);
+				ConverterResult = number.ToString("0.##########", CultureInfo.InvariantCulture);
 			}
 			else if (Converters[CurrentConverter].Title == "Temperature")
 			{
@@ -68,7 +68,7 @@ internal readonly struct Conversions
 				}
 			}
 
-			ConverterResult = number.ToString(CultureInfo.InvariantCulture);
+			ConverterResult = number.ToString("0.##########", CultureInfo.InvariantCulture);
 		}
 		else
 		{
