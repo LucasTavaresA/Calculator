@@ -49,11 +49,23 @@ internal readonly struct Conversions
 			}
 			else
 			{
-				number = ConvertFromBase(
-					number,
-					Converters[CurrentConverter].Conversions[ConverterFromIndex].Rate,
-					Converters[CurrentConverter].Conversions[ConverterToIndex].Rate
-				);
+				// NOTE(LucasTA): Reversed for currency rates as they are the only converter with all bases derived from USD
+				if (Converters[CurrentConverter].Title == "Currency")
+				{
+					number = ConvertFromBase(
+						number,
+						Converters[CurrentConverter].Conversions[ConverterToIndex].Rate,
+						Converters[CurrentConverter].Conversions[ConverterFromIndex].Rate
+					);
+				}
+				else
+				{
+					number = ConvertFromBase(
+						number,
+						Converters[CurrentConverter].Conversions[ConverterFromIndex].Rate,
+						Converters[CurrentConverter].Conversions[ConverterToIndex].Rate
+					);
+				}
 			}
 
 			ConverterResult = number.ToString(CultureInfo.InvariantCulture);
