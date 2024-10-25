@@ -1019,11 +1019,10 @@ public readonly struct CalculatorUI
 								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
-
-									float touchMoveDistance = Math.Abs(currentTouchPosition.Y - StartTouchPosition.Y);
+									float scrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
 
 									if (
-										touchMoveDistance > 2
+										Math.Abs(scrollDelta) > 2
 										&&
 										// NOTE(LucasTA): Don't scroll if touch starts outside the
 										// list
@@ -1040,7 +1039,7 @@ public readonly struct CalculatorUI
 										Dragging = true;
 
 										HistoryScrollOffset = Math.Clamp(
-											HistoryScrollOffset + currentTouchPosition.Y - StartTouchPosition.Y,
+											HistoryScrollOffset + scrollDelta,
 											maxScrollOffset,
 											0
 										);
@@ -1925,15 +1924,14 @@ public readonly struct CalculatorUI
 								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
+									float scrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
 
-									float touchMoveDistance = Math.Abs(currentTouchPosition.Y - StartTouchPosition.Y);
-
-									if (touchMoveDistance > 2)
+									if (Math.Abs(scrollDelta) > 2)
 									{
 										Dragging = true;
 
 										DropDownScrollOffset = Math.Clamp(
-											DropDownScrollOffset + currentTouchPosition.Y - StartTouchPosition.Y,
+											DropDownScrollOffset + scrollDelta,
 											maxScrollOffset,
 											0
 										);
