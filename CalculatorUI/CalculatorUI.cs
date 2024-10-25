@@ -161,6 +161,7 @@ public readonly struct CalculatorUI
 	internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
 	internal static int TouchCount = 0;
 	internal static Vector2 StartTouchPosition;
+	internal static float ScrollDelta;
 #else
 	internal const float INITIAL_REPEAT_INTERVAL = 0.3f;
 	internal static float MouseScroll = 0;
@@ -1014,15 +1015,16 @@ public readonly struct CalculatorUI
 								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
 								{
 									StartTouchPosition = Raylib.GetTouchPosition(0);
+									ScrollDelta = 0;
 								}
 
 								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
-									float scrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
+									ScrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
 
 									if (
-										Math.Abs(scrollDelta) > 2
+										Math.Abs(ScrollDelta) > 2
 										&&
 										// NOTE(LucasTA): Don't scroll if touch starts outside the
 										// list
@@ -1039,13 +1041,23 @@ public readonly struct CalculatorUI
 										Dragging = true;
 
 										HistoryScrollOffset = Math.Clamp(
-											HistoryScrollOffset + scrollDelta,
+											HistoryScrollOffset + ScrollDelta,
 											maxScrollOffset,
 											0
 										);
 
 										StartTouchPosition = currentTouchPosition;
 									}
+								}
+								else if (Math.Abs(ScrollDelta) > 0.1f)
+								{
+									HistoryScrollOffset = Math.Clamp(
+										HistoryScrollOffset + ScrollDelta,
+										maxScrollOffset,
+										0
+									);
+
+									ScrollDelta *= 0.95f;
 								}
 #else
 								if (MouseScroll > 0)
@@ -1919,25 +1931,36 @@ public readonly struct CalculatorUI
 								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
 								{
 									StartTouchPosition = Raylib.GetTouchPosition(0);
+									ScrollDelta = 0;
 								}
 
 								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
-									float scrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
+									ScrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
 
-									if (Math.Abs(scrollDelta) > 2)
+									if (Math.Abs(ScrollDelta) > 2)
 									{
 										Dragging = true;
 
 										DropDownScrollOffset = Math.Clamp(
-											DropDownScrollOffset + scrollDelta,
+											DropDownScrollOffset + ScrollDelta,
 											maxScrollOffset,
 											0
 										);
 
 										StartTouchPosition = currentTouchPosition;
 									}
+								}
+								else if (Math.Abs(ScrollDelta) > 0.1f)
+								{
+									DropDownScrollOffset = Math.Clamp(
+										DropDownScrollOffset + ScrollDelta,
+										maxScrollOffset,
+										0
+									);
+
+									ScrollDelta *= 0.95f;
 								}
 #else
 								if (MouseScroll > 0)
