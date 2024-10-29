@@ -295,7 +295,9 @@ public readonly struct CalculatorUI
 					ScrollbarWidth = BorderThickness * 4;
 					Padding = BorderThickness * 8;
 
-#if !ANDROID
+#if ANDROID
+					TouchCount = Raylib.GetTouchPointCount();
+#else
 					MouseScroll = Raylib.GetMouseWheelMove() * 32;
 #endif
 				}
