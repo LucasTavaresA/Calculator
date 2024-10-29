@@ -2040,9 +2040,6 @@ public readonly struct CalculatorUI
 						Dragging = false;
 					}
 
-					Layout.LastHotButton = Layout.HotButton;
-					Layout.HotButton = null;
-
 					Debug.Message += $"""
 FPS: {Raylib.GetFPS()}
 """;
