@@ -124,6 +124,7 @@ internal readonly struct Conversions
 		return number;
 	}
 
+	// TODO(LucasTA): Add more conversions from unitconverters.net
 	internal static readonly Converter[] Converters =
 	[
 #if HAS_APIKEY

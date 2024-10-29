@@ -8,6 +8,13 @@ using Raylib_cs;
 
 namespace Calculator;
 
+// TODO(LucasTA): Make a container with things inside like approach,
+// so i can draw multiple things inside it without calling DrawBox and DrawText separately,
+// also would make customizing the box behind both easier since currently we use transparent backgrounds
+// also would make dealing with the internal padding caused by the border easier
+// also try to deal with text on both sides of the box and overflow properly
+// TODO(LucasTA): Add OverflowMode.Wrap
+// TODO(LucasTA): Allow getting the index for row/column when drawing a button grid
 internal readonly struct Layout
 {
 	/// <summary>Tolerable difference between colors</summary>
@@ -163,6 +170,9 @@ internal readonly struct Layout
 			CalculatorUI.FONT_SPACING
 		);
 
+		// FIXME(LucasTA): stop checking this here when containers are added,
+		// keeping this here for now due to this functions doing one thing pattern
+		// and i don't want to make DrawTextBox not receive text sometimes
 		Debug.IfDrawPoint(
 			IsBadContrast(backgroundColor, textColor),
 			$"ERROR: The text at the {x},{y} text box is not visible!\n",
