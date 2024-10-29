@@ -324,13 +324,13 @@ public readonly struct CalculatorUI
 					Raylib.BeginDrawing();
 					Raylib.ClearBackground(BackgroundColor);
 
-					int displayX = Padding;
-					int displayY = Padding;
-					int displayWidth = ScreenWidth - (Padding * 2);
-					int displayHeight = (ScreenHeight / 6) - Padding;
-
 					Vector2 textSize = Raylib.MeasureTextEx(Fonte, "0", FontSize, FONT_SPACING);
-					int topIconSize = displayY + (int)textSize.Y;
+					int topIconSize = (ScreenHeight + ScreenWidth) / 28;
+
+					int displayY = topIconSize;
+					int displayX = Padding;
+					int displayWidth = ScreenWidth - (Padding * 2);
+					int displayHeight = (int)(textSize.Y * 3);
 
 					int menuSidePadding = Padding * 2 + topIconSize;
 					int menuEntryHeight = ((int)textSize.Y * 2) + Padding;
@@ -736,9 +736,9 @@ public readonly struct CalculatorUI
 
 									Layout.DrawButtonGrid(
 										Padding,
-										Padding + (ScreenHeight / 6),
+										displayY + displayHeight + BorderThickness,
 										ScreenWidth - (Padding * 2),
-										ScreenHeight - (Padding * 2) - (ScreenHeight / 6),
+										ScreenHeight - (BorderThickness + displayY + displayHeight),
 										Padding,
 										calculatorButtons
 									);
