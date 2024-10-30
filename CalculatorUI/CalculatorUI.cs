@@ -18,6 +18,7 @@ using Raylib_cs;
 
 using static Calculator.Conversions;
 using static Calculator.Currency;
+using static Calculator.EnumExtensions;
 using static Calculator.Resource;
 using static Calculator.Translations;
 #if ANDROID
@@ -199,15 +200,6 @@ public readonly struct CalculatorUI
 
 	private static readonly Random Random = new();
 	internal static Font Fonte;
-
-	private static void CycleEnum<T>(ref T enumValue)
-		where T : Enum
-	{
-		T[] enumValues = (T[])Enum.GetValues(typeof(T));
-		int currentIndex = Array.IndexOf(enumValues, enumValue);
-		int nextIndex = (currentIndex + 1) % enumValues.Length;
-		enumValue = enumValues[nextIndex];
-	}
 
 	private enum Scene
 	{
