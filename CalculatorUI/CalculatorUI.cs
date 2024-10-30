@@ -19,6 +19,7 @@ using Raylib_cs;
 using static Calculator.Conversions;
 using static Calculator.Currency;
 using static Calculator.Resource;
+using static Calculator.Translations;
 #if ANDROID
 using Android.Content;
 using Android.App;
@@ -258,7 +259,8 @@ public readonly struct CalculatorUI
 
 			if (Converters[0].Conversions.Count == 0)
 			{
-				Converters[0].Conversions.Add(new("No currency information available", 1));
+				Converters[0]
+					.Conversions.Add(new(GetTranslation("No conversion information available!"), 1));
 			}
 
 			foreach (string resource in Assembly.GetManifestResourceNames())
@@ -1292,7 +1294,7 @@ public readonly struct CalculatorUI
 									menuEntryWidth - menuSidePadding,
 									menuEntryHeight,
 									BorderThickness,
-									"Add to history with '='",
+									GetTranslation("\"=\" adds to history"),
 									ForegroundColor,
 									MenuEntryBackgroundColor,
 									FontSize,
@@ -1304,7 +1306,12 @@ public readonly struct CalculatorUI
 									menuEntryHeight,
 									menuEntryWidth,
 									menuEntryHeight,
-									new("Version:", FontSize, ForegroundColor, Layout.TextAlignment.Left),
+									new(
+										GetTranslation("Version") + ":",
+										FontSize,
+										ForegroundColor,
+										Layout.TextAlignment.Left
+									),
 									MenuEntryBackgroundColor,
 									new(BorderColor, BorderThickness)
 								);
@@ -1327,7 +1334,12 @@ public readonly struct CalculatorUI
 									menuEntryHeight * 2,
 									menuEntryWidth,
 									menuEntryHeight,
-									new("License:", FontSize, ForegroundColor, Layout.TextAlignment.Left),
+									new(
+										GetTranslation("License") + ":",
+										FontSize,
+										ForegroundColor,
+										Layout.TextAlignment.Left
+									),
 									MenuEntryBackgroundColor,
 									new(BorderColor, BorderThickness)
 								);
@@ -1372,7 +1384,7 @@ public readonly struct CalculatorUI
 									menuEntryWidth - menuSidePadding,
 									menuEntryHeight,
 									BorderThickness,
-									"Source code:",
+									GetTranslation("Source code") + ":",
 									ForegroundColor,
 									MenuEntryBackgroundColor,
 									FontSize,
@@ -1484,7 +1496,7 @@ public readonly struct CalculatorUI
 											converterBoxWidth - gridButtonSize,
 											gridButtonSize,
 											0,
-											convertingFrom,
+											GetTranslation(convertingFrom),
 											ForegroundColor,
 											DisplayBackgroundColor,
 											FontSize,
@@ -1640,7 +1652,7 @@ public readonly struct CalculatorUI
 											converterBoxWidth - gridButtonSize,
 											gridButtonSize,
 											0,
-											convertingTo,
+											GetTranslation(convertingTo),
 											ForegroundColor,
 											DisplayBackgroundColor,
 											FontSize,
@@ -1695,7 +1707,7 @@ public readonly struct CalculatorUI
 												converterBoxWidth - gridButtonSize,
 												converterBoxHeight,
 												1,
-												$"Updated {Settings.LastAPICallTime}",
+												$"{GetTranslation("Updated at")} {Settings.LastAPICallTime.ToString(Culture)}",
 												DarkForegroundColor,
 												DisplayBackgroundColor,
 												(int)(FontSize / 1.5f),
@@ -1711,7 +1723,7 @@ public readonly struct CalculatorUI
 									ScreenWidth - leftButtonSize,
 									ScreenHeight,
 									0,
-									$"{Converters[CurrentConverter].Title}",
+									GetTranslation(Converters[CurrentConverter].Title),
 									ForegroundColor,
 									Transparent,
 									FontSize,
@@ -2021,7 +2033,7 @@ public readonly struct CalculatorUI
 											Convert();
 											CurrentScene = Scene.Converters;
 										},
-										textFormat: new(converter, FontSize, ForegroundColor),
+										textFormat: new(GetTranslation(converter), FontSize, ForegroundColor),
 										borderStyle: new(
 											selectedIndex == i ? ButtonSelectedColor : BorderColor,
 											BorderThickness

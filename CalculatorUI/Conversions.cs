@@ -181,7 +181,7 @@ internal readonly struct Conversions
 			]
 		),
 		new(
-			"Weigth/Mass",
+			"Weight/Mass",
 			"weight_icon.png",
 			[
 				new("Kilogram", 1),
@@ -193,7 +193,7 @@ internal readonly struct Conversions
 				new("Microgram", 1.0e-9),
 				new("Pound", 0.453592),
 				new("Ounce", 0.0283495),
-				new("Carrat", 0.0002),
+				new("Carat", 0.0002),
 				new("Stone", 6.35029),
 				new("Atomic mass unit", 1.660540199e-27),
 			]
