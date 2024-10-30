@@ -27,7 +27,10 @@ internal readonly struct Debug
 		{
 			await func();
 		}
-		catch (Exception) { }
+		catch (Exception e)
+		{
+			Message += e.Message;
+		}
 #endif
 	}
 
@@ -41,7 +44,10 @@ internal readonly struct Debug
 		{
 			action();
 		}
-		catch (Exception) { }
+		catch (Exception e)
+		{
+			Message += e.Message;
+		}
 #endif
 	}
 
