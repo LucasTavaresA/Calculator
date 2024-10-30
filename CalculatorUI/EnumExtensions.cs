@@ -17,4 +17,19 @@ internal readonly struct EnumExtensions
 		int nextIndex = (currentIndex + 1) % enumValues.Length;
 		enumValue = enumValues[nextIndex];
 	}
+
+	internal static string GetDescription<T>(ref T value)
+		where T : Enum
+	{
+		FieldInfo field;
+		DescriptionAttribute attribute;
+		string result;
+
+		field = value.GetType().GetField(value.ToString());
+		attribute = (DescriptionAttribute)
+			Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
+		result = attribute != null ? attribute.Description : string.Empty;
+
+		return result;
+	}
 }
