@@ -804,6 +804,18 @@ internal readonly struct Layout
 			{
 				int colLength = availableWidth * rows[i].Buttons[j].WidthPercentage / 100;
 
+				// HACK(LucasTA): raylib uses integers, this adds some remainder pixels to the last button
+				if (i == rows.Length - 1 && takenHeight + rowLength + padding != height)
+				{
+					rowLength += height - (takenHeight + rowLength + padding * (rows.Length - 1));
+				}
+
+				// HACK(LucasTA): same as above
+				if (j == rows[i].Buttons.Length - 1 && takenWidth + colLength + padding != width)
+				{
+					colLength += width - (takenWidth + colLength + padding * (rows[i].Buttons.Length - 1));
+				}
+
 				DrawButton(
 					curX,
 					curY,

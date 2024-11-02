@@ -733,8 +733,8 @@ public readonly struct CalculatorUI
 									Layout.DrawButtonGrid(
 										Padding,
 										displayY + displayHeight + BorderThickness,
-										ScreenWidth - (Padding * 2),
-										ScreenHeight - (BorderThickness + displayY + displayHeight),
+										ScreenWidth - (ShadowDistance + Padding * 2),
+										ScreenHeight - (BorderThickness + displayY + displayHeight + ShadowDistance),
 										Padding,
 										calculatorButtons
 									);
@@ -1451,7 +1451,6 @@ public readonly struct CalculatorUI
 											.Name;
 										int gridCols = 4;
 										int gridWidthPercentage = 100 / gridCols;
-										int gridWidth = gridButtonSize * gridCols;
 
 										Layout.DrawBox(
 											leftButtonSize,
@@ -1594,10 +1593,10 @@ public readonly struct CalculatorUI
 										];
 
 										Layout.DrawButtonGrid(
-											ScreenWidth - gridButtonSize * gridCols,
-											leftButtonSize + converterBoxHeight - gridButtonSize,
-											gridWidth,
-											gridButtonSize - BorderThickness,
+											ScreenWidth - gridButtonSize * gridCols - BorderThickness,
+											leftButtonSize + converterBoxHeight - gridButtonSize - BorderThickness,
+											gridButtonSize * gridCols,
+											gridButtonSize,
 											BorderThickness,
 											converterButtons
 										);
@@ -1833,8 +1832,8 @@ public readonly struct CalculatorUI
 									Layout.DrawButtonGrid(
 										leftButtonSize + Padding,
 										converterKeyboardY,
-										ScreenWidth - leftButtonSize - Padding,
-										ScreenHeight - converterKeyboardY - Padding,
+										ScreenWidth - leftButtonSize - ShadowDistance - Padding,
+										ScreenHeight - converterKeyboardY - ShadowDistance,
 										Padding,
 										converterKeyboardButtons
 									);
