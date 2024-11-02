@@ -18,6 +18,7 @@ using Raylib_cs;
 
 using static Calculator.Conversions;
 using static Calculator.Currency;
+using static Calculator.DateConversion;
 using static Calculator.EnumExtensions;
 using static Calculator.Resource;
 using static Calculator.Translations;
@@ -30,6 +31,269 @@ namespace Calculator;
 
 public readonly struct CalculatorUI
 {
+	private static void DrawCalendarMonths(int x, int y, int width, int height, ref DateOnly date)
+	{
+		// Date to capture in the callbacks
+		DateOnly capturedDate = date;
+		int rowAmount = 3;
+		int colAmount = 6;
+		int rowHeight = 100 / rowAmount;
+		int colWidth = 100 / colAmount;
+		Layout.ButtonRow[] monthRows = new Layout.ButtonRow[rowAmount];
+		Layout.ButtonStyle greyButtonFlat =
+			new(
+				ButtonBackgroundColor,
+				ButtonPressedColor,
+				ButtonHoverColor,
+				new(BorderColor, BorderThickness)
+			);
+
+		monthRows[0] = new(
+			rowHeight,
+			[
+				new(
+					80,
+					new(date.Year.ToString(), FontSize, ForegroundColor),
+					() => CycleEnum(ref SelectedDatePicker),
+					greyButtonFlat
+				),
+				new(
+					10,
+					new("<", FontSize, ForegroundColor),
+					() => capturedDate = capturedDate.AddYears(-1),
+					greyButtonFlat,
+					Layout.ButtonPressMode.HoldToRepeat
+				),
+				new(
+					10,
+					new(">", FontSize, ForegroundColor),
+					() => capturedDate = capturedDate.AddYears(1),
+					greyButtonFlat,
+					Layout.ButtonPressMode.HoldToRepeat
+				),
+			]
+		);
+
+		for (int i = 1; i < rowAmount; i++)
+		{
+			monthRows[i] = new(rowHeight, new Layout.Button[colAmount]);
+
+			for (int j = 0; j < colAmount; j++)
+			{
+				int month = (i - 1) * colAmount + j + 1;
+
+				monthRows[i].Buttons[j] = new(
+					colWidth,
+					new(
+						$"{new DateOnly(1, month, 1).ToString("MMM", Culture).TrimEnd('.')}",
+						FontSize,
+						ForegroundColor
+					),
+					() =>
+					{
+						capturedDate = new(
+							capturedDate.Year,
+							month,
+							Math.Min(capturedDate.Day, DateTime.DaysInMonth(capturedDate.Year, month))
+						);
+						SelectedDatePicker = DatePickers.Days;
+					},
+					new(
+						Transparent,
+						ButtonPressedColor,
+						TransparentButtonHoverColor,
+						new(
+							date.Month == month ? ForegroundColor : TransparentButtonHoverColor,
+							BorderThickness
+						)
+					)
+				);
+			}
+		}
+
+		Layout.DrawButtonGrid(x, y, width, height, 0, monthRows);
+
+		date = capturedDate;
+	}
+
+	private static void DrawCalendar(int x, int y, int width, int height, ref DateOnly date)
+	{
+		int daysInMonth = DateTime.DaysInMonth(date.Year, date.Month);
+		int daysInPrevMonth = DateTime.DaysInMonth(date.Year, date.AddMonths(-1).Month);
+		int startingIndex = (int)new DateOnly(date.Year, date.Month, 1).DayOfWeek;
+		int endingIndex = (int)new DateOnly(date.Year, date.Month, daysInMonth).DayOfWeek;
+		int rowAmount = (daysInMonth + startingIndex) switch
+		{
+			<= 28 => 6,
+			<= 35 => 7,
+			_ => 8,
+		};
+		int rowHeight = 100 / rowAmount;
+		int colAmount = 7;
+		int colWidth = 100 / colAmount;
+
+		Layout.ButtonStyle weekButtonStyle = new(DarkerGray, DarkerGray, DarkerGray);
+		Layout.ButtonStyle greyButtonFlat =
+			new(
+				ButtonBackgroundColor,
+				ButtonPressedColor,
+				ButtonHoverColor,
+				new(BorderColor, BorderThickness)
+			);
+		Layout.ButtonRow[] buttonRows = new Layout.ButtonRow[rowAmount];
+
+		// Date to capture in the callbacks
+		DateOnly capturedDate = date;
+
+		buttonRows[0] = new(
+			rowHeight,
+			[
+				new(
+					80,
+					new(date.ToString("MMMM", Culture), FontSize, ForegroundColor),
+					() => CycleEnum(ref SelectedDatePicker),
+					greyButtonFlat
+				),
+				new(
+					10,
+					new("<", FontSize, ForegroundColor),
+					() => capturedDate = capturedDate.AddMonths(-1),
+					greyButtonFlat,
+					Layout.ButtonPressMode.HoldToRepeat
+				),
+				new(
+					10,
+					new(">", FontSize, ForegroundColor),
+					() => capturedDate = capturedDate.AddMonths(1),
+					greyButtonFlat,
+					Layout.ButtonPressMode.HoldToRepeat
+				),
+			]
+		);
+
+		buttonRows[1] = new(
+			rowHeight,
+			[
+				// csharpier-ignore-start
+				new(colWidth, new(GetTranslation("Sun"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(GetTranslation("Mon"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(GetTranslation("Tue"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(GetTranslation("Wed"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(GetTranslation("Thu"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(GetTranslation("Fri"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(GetTranslation("Sat"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				// csharpier-ignore-end
+			]
+		);
+
+		buttonRows[2] = new(rowHeight, new Layout.Button[colAmount]);
+
+		// previous month buttons
+		for (int i = 0; i < startingIndex; i++)
+		{
+			int day = daysInPrevMonth - startingIndex + i + 1;
+
+			buttonRows[2].Buttons[i] = new(
+				colWidth,
+				new($"{day}", FontSize, DarkForegroundColor),
+				() => capturedDate = new(capturedDate.Year, capturedDate.AddMonths(-1).Month, day),
+				new(
+					Transparent,
+					ButtonPressedColor,
+					TransparentButtonHoverColor,
+					new(
+						date == new DateOnly(date.Year, date.AddMonths(-1).Month, day)
+							? ForegroundColor
+							: TransparentButtonHoverColor,
+						BorderThickness
+					)
+				)
+			);
+		}
+
+		// first week buttons
+		for (int i = 1; i < colAmount - startingIndex + 1; i++)
+		{
+			int day = i;
+			buttonRows[2].Buttons[i + startingIndex - 1] = new(
+				colWidth,
+				new($"{i}", FontSize, ForegroundColor),
+				() => capturedDate = new(capturedDate.Year, capturedDate.Month, day),
+				new(
+					Transparent,
+					ButtonPressedColor,
+					TransparentButtonHoverColor,
+					new(
+						date == new DateOnly(date.Year, date.Month, i)
+							? ForegroundColor
+							: TransparentButtonHoverColor,
+						BorderThickness
+					)
+				)
+			);
+		}
+
+		// middle week buttons
+		for (int i = 3; i < rowAmount; i++)
+		{
+			buttonRows[i] = new(rowHeight, new Layout.Button[colAmount]);
+
+			for (int j = 0; j < colAmount; j++)
+			{
+				int day = colAmount - startingIndex + j + 1 + ((i - 3) * 7);
+
+				if (day > daysInMonth)
+				{
+					break;
+				}
+
+				buttonRows[i].Buttons[j] = new(
+					colWidth,
+					new($"{day}", FontSize, ForegroundColor),
+					() => capturedDate = new(capturedDate.Year, capturedDate.Month, day),
+					new(
+						Transparent,
+						ButtonPressedColor,
+						TransparentButtonHoverColor,
+						new(
+							date == new DateOnly(date.Year, date.Month, day)
+								? ForegroundColor
+								: TransparentButtonHoverColor,
+							BorderThickness
+						)
+					)
+				);
+			}
+		}
+
+		// next month buttons
+		for (int i = 1; i < colAmount - endingIndex; i++)
+		{
+			int day = i;
+
+			buttonRows[rowAmount - 1].Buttons[endingIndex + i] = new(
+				colWidth,
+				new($"{i}", FontSize, DarkForegroundColor),
+				() => capturedDate = new(capturedDate.Year, capturedDate.AddMonths(1).Month, day),
+				new(
+					Transparent,
+					ButtonPressedColor,
+					TransparentButtonHoverColor,
+					new(
+						date == new DateOnly(date.Year, date.AddMonths(1).Month, i)
+							? ForegroundColor
+							: TransparentButtonHoverColor,
+						BorderThickness
+					)
+				)
+			);
+		}
+
+		Layout.DrawButtonGrid(x, y, width, height, 0, buttonRows);
+
+		date = capturedDate;
+	}
+
 	private const string APP_VERSION = "1.0.0";
 	private const string APP_LICENSE = "GPL-3.0";
 	private const string APP_NAME = "Calculator";
@@ -208,6 +472,7 @@ public readonly struct CalculatorUI
 		Settings,
 		Converters,
 		Conversions,
+		DateDifference,
 	}
 
 	private enum DropDown
@@ -1418,12 +1683,19 @@ public readonly struct CalculatorUI
 										TransparentButtonHoverColor,
 										() =>
 										{
-											CurrentConverter = i;
-											ConverterFromIndex = 0;
-											ConverterToIndex = 0;
-											ConverterExpression = "";
-											ConverterResult = "";
-											ConverterTypingIndex = 0;
+											if (Converters[i].Title == "Date")
+											{
+												CurrentScene = Scene.DateDifference;
+											}
+											else
+											{
+												CurrentConverter = i;
+												ConverterFromIndex = 0;
+												ConverterToIndex = 0;
+												ConverterExpression = "";
+												ConverterResult = "";
+												ConverterTypingIndex = 0;
+											}
 										},
 										borderStyle: new(
 											CurrentConverter == i ? ButtonSelectedColor : Transparent,
@@ -2031,6 +2303,112 @@ public readonly struct CalculatorUI
 										)
 									);
 								}
+							}
+							break;
+						case Scene.DateDifference:
+							{
+								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								{
+									CurrentScene = Scene.Converters;
+								}
+
+								Layout.DrawButton(
+									0,
+									0,
+									topIconSize,
+									topIconSize,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() => CurrentScene = Scene.Converters,
+									icon: new(GetResource("close_icon.png"), ForegroundColor)
+								);
+
+								Layout.DrawButton(
+									Padding,
+									topIconSize,
+									ScreenWidth - Padding * 2,
+									(int)textSize.Y,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() => SelectedDateField = DateFields.From,
+									new(
+										$"{GetTranslation("From")}: {ConverterFromDate.ToString(Culture)}",
+										FontSize,
+										ForegroundColor
+									),
+									borderStyle: new(
+										SelectedDateField == DateFields.From ? ForegroundColor : BorderColor,
+										BorderThickness
+									)
+								);
+
+								Layout.DrawButton(
+									Padding,
+									topIconSize * 2,
+									ScreenWidth - Padding * 2,
+									(int)textSize.Y,
+									Transparent,
+									ButtonPressedColor,
+									TransparentButtonHoverColor,
+									() => SelectedDateField = DateFields.To,
+									new(
+										$"{GetTranslation("To")}: {ConverterToDate.ToString(Culture)}",
+										FontSize,
+										ForegroundColor
+									),
+									borderStyle: new(
+										SelectedDateField == DateFields.To ? ForegroundColor : BorderColor,
+										BorderThickness
+									)
+								);
+
+								Layout.DrawTextBox(
+									Padding,
+									topIconSize * 3,
+									ScreenWidth - Padding * 2,
+									(int)textSize.Y,
+									new(
+										DateDifferenceDescription(ConverterFromDate, ConverterToDate),
+										FontSize,
+										ForegroundColor
+									),
+									TransparentButtonHoverColor
+								);
+
+								int datePickerY = topIconSize * 4;
+								ref DateOnly date = ref SelectedDateField == DateFields.From
+									? ref ConverterFromDate
+									: ref ConverterToDate;
+
+								if (SelectedDatePicker == DatePickers.Days)
+								{
+									DrawCalendar(0, datePickerY, ScreenWidth, ScreenHeight - datePickerY, ref date);
+								}
+								else if (SelectedDatePicker == DatePickers.Months)
+								{
+									DrawCalendarMonths(
+										0,
+										datePickerY,
+										ScreenWidth,
+										ScreenHeight - datePickerY,
+										ref date
+									);
+								}
+
+								Layout.DrawText(
+									0,
+									0,
+									ScreenWidth,
+									ScreenHeight,
+									0,
+									GetTranslation("Difference between dates"),
+									ForegroundColor,
+									Transparent,
+									FontSize,
+									Layout.TextAlignment.Top
+								);
 							}
 							break;
 						default:

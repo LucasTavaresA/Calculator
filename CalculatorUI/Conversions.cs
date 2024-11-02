@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
+using static Calculator.Translations;
+
 namespace Calculator;
 
 internal readonly struct Conversions
@@ -552,5 +554,73 @@ internal readonly struct Conversions
 				new("sextant", 60),
 			]
 		),
+		// NOTE(LucasTA): Special case that uses a separate scene
+		new("Date", "calendar_icon.png", []),
 	];
+}
+
+internal readonly struct DateConversion
+{
+	internal enum DateFields
+	{
+		From,
+		To,
+	}
+
+	internal enum DatePickers
+	{
+		Days,
+		Months,
+	}
+
+	internal static DateOnly ConverterFromDate = DateOnly.FromDateTime(DateTime.Now);
+	internal static DateOnly ConverterToDate = DateOnly.FromDateTime(DateTime.Now);
+	internal static DateFields SelectedDateField = DateFields.From;
+	internal static DatePickers SelectedDatePicker = DatePickers.Days;
+
+	internal static string DateDifferenceDescription(DateOnly start, DateOnly end)
+	{
+		if (start > end)
+		{
+			(start, end) = (end, start);
+		}
+
+		int years = end.Year - start.Year;
+		int months = end.Month - start.Month;
+		int days = end.Day - start.Day;
+
+		// Adjust for negative days or months
+		if (days < 0)
+		{
+			months--;
+			days += DateTime.DaysInMonth(end.Year, end.Month == 1 ? 12 : end.Month - 1);
+		}
+
+		if (months < 0)
+		{
+			years--;
+			months += 12;
+		}
+
+		string result = "";
+
+		if (years > 0)
+			result += $"{years} {GetTranslation($"year{(years != 1 ? "s" : "")}")}";
+
+		if (months > 0)
+		{
+			if (result.Length > 0)
+				result += ", ";
+			result += $"{months} {GetTranslation($"month{(months != 1 ? "s" : "")}")}";
+		}
+
+		if (days > 0)
+		{
+			if (result.Length > 0)
+				result += $", {GetTranslation("and")} ";
+			result += $"{days} {GetTranslation($"day{(days != 1 ? "s" : "")}")}";
+		}
+
+		return result;
+	}
 }
