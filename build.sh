@@ -106,4 +106,4 @@ else
   echo "You need to be in the repo directory to build!"
 fi
 
-./after.sh
+./after.sh | exit 0

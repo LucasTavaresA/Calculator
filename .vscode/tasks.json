@@ -1,0 +1,57 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "debug",
+			"type": "shell",
+			"dependsOn": "clean",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"-o",
+				"build",
+				"-f",
+				"net8.0",
+				"CalculatorDesktop", 
+				"/p:DEBUG=\"1\""
+			],
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "release",
+			"type": "shell",			
+			"dependsOn": "clean",
+			"command": "dotnet",
+			"args": [
+				"build",
+				"-o",
+				"build",
+				"-f",
+				"net8.0",
+				"-c",
+				"Release",
+				"CalculatorDesktop"
+			],
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "clean",
+			"type": "shell",			
+			"command": "rm",
+			"args": [
+				"-rf",
+				"./**/bin/", 
+				"./**/obj/",
+				"./build/",
+			],
+		}
+	]
+}

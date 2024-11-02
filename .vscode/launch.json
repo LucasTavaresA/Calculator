@@ -1,0 +1,27 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "debug",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "debug",
+			"program": "${workspaceFolder}/build/CalculatorDesktop",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"stopAtEntry": false,
+			"console": "internalConsole"
+		},
+		{
+			"name": "release",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "release",
+			"program": "${workspaceFolder}/build/CalculatorDesktop",
+			"args": [],
+			"cwd": "${workspaceFolder}",
+			"stopAtEntry": false,
+			"console": "internalConsole"
+		}
+	]
+}
