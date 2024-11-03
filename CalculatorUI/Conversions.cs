@@ -100,7 +100,7 @@ internal readonly struct Conversions
 
 	private static double ConvertFromBase(double number, double fromBase, double toBase)
 	{
-		return number * toBase / fromBase;
+		return number * fromBase / toBase;
 	}
 
 	private static double ConvertTemperature(double number, string from, string to)
