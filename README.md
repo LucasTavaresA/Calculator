@@ -1,7 +1,14 @@
 # Calculator
 
 Crossplatform calculator
-![Calculator](https://github.com/user-attachments/assets/ee04ecc2-901e-450a-bf72-b695008c6995)
+
+https://github.com/user-attachments/assets/1c413f65-0729-42fa-8684-5183473134a3
+
+## Installation
+
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png"
+    alt="Get it on GitHub"
+    height="80">](https://github.com/lucastavaresa/calculator/releases)
 
 ## Build
 
