@@ -11,6 +11,20 @@ cd Calculator
 ./build.sh
 ```
 
+### Build with docker
+
+This will build calculator, get you the executable and delete everything
+
+Install docker then run
+
+```sh
+docker build -t calc .
+docker run --name calc-container calc
+docker cp calc-container:/Calculator/build/CalculatorDesktop Calculator
+docker rm -f calc-container
+docker rmi -f calc
+```
+
 ## Credits
 
 Made with [raylib](https://www.raylib.com/), used [Raylib-cs](https://github.com/ChrisDill/Raylib-cs) bindings
