@@ -613,7 +613,7 @@ public readonly struct CalculatorUI
 #if ANDROID
 					TouchCount = Raylib.GetTouchPointCount();
 #else
-					MouseScroll = Raylib.GetMouseWheelMove() * 32;
+					MouseScroll = Raylib.GetMouseWheelMove() * 64;
 #endif
 				}
 
@@ -1141,12 +1141,12 @@ public readonly struct CalculatorUI
 										Equal();
 										ButtonPressedTime = 0;
 									}
-									if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
+									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
 									{
 										TypingIndex = Math.Max(0, TypingIndex - 1);
 										ButtonPressedTime = 0;
 									}
-									if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
+									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
 									{
 										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
 										ButtonPressedTime = 0;
