@@ -205,20 +205,20 @@ public readonly struct CalculatorUI
 			rowHeight,
 			[
 				new(
-					80,
+					70,
 					new(date.ToString("MMMM", Culture), FontSize, ForegroundColor),
 					() => CycleEnum(ref SelectedDatePicker),
 					greyButtonFlat
 				),
 				new(
-					10,
+					15,
 					new("<", FontSize, ForegroundColor),
 					() => capturedDate = capturedDate.AddMonths(-1),
 					greyButtonFlat,
 					Layout.ButtonPressMode.HoldToRepeat
 				),
 				new(
-					10,
+					15,
 					new(">", FontSize, ForegroundColor),
 					() => capturedDate = capturedDate.AddMonths(1),
 					greyButtonFlat,
@@ -1734,7 +1734,12 @@ public readonly struct CalculatorUI
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
 
-								DrawConverterButtons(0, leftButtonSize, leftButtonSize, ScreenHeight - leftButtonSize);
+								DrawConverterButtons(
+									0,
+									leftButtonSize,
+									leftButtonSize,
+									ScreenHeight - leftButtonSize
+								);
 
 								// NOTE(LucasTA): To avoid indexes breaking as we change scene to date stuff
 								if (CurrentScene == Scene.DateConverter)
@@ -2366,9 +2371,14 @@ public readonly struct CalculatorUI
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
 
-								DrawConverterButtons(0, leftButtonSize, leftButtonSize, ScreenHeight - leftButtonSize);
+								DrawConverterButtons(
+									0,
+									leftButtonSize,
+									leftButtonSize,
+									ScreenHeight - leftButtonSize
+								);
 
-								int fromY = leftButtonSize;
+								int fromY = topIconSize;
 
 								Layout.DrawButton(
 									leftButtonSize,
@@ -2394,7 +2404,7 @@ public readonly struct CalculatorUI
 
 								if (Converters[CurrentConverter].Title == "DateDifference")
 								{
-									int toY = fromY + leftButtonSize;
+									int toY = fromY + topIconSize;
 
 									Layout.DrawButton(
 										leftButtonSize,
@@ -2416,7 +2426,7 @@ public readonly struct CalculatorUI
 										)
 									);
 
-									int differenceY = toY + leftButtonSize;
+									int differenceY = toY + topIconSize;
 
 									Layout.DrawTextBox(
 										leftButtonSize,
@@ -2431,11 +2441,11 @@ public readonly struct CalculatorUI
 										TransparentButtonHoverColor
 									);
 
-									datePickerY = differenceY + leftButtonSize;
+									datePickerY = differenceY + topIconSize;
 								}
 								else if (Converters[CurrentConverter].Title == "DateAddSub")
 								{
-									int differenceY = fromY + leftButtonSize;
+									int differenceY = fromY + topIconSize;
 
 									Layout.DrawTextBox(
 										leftButtonSize,
@@ -2455,7 +2465,7 @@ public readonly struct CalculatorUI
 									int rowHeight = 100 / rowAmount;
 									int colWidth = 100 / colAmount;
 
-									int addSubY = differenceY + leftButtonSize;
+									int addSubY = differenceY + topIconSize;
 
 									Layout.DrawButtonGrid(
 										leftButtonSize,
@@ -2497,7 +2507,7 @@ public readonly struct CalculatorUI
 										leftButtonSize,
 										datePickerY,
 										ScreenWidth - leftButtonSize,
-										ScreenHeight - datePickerY,
+										Math.Min(ScreenWidth - leftButtonSize, ScreenHeight - datePickerY),
 										ref date
 									);
 								}
@@ -2507,7 +2517,7 @@ public readonly struct CalculatorUI
 										leftButtonSize,
 										datePickerY,
 										ScreenWidth - leftButtonSize,
-										ScreenHeight - datePickerY,
+										Math.Min(ScreenWidth - leftButtonSize, ScreenHeight - datePickerY),
 										ref date
 									);
 								}
