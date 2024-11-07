@@ -231,13 +231,13 @@ public readonly struct CalculatorUI
 			rowHeight,
 			[
 				// csharpier-ignore-start
-				new(colWidth, new(GetTranslation("Sun"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
-				new(colWidth, new(GetTranslation("Mon"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
-				new(colWidth, new(GetTranslation("Tue"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
-				new(colWidth, new(GetTranslation("Wed"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
-				new(colWidth, new(GetTranslation("Thu"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
-				new(colWidth, new(GetTranslation("Fri"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
-				new(colWidth, new(GetTranslation("Sat"), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Sunday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Monday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Tuesday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Wednesday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Thursday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Friday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
+				new(colWidth, new(Culture.DateTimeFormat.GetDayName(DayOfWeek.Saturday)[..1].ToUpper(), FontSize, ForegroundColor), () => {}, weekButtonStyle),
 				// csharpier-ignore-end
 			]
 		);

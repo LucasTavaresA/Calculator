@@ -595,13 +595,6 @@ internal readonly struct Translations
 					{ "and", "e" },
 					{ "Difference between dates", "Diferença entre datas" },
 					{ "Add/Subtract dates", "Adicionar/Subtrair datas" },
-					{ "Sun", "Dom" },
-					{ "Mon", "Seg" },
-					{ "Tue", "Ter" },
-					{ "Wed", "Qua" },
-					{ "Thu", "Qui" },
-					{ "Fri", "Sex" },
-					{ "Sat", "Sáb" },
 				}
 			},
 		};
