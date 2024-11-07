@@ -554,8 +554,9 @@ internal readonly struct Conversions
 				new("sextant", 60),
 			]
 		),
-		// NOTE(LucasTA): Special case that uses a separate scene
-		new("Date", "calendar_icon.png", []),
+		// NOTE(LucasTA): Special cases that use a separate scenes
+		new("DateDifference", "calendar_clock_icon.png", null),
+		new("DateAddSub", "calendar_plus_icon.png", null),
 	];
 }
 
@@ -577,6 +578,9 @@ internal readonly struct DateConversion
 	internal static DateOnly ConverterToDate = DateOnly.FromDateTime(DateTime.Now);
 	internal static DateFields SelectedDateField = DateFields.From;
 	internal static DatePickers SelectedDatePicker = DatePickers.Days;
+	internal static int DateOpYears = 0;
+	internal static int DateOpMonths = 0;
+	internal static int DateOpDays = 0;
 
 	internal static string DateDifferenceDescription(DateOnly start, DateOnly end)
 	{

@@ -594,6 +594,7 @@ internal readonly struct Translations
 					{ "To", "Para" },
 					{ "and", "e" },
 					{ "Difference between dates", "Diferença entre datas" },
+					{ "Add/Subtract dates", "Adicionar/Subtrair datas" },
 					{ "Sun", "Dom" },
 					{ "Mon", "Seg" },
 					{ "Tue", "Ter" },

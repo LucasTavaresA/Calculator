@@ -31,6 +31,62 @@ namespace Calculator;
 
 public readonly struct CalculatorUI
 {
+	private static void DrawConverterButtons(int x, int y, int width, int height)
+	{
+		int heightPercentage = Math.DivRem(100, Converters.Length, out int remainder);
+		Layout.ButtonRow[] buttonRows = new Layout.ButtonRow[Converters.Length];
+
+		for (int i = 0; i < Converters.Length; i++)
+		{
+			int capturedI = i;
+
+			buttonRows[i] = new Layout.ButtonRow(
+				heightPercentage + (remainder > 0 ? 1 : 0),
+				new Layout.Button(
+					100,
+					null,
+					() =>
+					{
+						if (Converters[capturedI].Title.StartsWith("Date"))
+						{
+							CurrentScene = Scene.DateConverter;
+							SelectedDateField = DateFields.From;
+							DateOpYears = 0;
+							DateOpMonths = 0;
+							DateOpDays = 0;
+						}
+						else
+						{
+							CurrentScene = Scene.Converters;
+						}
+
+						CurrentConverter = capturedI;
+						ConverterFromIndex = 0;
+						ConverterToIndex = 0;
+						ConverterExpression = "";
+						ConverterResult = "";
+						ConverterTypingIndex = 0;
+					},
+					new(
+						CurrentConverter == i ? ButtonPressedColor : MenuEntryBackgroundColor,
+						ButtonPressedColor,
+						TransparentButtonHoverColor,
+						new(CurrentConverter == i ? ButtonSelectedColor : Transparent, BorderThickness),
+						Icon: new(
+							GetResource(Converters[i].Icon),
+							CurrentConverter == i ? ButtonSelectedColor : ButtonDeselectedColor,
+							width
+						)
+					)
+				)
+			);
+
+			remainder--;
+		}
+
+		Layout.DrawButtonGrid(x, y, width, height, 0, buttonRows);
+	}
+
 	private static void DrawCalendarMonths(int x, int y, int width, int height, ref DateOnly date)
 	{
 		// Date to capture in the callbacks
@@ -472,7 +528,7 @@ public readonly struct CalculatorUI
 		Settings,
 		Converters,
 		Conversions,
-		DateDifference,
+		DateConverter,
 	}
 
 	private enum DropDown
@@ -608,6 +664,14 @@ public readonly struct CalculatorUI
 						new(RedButtonShadowColor, ShadowDistance, Layout.ShadowKind.Pillar);
 					Layout.ShadowStyle greenButtonShadow =
 						new(GreenButtonShadowColor, ShadowDistance, Layout.ShadowKind.Pillar);
+
+					Layout.ButtonStyle greyButtonFlat =
+						new(
+							ButtonBackgroundColor,
+							ButtonPressedColor,
+							ButtonHoverColor,
+							new(BorderColor, BorderThickness)
+						);
 
 					Layout.ButtonStyle greyButton =
 						new(
@@ -1656,8 +1720,7 @@ public readonly struct CalculatorUI
 									CurrentScene = Scene.Calculator;
 								}
 
-								int converterAmount = Converters.Length;
-								int leftButtonSize = ScreenHeight / (converterAmount + 1);
+								int leftButtonSize = ScreenHeight / (Converters.Length + 1);
 
 								Layout.DrawButton(
 									0,
@@ -1671,42 +1734,12 @@ public readonly struct CalculatorUI
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
 
-								for (int i = 0; i < converterAmount; i++)
+								DrawConverterButtons(0, leftButtonSize, leftButtonSize, ScreenHeight - leftButtonSize);
+
+								// NOTE(LucasTA): To avoid indexes breaking as we change scene to date stuff
+								if (CurrentScene == Scene.DateConverter)
 								{
-									Layout.DrawButton(
-										0,
-										(i + 1) * leftButtonSize,
-										leftButtonSize,
-										leftButtonSize,
-										CurrentConverter == i ? ButtonPressedColor : MenuEntryBackgroundColor,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() =>
-										{
-											if (Converters[i].Title == "Date")
-											{
-												CurrentScene = Scene.DateDifference;
-											}
-											else
-											{
-												CurrentConverter = i;
-												ConverterFromIndex = 0;
-												ConverterToIndex = 0;
-												ConverterExpression = "";
-												ConverterResult = "";
-												ConverterTypingIndex = 0;
-											}
-										},
-										borderStyle: new(
-											CurrentConverter == i ? ButtonSelectedColor : Transparent,
-											BorderThickness
-										),
-										icon: new(
-											GetResource(Converters[i].Icon),
-											CurrentConverter == i ? ButtonSelectedColor : ButtonDeselectedColor,
-											leftButtonSize
-										)
-									);
+									continue;
 								}
 
 								int converterBoxHeight = (int)textSize.Y * 3;
@@ -1793,7 +1826,7 @@ public readonly struct CalculatorUI
 											Layout.TextAlignment.Left
 										);
 
-										Layout.ButtonRow[] converterButtons =
+										Layout.ButtonRow[] converterDisplayButtons =
 										[
 											new Layout.ButtonRow(
 												100,
@@ -1870,7 +1903,7 @@ public readonly struct CalculatorUI
 											gridButtonSize * gridCols,
 											gridButtonSize,
 											BorderThickness,
-											converterButtons
+											converterDisplayButtons
 										);
 									}
 
@@ -2305,29 +2338,42 @@ public readonly struct CalculatorUI
 								}
 							}
 							break;
-						case Scene.DateDifference:
+						case Scene.DateConverter:
 							{
 								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 								{
 									CurrentScene = Scene.Converters;
+									CurrentConverter = 0;
 								}
+
+								int leftButtonSize = ScreenHeight / (Converters.Length + 1);
 
 								Layout.DrawButton(
 									0,
 									0,
-									topIconSize,
-									topIconSize,
+									leftButtonSize,
+									leftButtonSize,
 									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
-									() => CurrentScene = Scene.Converters,
+									() =>
+									{
+										CurrentScene = Scene.Calculator;
+										// NOTE(LucasTA): To avoid indexes breaking when switching scenes
+										CurrentConverter = 0;
+										ConverterFromIndex = 0;
+									},
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
 
+								DrawConverterButtons(0, leftButtonSize, leftButtonSize, ScreenHeight - leftButtonSize);
+
+								int fromY = leftButtonSize;
+
 								Layout.DrawButton(
-									Padding,
-									topIconSize,
-									ScreenWidth - Padding * 2,
+									leftButtonSize,
+									fromY,
+									ScreenWidth - leftButtonSize,
 									(int)textSize.Y,
 									Transparent,
 									ButtonPressedColor,
@@ -2344,66 +2390,141 @@ public readonly struct CalculatorUI
 									)
 								);
 
-								Layout.DrawButton(
-									Padding,
-									topIconSize * 2,
-									ScreenWidth - Padding * 2,
-									(int)textSize.Y,
-									Transparent,
-									ButtonPressedColor,
-									TransparentButtonHoverColor,
-									() => SelectedDateField = DateFields.To,
-									new(
-										$"{GetTranslation("To")}: {ConverterToDate.ToString(Culture)}",
-										FontSize,
-										ForegroundColor
-									),
-									borderStyle: new(
-										SelectedDateField == DateFields.To ? ForegroundColor : BorderColor,
-										BorderThickness
-									)
-								);
+								int datePickerY = 0;
 
-								Layout.DrawTextBox(
-									Padding,
-									topIconSize * 3,
-									ScreenWidth - Padding * 2,
-									(int)textSize.Y,
-									new(
-										DateDifferenceDescription(ConverterFromDate, ConverterToDate),
-										FontSize,
-										ForegroundColor
-									),
-									TransparentButtonHoverColor
-								);
+								if (Converters[CurrentConverter].Title == "DateDifference")
+								{
+									int toY = fromY + leftButtonSize;
 
-								int datePickerY = topIconSize * 4;
+									Layout.DrawButton(
+										leftButtonSize,
+										toY,
+										ScreenWidth - leftButtonSize,
+										(int)textSize.Y,
+										Transparent,
+										ButtonPressedColor,
+										TransparentButtonHoverColor,
+										() => SelectedDateField = DateFields.To,
+										new(
+											$"{GetTranslation("To")}: {ConverterToDate.ToString(Culture)}",
+											FontSize,
+											ForegroundColor
+										),
+										borderStyle: new(
+											SelectedDateField == DateFields.To ? ForegroundColor : BorderColor,
+											BorderThickness
+										)
+									);
+
+									int differenceY = toY + leftButtonSize;
+
+									Layout.DrawTextBox(
+										leftButtonSize,
+										differenceY,
+										ScreenWidth - leftButtonSize,
+										(int)textSize.Y,
+										new(
+											DateDifferenceDescription(ConverterFromDate, ConverterToDate),
+											FontSize,
+											ForegroundColor
+										),
+										TransparentButtonHoverColor
+									);
+
+									datePickerY = differenceY + leftButtonSize;
+								}
+								else if (Converters[CurrentConverter].Title == "DateAddSub")
+								{
+									int differenceY = fromY + leftButtonSize;
+
+									Layout.DrawTextBox(
+										leftButtonSize,
+										differenceY,
+										ScreenWidth - leftButtonSize,
+										(int)textSize.Y,
+										new(
+											$"{ConverterFromDate.AddYears(DateOpYears).AddMonths(DateOpMonths).AddDays(DateOpDays)}",
+											FontSize,
+											ForegroundColor
+										),
+										TransparentButtonHoverColor
+									);
+
+									int rowAmount = 3;
+									int colAmount = 3;
+									int rowHeight = 100 / rowAmount;
+									int colWidth = 100 / colAmount;
+
+									int addSubY = differenceY + leftButtonSize;
+
+									Layout.DrawButtonGrid(
+										leftButtonSize,
+										addSubY,
+										ScreenWidth - leftButtonSize,
+										(int)textSize.Y * 3,
+										0,
+										[
+											// csharpier-ignore-start
+												new(rowHeight, [
+													new(colWidth, new("^", FontSize, ForegroundColor), () => DateOpYears++, greyButton, Layout.ButtonPressMode.HoldToRepeat),
+													new(colWidth, new("^", FontSize, ForegroundColor), () => DateOpMonths++, greyButton, Layout.ButtonPressMode.HoldToRepeat),
+													new(colWidth, new("^", FontSize, ForegroundColor), () => DateOpDays++, greyButton, Layout.ButtonPressMode.HoldToRepeat),
+												]),
+												new(rowHeight, [
+													new(colWidth, new($"{GetTranslation("years")} {DateOpYears}", FontSize, ForegroundColor), () => {}, greyButtonFlat),
+													new(colWidth, new($"{GetTranslation("months")} {DateOpMonths}", FontSize, ForegroundColor), () => {}, greyButtonFlat),
+													new(colWidth, new($"{GetTranslation("days")} {DateOpDays}", FontSize, ForegroundColor), () => {}, greyButtonFlat),
+												]),
+												new(rowHeight, [
+													new(colWidth, new("v", FontSize, ForegroundColor), () => DateOpYears--, greyButton, Layout.ButtonPressMode.HoldToRepeat),
+													new(colWidth, new("v", FontSize, ForegroundColor), () => DateOpMonths--, greyButton, Layout.ButtonPressMode.HoldToRepeat),
+													new(colWidth, new("v", FontSize, ForegroundColor), () => DateOpDays--, greyButton, Layout.ButtonPressMode.HoldToRepeat),
+												]),
+											// csharpier-ignore-end
+										]
+									);
+
+									datePickerY = addSubY + (int)textSize.Y * 3 + Padding;
+								}
+
 								ref DateOnly date = ref SelectedDateField == DateFields.From
 									? ref ConverterFromDate
 									: ref ConverterToDate;
 
 								if (SelectedDatePicker == DatePickers.Days)
 								{
-									DrawCalendar(0, datePickerY, ScreenWidth, ScreenHeight - datePickerY, ref date);
+									DrawCalendar(
+										leftButtonSize,
+										datePickerY,
+										ScreenWidth - leftButtonSize,
+										ScreenHeight - datePickerY,
+										ref date
+									);
 								}
 								else if (SelectedDatePicker == DatePickers.Months)
 								{
 									DrawCalendarMonths(
-										0,
+										leftButtonSize,
 										datePickerY,
-										ScreenWidth,
+										ScreenWidth - leftButtonSize,
 										ScreenHeight - datePickerY,
 										ref date
 									);
 								}
 
 								Layout.DrawText(
+									leftButtonSize,
 									0,
-									0,
-									ScreenWidth,
+									ScreenWidth - leftButtonSize,
 									ScreenHeight,
 									0,
-									GetTranslation("Difference between dates"),
+									GetTranslation(
+										Converters[CurrentConverter].Title switch
+										{
+											"DateDifference" => "Difference between dates",
+											_ => "Add/Subtract dates",
+										}
+									),
 									ForegroundColor,
 									Transparent,
 									FontSize,
