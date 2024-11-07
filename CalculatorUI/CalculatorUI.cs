@@ -1230,95 +1230,106 @@ public readonly struct CalculatorUI
 
 								// top buttons
 								{
-									Layout.DrawButton(
-										0,
-										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() => CurrentScene = Scene.Settings,
-										icon: new(GetResource("settings_icon.png"), ForegroundColor)
-									);
+									int topButtonAmount = 7;
+									int topButtonWidth = 100 / topButtonAmount;
 
-									Layout.DrawButton(
-										topIconSize + Padding,
+									Layout.DrawButtonGrid(
 										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() => CurrentScene = Scene.Converters,
-										icon: new(GetResource("ruler_icon.png"), ForegroundColor)
-									);
-
-									Layout.DrawButton(
-										(topIconSize + Padding) * 2,
 										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() =>
-										{
-											Settings.FunctionsOpened = !Settings.FunctionsOpened;
-											Settings.Save();
-										},
-										icon: new(GetResource("function_icon.png"), ForegroundColor)
-									);
-
-									Layout.DrawButton(
-										ScreenWidth - topIconSize,
-										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() => CurrentScene = Scene.History,
-										icon: new(GetResource("history_icon.png"), ForegroundColor)
-									);
-
-									Layout.DrawButton(
-										ScreenWidth - topIconSize * 2 - Padding,
-										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() => Clipboard.Set(Expression),
-										icon: new(GetResource("copy_icon.png"), ForegroundColor)
-									);
-
-									Layout.DrawButton(
-										ScreenWidth - topIconSize * 3 - Padding * 2,
-										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() =>
-										{
-											InsertExpression(Clipboard.Get());
-										},
-										icon: new(GetResource("paste_icon.png"), ForegroundColor)
-									);
-
-									Layout.DrawButton(
-										ScreenWidth - topIconSize * 4 - Padding * 3,
-										0,
-										topIconSize,
-										topIconSize,
-										Transparent,
-										ButtonPressedColor,
-										TransparentButtonHoverColor,
-										() => History.Add(Expression),
-										icon: new(GetResource("bookmark_add_icon.png"), ForegroundColor)
+										ScreenWidth,
+										(ScreenHeight + ScreenWidth) / 28,
+										Padding,
+										[
+											new(
+												100,
+												[
+													new(
+														topButtonWidth,
+														null,
+														() => CurrentScene = Scene.Settings,
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("settings_icon.png"), ForegroundColor)
+														)
+													),
+													new(
+														topButtonWidth,
+														null,
+														() => CurrentScene = Scene.Converters,
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("ruler_icon.png"), ForegroundColor)
+														)
+													),
+													new(
+														topButtonWidth,
+														null,
+														() =>
+														{
+															Settings.FunctionsOpened = !Settings.FunctionsOpened;
+															Settings.Save();
+														},
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("function_icon.png"), ForegroundColor)
+														)
+													),
+													new(
+														topButtonWidth,
+														null,
+														() => History.Add(Expression),
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("bookmark_add_icon.png"), ForegroundColor)
+														)
+													),
+													new(
+														topButtonWidth,
+														null,
+														() =>
+														{
+															InsertExpression(Clipboard.Get());
+														},
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("paste_icon.png"), ForegroundColor)
+														)
+													),
+													new(
+														topButtonWidth,
+														null,
+														() => Clipboard.Set(Expression),
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("copy_icon.png"), ForegroundColor)
+														)
+													),
+													new(
+														topButtonWidth,
+														null,
+														() => CurrentScene = Scene.History,
+														new(
+															Transparent,
+															ButtonPressedColor,
+															TransparentButtonHoverColor,
+															Icon: new(GetResource("history_icon.png"), ForegroundColor)
+														)
+													),
+												]
+											),
+										]
 									);
 								}
 							}
