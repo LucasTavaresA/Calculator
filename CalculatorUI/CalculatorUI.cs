@@ -54,6 +54,8 @@ public readonly struct CalculatorUI
 							DateOpYears = 0;
 							DateOpMonths = 0;
 							DateOpDays = 0;
+							ConverterFromDate = DateOnly.FromDateTime(DateTime.Now);
+							ConverterToDate = DateOnly.FromDateTime(DateTime.Now);
 						}
 						else
 						{
@@ -701,6 +703,8 @@ public readonly struct CalculatorUI
 							ShadowStyle: greenButtonShadow
 						);
 
+					string converting = Converters[CurrentConverter].Title;
+
 					switch (CurrentScene)
 					{
 						case Scene.Calculator:
@@ -1257,7 +1261,12 @@ public readonly struct CalculatorUI
 													new(
 														topButtonWidth,
 														null,
-														() => CurrentScene = Scene.Converters,
+														() =>
+														{
+															CurrentScene = converting.StartsWith("Date")
+																? Scene.DateConverter
+																: Scene.Converters;
+														},
 														new(
 															Transparent,
 															ButtonPressedColor,
@@ -1745,19 +1754,6 @@ public readonly struct CalculatorUI
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
 
-								DrawConverterButtons(
-									0,
-									leftButtonSize,
-									leftButtonSize,
-									ScreenHeight - leftButtonSize
-								);
-
-								// NOTE(LucasTA): To avoid indexes breaking as we change scene to date stuff
-								if (CurrentScene == Scene.DateConverter)
-								{
-									continue;
-								}
-
 								int converterBoxHeight = (int)textSize.Y * 3;
 
 								// converter display and buttons
@@ -2011,7 +2007,7 @@ public readonly struct CalculatorUI
 											icon: new(GetResource("copy_icon.png"), ForegroundColor)
 										);
 
-										if (Converters[CurrentConverter].Title == "Currency")
+										if (converting == "Currency")
 										{
 											Layout.DrawText(
 												leftButtonSize,
@@ -2035,7 +2031,7 @@ public readonly struct CalculatorUI
 									ScreenWidth - leftButtonSize,
 									ScreenHeight,
 									0,
-									GetTranslation(Converters[CurrentConverter].Title),
+									GetTranslation(converting),
 									ForegroundColor,
 									Transparent,
 									FontSize,
@@ -2239,6 +2235,13 @@ public readonly struct CalculatorUI
 										}
 									}
 								}
+
+								DrawConverterButtons(
+									0,
+									leftButtonSize,
+									leftButtonSize,
+									ScreenHeight - leftButtonSize
+								);
 							}
 							break;
 						case Scene.Conversions:
@@ -2358,8 +2361,7 @@ public readonly struct CalculatorUI
 							{
 								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 								{
-									CurrentScene = Scene.Converters;
-									CurrentConverter = 0;
+									CurrentScene = Scene.Calculator;
 								}
 
 								int leftButtonSize = ScreenHeight / (Converters.Length + 1);
@@ -2372,21 +2374,8 @@ public readonly struct CalculatorUI
 									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
-									() =>
-									{
-										CurrentScene = Scene.Calculator;
-										// NOTE(LucasTA): To avoid indexes breaking when switching scenes
-										CurrentConverter = 0;
-										ConverterFromIndex = 0;
-									},
+									() => CurrentScene = Scene.Calculator,
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
-								);
-
-								DrawConverterButtons(
-									0,
-									leftButtonSize,
-									leftButtonSize,
-									ScreenHeight - leftButtonSize
 								);
 
 								int fromY = topIconSize;
@@ -2413,7 +2402,7 @@ public readonly struct CalculatorUI
 
 								int datePickerY = 0;
 
-								if (Converters[CurrentConverter].Title == "DateDifference")
+								if (converting == "DateDifference")
 								{
 									int toY = fromY + topIconSize;
 
@@ -2454,7 +2443,7 @@ public readonly struct CalculatorUI
 
 									datePickerY = differenceY + topIconSize;
 								}
-								else if (Converters[CurrentConverter].Title == "DateAddSub")
+								else if (converting == "DateAddSub")
 								{
 									int differenceY = fromY + topIconSize;
 
@@ -2540,7 +2529,7 @@ public readonly struct CalculatorUI
 									ScreenHeight,
 									0,
 									GetTranslation(
-										Converters[CurrentConverter].Title switch
+										converting switch
 										{
 											"DateDifference" => "Difference between dates",
 											_ => "Add/Subtract dates",
@@ -2550,6 +2539,13 @@ public readonly struct CalculatorUI
 									Transparent,
 									FontSize,
 									Layout.TextAlignment.Top
+								);
+
+								DrawConverterButtons(
+									0,
+									leftButtonSize,
+									leftButtonSize,
+									ScreenHeight - leftButtonSize
 								);
 							}
 							break;
