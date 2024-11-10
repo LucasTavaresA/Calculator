@@ -352,7 +352,7 @@ public readonly struct CalculatorUI
 		date = capturedDate;
 	}
 
-	private const string APP_VERSION = "2.0.0";
+	private const string APP_VERSION = "3.0.0";
 	private const string APP_LICENSE = "GPL-3.0";
 	private const string APP_NAME = "Calculator";
 	private const int TARGET_FPS = 60;
