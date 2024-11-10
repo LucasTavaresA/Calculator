@@ -8,7 +8,7 @@ RUN apt-get update && apt-get install -y git build-essential libx11-dev \
 
 WORKDIR /Calculator
 
-RUN git clone --depth=1 --recurse-submodules https://github.com/LucasTavaresA/Calculator.git .
+COPY . .
 
 RUN wget https://download.visualstudio.microsoft.com/download/pr/ca6cd525-677e-4d3a-b66c-11348a6f920a/ec395f498f89d0ca4d67d903892af82d/dotnet-sdk-8.0.403-linux-x64.tar.gz
 RUN mkdir -p $HOME/dotnet && tar zxf dotnet-sdk-8.0.403-linux-x64.tar.gz -C $HOME/dotnet
