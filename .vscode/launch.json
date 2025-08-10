@@ -2,10 +2,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "debug",
+			"name": "debug-linux",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "debug",
+			"preLaunchTask": "debug-linux",
 			"program": "${workspaceFolder}/build/CalculatorDesktop",
 			"args": [],
 			"cwd": "${workspaceFolder}",
@@ -13,10 +13,10 @@
 			"console": "internalConsole"
 		},
 		{
-			"name": "release",
+			"name": "release-linux",
 			"type": "coreclr",
 			"request": "launch",
-			"preLaunchTask": "release",
+			"preLaunchTask": "release-linux",
 			"program": "${workspaceFolder}/build/CalculatorDesktop",
 			"args": [],
 			"cwd": "${workspaceFolder}",

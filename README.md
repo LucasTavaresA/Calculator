@@ -15,7 +15,7 @@ https://github.com/user-attachments/assets/1c413f65-0729-42fa-8684-5183473134a3
 ```sh
 git clone https://github.com/LucasTavaresA/Calculator.git
 cd Calculator
-./build.sh
+make
 ```
 
 ### Build with docker

@@ -16,6 +16,6 @@ ENV DOTNET_ROOT=/root/dotnet
 ENV PATH=$PATH:/root/dotnet/
 
 RUN dotnet workload restore
-RUN chmod +x ./build.sh && ./build.sh linux -R
+RUN make release-linux
 
 CMD ["sh"]
