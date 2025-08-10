@@ -1,5 +1,11 @@
 // Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
+// TODO(LucasTA): macros calculator for food
+// TODO(LucasTA): base conversions (hex, dec, oct, bin)
+// TODO(LucasTA): programmer calculator mode
+// TODO(LucasTA): graphing mode
+// TODO(LucasTA): better keybindings for text fields (standart ctrl-..., home/end, etc.)
+// TODO(LucasTA): better year picker ux
 
 #if LINUX || ANDROID || WINDOWS || MACOS
 #else
