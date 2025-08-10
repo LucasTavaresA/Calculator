@@ -22,15 +22,7 @@ make
 
 This will build calculator, get you the executable and delete everything
 
-Install docker then run
-
-```sh
-docker build -t calc .
-docker run --name calc-container calc
-docker cp calc-container:/Calculator/build/CalculatorDesktop Calculator
-docker rm -f calc-container
-docker rmi -f calc
-```
+Install docker then run `make docker-linux` or `make docker-linux CONTAINER=podman` to use podman
 
 ## Credits
 

@@ -1,4 +1,5 @@
 .DEFAULT_GOAL := help
+CONTAINER ?= docker
 
 help:
 	@echo "Usage:"
@@ -20,6 +21,13 @@ debug-linux:
 
 release-linux: clean
 	dotnet publish -o build -f net8.0 -c Release CalculatorDesktop
+
+docker-linux: clean
+	$(CONTAINER) build -t calc .
+	$(CONTAINER) run --name calc-container calc
+	$(CONTAINER) cp calc-container:/Calculator/build/CalculatorDesktop Calculator
+	$(CONTAINER) rm -f calc-container
+	$(CONTAINER) rmi -f calc
 
 debug-macos:
 	dotnet build -o build -f net8.0-macos -r osx-x64 CalculatorDesktop /p:DEBUG="1"
