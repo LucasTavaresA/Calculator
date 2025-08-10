@@ -449,7 +449,7 @@ public readonly struct CalculatorUI
 				string result = Evaluator.Evaluate(Expression).ToString(CultureInfo.InvariantCulture);
 				ErrorMessage = "";
 
-				if (Settings.BookmarkOnEval)
+				if (Settings.BookmarkOnEval && result != Expression)
 				{
 					History.Add(Expression);
 				}
