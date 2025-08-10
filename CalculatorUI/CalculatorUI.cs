@@ -3,7 +3,7 @@
 
 #if LINUX || ANDROID || WINDOWS || MACOS
 #else
-#error "Yout need to specify a platform: ANDROID, WINDOWS, MACOS, or LINUX"
+#error "You need to specify a platform: ANDROID, WINDOWS, MACOS or LINUX"
 #endif
 
 using System;
@@ -352,7 +352,7 @@ public readonly struct CalculatorUI
 		date = capturedDate;
 	}
 
-	private const string APP_VERSION = "3.0.0";
+	private const string APP_VERSION = "4.0.0";
 	private const string APP_LICENSE = "GPL-3.0";
 	private const string APP_NAME = "Calculator";
 	private const int TARGET_FPS = 60;
@@ -1345,8 +1345,7 @@ public readonly struct CalculatorUI
 							break;
 						case Scene.History:
 							{
-								List<string> expressions = new(History.PinnedExpressions);
-								expressions.AddRange(History.ExpressionHistory);
+								List<string> expressions = [.. History.PinnedExpressions, .. History.ExpressionHistory];
 
 								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
 								{
@@ -1456,7 +1455,9 @@ public readonly struct CalculatorUI
 									pressMode: Layout.ButtonPressMode.HoldToPress
 								);
 
+								// Draw history entries
 								{
+									// Draws a background that matches the scrollbar color
 									Raylib.DrawRectangle(
 										0,
 										0,

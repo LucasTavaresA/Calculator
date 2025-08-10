@@ -9,8 +9,8 @@
 		<LangVersion>preview</LangVersion>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<ApplicationId>com.lucasta.calculator</ApplicationId>
-		<ApplicationVersion>3</ApplicationVersion>
-		<ApplicationDisplayVersion>3.0.0</ApplicationDisplayVersion>
+		<ApplicationVersion>4</ApplicationVersion>
+		<ApplicationDisplayVersion>4.0.0</ApplicationDisplayVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

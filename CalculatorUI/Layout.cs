@@ -15,6 +15,7 @@ namespace Calculator;
 // also try to deal with text on both sides of the box and overflow properly
 // TODO(LucasTA): Add OverflowMode.Wrap
 // TODO(LucasTA): Allow getting the index for row/column when drawing a button grid
+// TODO(LucasTA): Have a CalculateScroll() function to reduce repetition
 internal readonly struct Layout
 {
 	/// <summary>Tolerable difference between colors</summary>
