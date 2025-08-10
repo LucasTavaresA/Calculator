@@ -1353,6 +1353,20 @@ public readonly struct CalculatorUI
 									CurrentScene = Scene.Calculator;
 								}
 
+								int historyTextWidth = menuEntryWidth / 2;
+								int resultTextX = menuEntryX + historyTextWidth;
+								Layout.TextAlignment historyTextAlignment = Layout.TextAlignment.BottomLeft;
+								Layout.TextAlignment resultTextAlignment = Layout.TextAlignment.BottomRight;
+
+								if (ScreenHeight > ScreenWidth)
+								{
+									menuEntryHeight = (int)textSize.Y * 3 + Padding * 2;
+									historyTextWidth = menuEntryWidth;
+									resultTextX = menuEntryX;
+									historyTextAlignment = Layout.TextAlignment.Left;
+									resultTextAlignment = Layout.TextAlignment.BottomLeft;
+								}
+
 								float maxScrollOffset =
 									Math.Max(0, expressions.Count - menuVisibleEntries) * -menuEntryHeight;
 
@@ -1469,20 +1483,48 @@ public readonly struct CalculatorUI
 									{
 										int menuEntryY = (int)HistoryScrollOffset + i * menuEntryHeight;
 
-										Layout.DrawTextBox(
+										Layout.DrawBox(
 											menuEntryX,
 											menuEntryY,
 											menuEntryWidth,
 											menuEntryHeight,
-											new(
-												expressions[i],
-												FontSize,
-												ForegroundColor,
-												Layout.TextAlignment.BottomLeft,
-												Layout.OverflowMode.Truncate
-											),
 											MenuEntryBackgroundColor,
 											new(BorderColor, BorderThickness)
+										);
+
+										Layout.DrawText(
+											menuEntryX,
+											menuEntryY,
+											historyTextWidth,
+											menuEntryHeight,
+											BorderThickness,
+											expressions[i],
+											ForegroundColor,
+											MenuEntryBackgroundColor,
+											FontSize,
+											historyTextAlignment,
+											Layout.OverflowMode.Truncate
+										);
+
+										string result = "";
+										try
+										{
+											result = Evaluator.Evaluate(expressions[i]).ToString(CultureInfo.InvariantCulture);
+										}
+										catch (Exception) { }
+
+										Layout.DrawText(
+											resultTextX,
+											menuEntryY,
+											historyTextWidth,
+											menuEntryHeight,
+											BorderThickness,
+											result,
+											DarkForegroundColor,
+											MenuEntryBackgroundColor,
+											FontSize,
+											resultTextAlignment,
+											Layout.OverflowMode.Truncate
 										);
 
 										int deleteX = menuEntryX + menuEntryWidth - topIconSize - Padding;
