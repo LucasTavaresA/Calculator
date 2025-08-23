@@ -85,11 +85,11 @@ internal readonly struct Debug
 	internal static void Draw()
 	{
 		Raylib.DrawTextEx(
-			CalculatorUI.Fonte,
+			Calculator.Fonte,
 			Message,
 			new(0, 0),
-			CalculatorUI.FontSize,
-			CalculatorUI.FONT_SPACING,
+			Calculator.FontSize,
+			Calculator.FONT_SPACING,
 			Color.RED
 		);
 	}

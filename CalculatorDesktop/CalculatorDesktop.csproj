@@ -24,7 +24,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="../CalculatorUI/CalculatorUI.csproj" />
+		<ProjectReference Include="../Calculator/Calculator.csproj" />
 	</ItemGroup>
 
 </Project>

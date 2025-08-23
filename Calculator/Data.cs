@@ -19,7 +19,7 @@ internal readonly struct Data
 #elif LINUX || MACOS
 	internal static readonly string DataFolder = UserFolder + "/.local/share/Calculator/";
 #elif ANDROID
-	internal static readonly string DataFolder = CalculatorUI.Context.FilesDir.AbsolutePath;
+	internal static readonly string DataFolder = Calculator.Context.FilesDir.AbsolutePath;
 #endif
 
 	internal static void SaveList(List<string> list, string fileName)

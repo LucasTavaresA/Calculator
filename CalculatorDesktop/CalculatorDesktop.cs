@@ -11,6 +11,6 @@ internal struct CalculatorDesktop
 #endif
 	internal static void Main()
 	{
-		CalculatorUI.MainLoop();
+		Calculator.MainLoop();
 	}
 }

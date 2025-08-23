@@ -66,7 +66,7 @@ internal readonly struct Currency
 			.Deserialize<RatesResponse>(
 				await HttpClient.GetStringAsync(
 					"https://openexchangerates.org/api/latest.json?app_id="
-						+ Resource.LoadStringFromAssembly("CalculatorUI.APIKEY")
+						+ Resource.LoadStringFromAssembly("Calculator.APIKEY")
 				)
 			)
 			.rates;

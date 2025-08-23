@@ -165,10 +165,10 @@ internal readonly struct Layout
 		height -= padding * 2;
 
 		Vector2 textSize = Raylib.MeasureTextEx(
-			CalculatorUI.Fonte,
+			Calculator.Fonte,
 			text,
 			fontSize,
-			CalculatorUI.FONT_SPACING
+			Calculator.FONT_SPACING
 		);
 
 		// FIXME(LucasTA): stop checking this here when containers are added,
@@ -185,12 +185,12 @@ internal readonly struct Layout
 		{
 			case OverflowMode.Truncate:
 				Vector2 charSize = Raylib.MeasureTextEx(
-					CalculatorUI.Fonte,
+					Calculator.Fonte,
 					"-",
 					fontSize,
-					CalculatorUI.FONT_SPACING
+					Calculator.FONT_SPACING
 				);
-				int charsLimit = width / (int)Math.Ceiling(charSize.X + CalculatorUI.FONT_SPACING);
+				int charsLimit = width / (int)Math.Ceiling(charSize.X + Calculator.FONT_SPACING);
 
 				if (charsLimit <= 3)
 				{
@@ -202,10 +202,10 @@ internal readonly struct Layout
 				}
 
 				textSize = Raylib.MeasureTextEx(
-					CalculatorUI.Fonte,
+					Calculator.Fonte,
 					text,
 					fontSize,
-					CalculatorUI.FONT_SPACING
+					Calculator.FONT_SPACING
 				);
 				break;
 			case OverflowMode.Shrink:
@@ -215,10 +215,10 @@ internal readonly struct Layout
 					fontSize -= 1;
 
 					textSize = Raylib.MeasureTextEx(
-						CalculatorUI.Fonte,
+						Calculator.Fonte,
 						text,
 						fontSize,
-						CalculatorUI.FONT_SPACING
+						Calculator.FONT_SPACING
 					);
 				}
 				break;
@@ -275,11 +275,11 @@ internal readonly struct Layout
 		}
 
 		Raylib.DrawTextEx(
-			CalculatorUI.Fonte,
+			Calculator.Fonte,
 			text,
 			new(textX, textY),
 			fontSize,
-			CalculatorUI.FONT_SPACING,
+			Calculator.FONT_SPACING,
 			textColor
 		);
 	}
@@ -328,13 +328,13 @@ internal readonly struct Layout
 	)
 	{
 		if (
-			!CalculatorUI.Dragging
-			&& !CalculatorUI.ButtonWasPressed
+			!Calculator.Dragging
+			&& !Calculator.ButtonWasPressed
 			&& Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)
-			&& IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height)
+			&& IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height)
 			&& IsPointInsideRect(
-				CalculatorUI.MousePressedX,
-				CalculatorUI.MousePressedY,
+				Calculator.MousePressedX,
+				Calculator.MousePressedY,
 				x,
 				y,
 				width,
@@ -342,10 +342,10 @@ internal readonly struct Layout
 			)
 		)
 		{
-			CalculatorUI.ButtonWasHeldPressed = false;
-			CalculatorUI.ButtonWasPressed = true;
-			CalculatorUI.ButtonPressedTime = 0;
-			CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+			Calculator.ButtonWasHeldPressed = false;
+			Calculator.ButtonWasPressed = true;
+			Calculator.ButtonPressedTime = 0;
+			Calculator.KeyRepeatInterval = Calculator.INITIAL_REPEAT_INTERVAL;
 
 			if (pressMode != ButtonPressMode.HoldToPress)
 			{
@@ -354,15 +354,15 @@ internal readonly struct Layout
 		}
 		else if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
 		{
-			if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
+			if (IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height))
 			{
 				if (
-					!CalculatorUI.Dragging
-					&& !CalculatorUI.ButtonWasHeldPressed
-					&& !CalculatorUI.ButtonWasPressed
+					!Calculator.Dragging
+					&& !Calculator.ButtonWasHeldPressed
+					&& !Calculator.ButtonWasPressed
 					&& IsPointInsideRect(
-						CalculatorUI.MousePressedX,
-						CalculatorUI.MousePressedY,
+						Calculator.MousePressedX,
+						Calculator.MousePressedY,
 						x,
 						y,
 						width,
@@ -381,7 +381,7 @@ internal readonly struct Layout
 					if (pressMode == ButtonPressMode.HoldToPress)
 					{
 						progress = (int)(
-							height / CalculatorUI.ButtonHoldToPressTime * CalculatorUI.ButtonPressedTime
+							height / Calculator.ButtonHoldToPressTime * Calculator.ButtonPressedTime
 						);
 					}
 
@@ -404,30 +404,30 @@ internal readonly struct Layout
 						);
 					}
 
-					CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
+					Calculator.ButtonPressedTime += Raylib.GetFrameTime();
 
 					if (
 						pressMode == ButtonPressMode.HoldToRepeat
-						&& CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval
+						&& Calculator.ButtonPressedTime >= Calculator.KeyRepeatInterval
 					)
 					{
-						CalculatorUI.ButtonWasPressed = true;
-						CalculatorUI.ButtonPressedTime = 0;
-						CalculatorUI.KeyRepeatInterval = Math.Max(
-							CalculatorUI.KeyRepeatInterval * CalculatorUI.INITIAL_REPEAT_INTERVAL,
-							CalculatorUI.MIN_REPEAT_INTERVAL
+						Calculator.ButtonWasPressed = true;
+						Calculator.ButtonPressedTime = 0;
+						Calculator.KeyRepeatInterval = Math.Max(
+							Calculator.KeyRepeatInterval * Calculator.INITIAL_REPEAT_INTERVAL,
+							Calculator.MIN_REPEAT_INTERVAL
 						);
 						callback();
 					}
 					else if (
 						pressMode == ButtonPressMode.HoldToPress
-						&& CalculatorUI.ButtonPressedTime >= CalculatorUI.ButtonHoldToPressTime
+						&& Calculator.ButtonPressedTime >= Calculator.ButtonHoldToPressTime
 					)
 					{
-						CalculatorUI.ButtonWasHeldPressed = true;
-						CalculatorUI.ButtonWasPressed = true;
-						CalculatorUI.ButtonPressedTime = 0;
-						CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+						Calculator.ButtonWasHeldPressed = true;
+						Calculator.ButtonWasPressed = true;
+						Calculator.ButtonPressedTime = 0;
+						Calculator.KeyRepeatInterval = Calculator.INITIAL_REPEAT_INTERVAL;
 
 						callback();
 					}
@@ -436,7 +436,7 @@ internal readonly struct Layout
 				{
 					backgroundColor =
 #if ANDROID
-						CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor;
+						Calculator.TouchCount > 0 ? hoveredColor : backgroundColor;
 #else
 					hoveredColor;
 #endif
@@ -464,12 +464,12 @@ internal readonly struct Layout
 			else
 			{
 				if (
-					!CalculatorUI.Dragging
-					&& !CalculatorUI.ButtonWasHeldPressed
-					&& !CalculatorUI.ButtonWasPressed
+					!Calculator.Dragging
+					&& !Calculator.ButtonWasHeldPressed
+					&& !Calculator.ButtonWasPressed
 					&& IsPointInsideRect(
-						CalculatorUI.MousePressedX,
-						CalculatorUI.MousePressedY,
+						Calculator.MousePressedX,
+						Calculator.MousePressedY,
 						x,
 						y,
 						width,
@@ -488,7 +488,7 @@ internal readonly struct Layout
 					if (pressMode == ButtonPressMode.HoldToPress)
 					{
 						progress = (int)(
-							height / CalculatorUI.ButtonHoldToPressTime * CalculatorUI.ButtonPressedTime
+							height / Calculator.ButtonHoldToPressTime * Calculator.ButtonPressedTime
 						);
 					}
 
@@ -511,30 +511,30 @@ internal readonly struct Layout
 						);
 					}
 
-					CalculatorUI.ButtonPressedTime += Raylib.GetFrameTime();
+					Calculator.ButtonPressedTime += Raylib.GetFrameTime();
 
 					if (
 						pressMode == ButtonPressMode.HoldToRepeat
-						&& CalculatorUI.ButtonPressedTime >= CalculatorUI.KeyRepeatInterval
+						&& Calculator.ButtonPressedTime >= Calculator.KeyRepeatInterval
 					)
 					{
-						CalculatorUI.ButtonWasPressed = true;
-						CalculatorUI.ButtonPressedTime = 0;
-						CalculatorUI.KeyRepeatInterval = Math.Max(
-							CalculatorUI.KeyRepeatInterval * CalculatorUI.INITIAL_REPEAT_INTERVAL,
-							CalculatorUI.MIN_REPEAT_INTERVAL
+						Calculator.ButtonWasPressed = true;
+						Calculator.ButtonPressedTime = 0;
+						Calculator.KeyRepeatInterval = Math.Max(
+							Calculator.KeyRepeatInterval * Calculator.INITIAL_REPEAT_INTERVAL,
+							Calculator.MIN_REPEAT_INTERVAL
 						);
 						callback();
 					}
 					else if (
 						pressMode == ButtonPressMode.HoldToPress
-						&& CalculatorUI.ButtonPressedTime >= CalculatorUI.ButtonHoldToPressTime
+						&& Calculator.ButtonPressedTime >= Calculator.ButtonHoldToPressTime
 					)
 					{
-						CalculatorUI.ButtonWasHeldPressed = true;
-						CalculatorUI.ButtonWasPressed = true;
-						CalculatorUI.ButtonPressedTime = 0;
-						CalculatorUI.KeyRepeatInterval = CalculatorUI.INITIAL_REPEAT_INTERVAL;
+						Calculator.ButtonWasHeldPressed = true;
+						Calculator.ButtonWasPressed = true;
+						Calculator.ButtonPressedTime = 0;
+						Calculator.KeyRepeatInterval = Calculator.INITIAL_REPEAT_INTERVAL;
 
 						callback();
 					}
@@ -564,11 +564,11 @@ internal readonly struct Layout
 		}
 		else
 		{
-			if (IsPointInsideRect(CalculatorUI.MouseX, CalculatorUI.MouseY, x, y, width, height))
+			if (IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height))
 			{
 				backgroundColor =
 #if ANDROID
-					CalculatorUI.TouchCount > 0 ? hoveredColor : backgroundColor;
+					Calculator.TouchCount > 0 ? hoveredColor : backgroundColor;
 #else
 				hoveredColor;
 #endif
@@ -780,8 +780,8 @@ internal readonly struct Layout
 				|| y < 0
 				|| width <= 0
 				|| height <= 0
-				|| x + width > CalculatorUI.ScreenWidth
-				|| y + height > CalculatorUI.ScreenHeight,
+				|| x + width > Calculator.ScreenWidth
+				|| y + height > Calculator.ScreenHeight,
 			"ERROR: Button grid is outside of the screen!\n",
 			x,
 			y,

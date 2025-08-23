@@ -6,6 +6,8 @@
 // TODO(LucasTA): graphing mode
 // TODO(LucasTA): better keybindings for text fields (standart ctrl-..., home/end, etc.)
 // TODO(LucasTA): better year picker ux
+// TODO(LucasTA): make all IO async
+// TODO(LucasTA): sort currencies by last used
 
 #if LINUX || ANDROID || WINDOWS || MACOS
 #else
@@ -35,7 +37,7 @@ using Android.App;
 
 namespace Calculator;
 
-public readonly struct CalculatorUI
+public readonly struct Calculator
 {
 	private static void DrawConverterButtons(int x, int y, int width, int height)
 	{

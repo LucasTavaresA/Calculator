@@ -26,6 +26,6 @@ public class MainActivity : RaylibActivity
 {
 	protected override void OnReady()
 	{
-		CalculatorUI.MainLoop();
+		Calculator.MainLoop();
 	}
 }

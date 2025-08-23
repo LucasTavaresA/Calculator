@@ -14,7 +14,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="../CalculatorUI/CalculatorUI.csproj" />
+		<ProjectReference Include="../Calculator/Calculator.csproj" />
 		<PackageReference Include="Raylib-cs" Version="4.5.0.4" />
 		<PackageReference Include="Raylib-cs.Android" Version="4.5.0.4" />
 	</ItemGroup>
