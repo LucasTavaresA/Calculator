@@ -10,7 +10,7 @@ using Raylib_cs;
 
 namespace Calculator;
 
-internal readonly struct Resource
+internal readonly struct AssemblyResources
 {
 #pragma warning disable
 	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]

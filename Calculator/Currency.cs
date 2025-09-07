@@ -10,6 +10,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+using static Calculator.AssemblyResources;
+
 namespace Calculator;
 
 internal readonly struct Currency
@@ -65,8 +67,7 @@ internal readonly struct Currency
 		Dictionary<string, double> rates = JsonSerializer
 			.Deserialize<RatesResponse>(
 				await HttpClient.GetStringAsync(
-					"https://openexchangerates.org/api/latest.json?app_id="
-						+ Resource.LoadStringFromAssembly("Calculator.APIKEY")
+					"https://openexchangerates.org/api/latest.json?app_id=" + LoadStringFromAssembly("Calculator.APIKEY")
 				)
 			)
 			.rates;

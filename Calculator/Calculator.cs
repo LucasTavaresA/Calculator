@@ -28,7 +28,7 @@ using static Calculator.Conversions;
 using static Calculator.Currency;
 using static Calculator.DateConversion;
 using static Calculator.EnumExtensions;
-using static Calculator.Resource;
+using static Calculator.AssemblyResources;
 using static Calculator.Translations;
 #if ANDROID
 using Android.Content;
