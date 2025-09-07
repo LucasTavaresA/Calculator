@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := help
 CONTAINER ?= docker
+BUILD_DIR ?= ./build/
 
 help:
 	@echo "Usage:"
@@ -11,16 +12,16 @@ help:
 	@echo "  clean                Remove build files"
 
 run:
-	./build/CalculatorDesktop
+	$(BUILD_DIR)CalculatorDesktop
 
 clean:
-	rm -rf ./**/bin/ ./**/obj/ ./build/
+	rm -rf ./**/bin/ ./**/obj/ $(BUILD_DIR)
 
 debug-linux:
-	dotnet build -o build -f net8.0 CalculatorDesktop /p:DEBUG="1"
+	dotnet build -o $(BUILD_DIR) -f net8.0 CalculatorDesktop /p:DEBUG="1"
 
 release-linux: clean
-	dotnet publish -o build -f net8.0 -c Release CalculatorDesktop
+	dotnet publish -o $(BUILD_DIR) -f net8.0 -c Release CalculatorDesktop
 
 docker-linux: clean
 	$(CONTAINER) build -t calc .
@@ -30,27 +31,27 @@ docker-linux: clean
 	$(CONTAINER) rmi -f calc
 
 debug-macos:
-	dotnet build -o build -f net8.0-macos -r osx-x64 CalculatorDesktop /p:DEBUG="1"
+	dotnet build -o $(BUILD_DIR) -f net8.0-macos -r osx-x64 CalculatorDesktop /p:DEBUG="1"
 
 release-macos: clean
-	dotnet publish -o build -f net8.0-macos -r osx-x64 -c Release CalculatorDesktop
+	dotnet publish -o $(BUILD_DIR) -f net8.0-macos -r osx-x64 -c Release CalculatorDesktop
 
 debug-windows:
-	dotnet build -o build -f net8.0-windows -r win-x64 CalculatorDesktop /p:DEBUG="1"
+	dotnet build -o $(BUILD_DIR) -f net8.0-windows -r win-x64 CalculatorDesktop /p:DEBUG="1"
 
 release-windows: clean
-	dotnet publish -o build -f net8.0-windows -r win-x64 -c Release CalculatorDesktop
+	dotnet publish -o $(BUILD_DIR) -f net8.0-windows -r win-x64 -c Release CalculatorDesktop
 
 # Android
 
 debug-android: clean
-	dotnet build -o build CalculatorAndroid /p:DEBUG="1"
+	dotnet build -o $(BUILD_DIR) CalculatorAndroid /p:DEBUG="1"
 
 release-android: clean
-	dotnet publish -o build -c Release CalculatorAndroid
+	dotnet publish -o $(BUILD_DIR) -c Release CalculatorAndroid
 
 # FIXME(LucasTA): This weird name comes from Raylib_cs generated AssemblyManifest.xml
 # maybe just do my own stuff for raylib
 run-android:
-	adb install -r build/com.lucasta.calculator-Signed.apk
+	adb install -r $(BUILD_DIR)com.lucasta.calculator-Signed.apk
 	adb shell am start -n com.lucasta.calculator/crc6480e6caa1236d905b.MainActivity
