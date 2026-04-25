@@ -33,6 +33,7 @@ using static Calculator.Translations;
 #if ANDROID
 using Android.Content;
 using Android.App;
+using Android.Views;
 #endif
 
 namespace Calculator;
@@ -406,6 +407,8 @@ public readonly struct Calculator
 
 	private static readonly Color ToggleOffColor = Color.LIGHTGRAY;
 	private static readonly Color ToggleOnColor = Color.SKYBLUE;
+	private record struct GestureZone(int Left, int Right, int Bottom);
+	private static GestureZone Zone;
 
 	private static void InsertExpression(string value)
 	{
@@ -487,6 +490,41 @@ public readonly struct Calculator
 		Process.Start("open", url);
 #endif
 	}
+
+#if ANDROID
+	private static GestureZone GetSystemGestureZones()
+	{
+		float density = (float)Context.Resources.DisplayMetrics.Density;
+		int left = (int)(16 * density);
+		int right = (int)(16 * density);
+		int bottom = (int)(32 * density);
+
+		if (Context is not Android.App.Activity activity)
+			return new(left, right, bottom);
+
+		if (!OperatingSystem.IsAndroidVersionAtLeast(23))
+			return new(left, right, bottom);
+
+		WindowInsets insets = activity.Window?.DecorView?.RootWindowInsets;
+
+		if (insets is null)
+			return new(left, right, bottom);
+
+		if (OperatingSystem.IsAndroidVersionAtLeast(30))
+		{
+			Android.Graphics.Insets gesture = insets.GetInsetsIgnoringVisibility(WindowInsets.Type.SystemGestures());
+			return new(gesture.Left, gesture.Right, gesture.Bottom);
+		}
+
+		if (OperatingSystem.IsAndroidVersionAtLeast(29))
+		{
+			Android.Graphics.Insets gesture = insets.SystemGestureInsets;
+			return new(gesture.Left, gesture.Right, gesture.Bottom);
+		}
+
+		return new(left, right, bottom);
+	}
+#endif
 
 #if ANDROID
 	internal static Context Context = Application.Context;
@@ -622,6 +660,7 @@ public readonly struct Calculator
 
 #if ANDROID
 					TouchCount = Raylib.GetTouchPointCount();
+					Zone = GetSystemGestureZones();
 #else
 					MouseScroll = Raylib.GetMouseWheelMove() * 64;
 #endif
@@ -632,6 +671,15 @@ public readonly struct Calculator
 					MouseX = Raylib.GetMouseX();
 					MouseY = Raylib.GetMouseY();
 					ButtonWasPressed = false;
+
+					if (
+		MouseX < Zone.Left
+		|| MouseX > ScreenWidth - Zone.Right
+		|| MouseY > ScreenHeight - Zone.Bottom
+)
+					{
+						Dragging = true;
+					}
 
 					if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
 					{
