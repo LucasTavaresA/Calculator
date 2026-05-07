@@ -673,10 +673,10 @@ public readonly struct Calculator
 					ButtonWasPressed = false;
 
 					if (
-		MouseX < Zone.Left
-		|| MouseX > ScreenWidth - Zone.Right
-		|| MouseY > ScreenHeight - Zone.Bottom
-)
+						Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) && MouseX < Zone.Left
+						|| MouseX > ScreenWidth - Zone.Right
+						|| MouseY > ScreenHeight - Zone.Bottom
+					)
 					{
 						Dragging = true;
 					}
