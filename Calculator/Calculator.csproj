@@ -19,7 +19,9 @@
 
 	<ItemGroup>
 		<PackageReference Include="Eval.cs" Version="0.11.0" />
-		<PackageReference Include="Raylib-cs" Version="4.5.0.4" />
+		<PackageReference Include="Raylib-cs" Version="4.5.0.4">
+			<ExcludeAssets Condition="'$(TargetFramework)' == 'net8.0-android'">native</ExcludeAssets>
+		</PackageReference>
 		<EmbeddedResource Include="Resources/*.png">
 			<LogicalName>$([System.String]::new('%(FileName)%(Extension)'))</LogicalName>
 		</EmbeddedResource>
@@ -48,7 +50,6 @@
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-		<PackageReference Include="Raylib-cs.Android" Version="4.5.0.4" />
 		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
 	</ItemGroup>
 
