@@ -50,8 +50,6 @@ debug-android: clean
 release-android: clean
 	dotnet publish -o $(BUILD_DIR) -c Release CalculatorAndroid
 
-# FIXME(LucasTA): This weird name comes from Raylib_cs generated AssemblyManifest.xml
-# maybe just do my own stuff for raylib
 run-android:
 	adb install -r $(BUILD_DIR)com.lucasta.calculator-Signed.apk
-	adb shell am start -n com.lucasta.calculator/crc6480e6caa1236d905b.MainActivity
+	adb shell am start -n com.lucasta.calculator/com.lucasta.calculator.MainActivity

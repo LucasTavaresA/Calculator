@@ -11,6 +11,7 @@ namespace Calculator;
 
 [
 	Activity(
+		Name = "com.lucasta.calculator.MainActivity",
 		Label = "@string/app_name",
 		MainLauncher = true,
 		ConfigurationChanges = ConfigChanges.Orientation
