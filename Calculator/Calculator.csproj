@@ -18,9 +18,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<TrimmerRootNamespace Include="System.Windows.Forms.Clipboard" />
-		<TrimmerRootNamespace Include="System.Text.Json" />
-		<TrimmerRootNamespace Include="System.Collections.Generic" />
 		<PackageReference Include="Eval.cs" Version="0.11.0" />
 		<PackageReference Include="Raylib-cs" Version="4.5.0.4" />
 		<EmbeddedResource Include="Resources/*.png">
@@ -58,9 +55,6 @@
 	<!-- WINDOWS -->
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
 		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-		<UseWindowsForms>true</UseWindowsForms>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<UseWPF>false</UseWPF>
 	</PropertyGroup>
 
 	<!-- LINUX -->

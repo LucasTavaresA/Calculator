@@ -10,11 +10,14 @@
 		<SelfContained>true</SelfContained>
 		<PublishSelfContained>true</PublishSelfContained>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>full</TrimMode>
+		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+		<InvariantGlobalization>true</InvariantGlobalization>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
 		<OutputType>WinExe</OutputType>
-		<UseWindowsForms>true</UseWindowsForms>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<UseWPF>false</UseWPF>
 	</PropertyGroup>

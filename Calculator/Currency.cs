@@ -2,17 +2,24 @@
 // See the LICENSE file in the project root for more information.
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Text.Json.Serialization;
 
 using static Calculator.AssemblyResources;
 
 namespace Calculator;
+
+[JsonSourceGenerationOptions(WriteIndented = true)]
+[JsonSerializable(typeof(Dictionary<string, string>))]
+[JsonSerializable(typeof(Currency.RatesResponse))]
+internal partial class AppJsonContext : JsonSerializerContext
+{
+}
 
 internal readonly struct Currency
 {
@@ -53,22 +60,19 @@ internal readonly struct Currency
 
 	internal static readonly HttpClient HttpClient = new();
 
-	[UnconditionalSuppressMessage(
-		"Warning",
-		"IL2026",
-		Justification = "Trimming is disabled for JSON."
-	)]
 	internal static async Task GetCurrencyRatesAsync()
 	{
-		Dictionary<string, string> currencies = JsonSerializer.Deserialize<Dictionary<string, string>>(
-			await HttpClient.GetStringAsync("https://openexchangerates.org/api/currencies.json")
+		Dictionary<string, string> currencies = JsonSerializer.Deserialize(
+			await HttpClient.GetStringAsync("https://openexchangerates.org/api/currencies.json"),
+			AppJsonContext.Default.DictionaryStringString
 		);
 
 		Dictionary<string, double> rates = JsonSerializer
-			.Deserialize<RatesResponse>(
+			.Deserialize(
 				await HttpClient.GetStringAsync(
 					"https://openexchangerates.org/api/latest.json?app_id=" + LoadStringFromAssembly("Calculator.APIKEY")
-				)
+				),
+				AppJsonContext.Default.RatesResponse
 			)
 			.rates;
 

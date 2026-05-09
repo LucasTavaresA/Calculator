@@ -6,14 +6,51 @@ using System;
 using System.Diagnostics;
 #elif ANDROID
 using Plugin.Clipboard;
+#elif WINDOWS
+using System;
+using System.Runtime.InteropServices;
 #endif
 
 namespace Calculator;
 
 internal readonly struct Clipboard
 {
+#if WINDOWS
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool OpenClipboard(IntPtr hWndNewOwner);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool CloseClipboard();
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern bool EmptyClipboard();
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
+
+	[DllImport("kernel32.dll", SetLastError = true)]
+	private static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
+
+	[DllImport("kernel32.dll", SetLastError = true)]
+	private static extern IntPtr GlobalLock(IntPtr hMem);
+
+	[DllImport("kernel32.dll", SetLastError = true)]
+	private static extern bool GlobalUnlock(IntPtr hMem);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	private static extern IntPtr GetClipboardData(uint uFormat);
+
+	private const uint CF_UNICODETEXT = 13;
+	private const uint GMEM_MOVEABLE = 0x0002;
+#endif
+
 	internal static void Set(string text)
 	{
+		if (string.IsNullOrEmpty(text))
+		{
+			return;
+		}
+
 #if LINUX || MACOS
 		string processName;
 		string args;
@@ -53,13 +90,34 @@ internal readonly struct Clipboard
 			process.WaitForExit();
 		});
 #elif WINDOWS
-		// NOTE(LucasTA): Why SetText fucking crashes on ""? WTF!
-		if (string.IsNullOrEmpty(text))
+		if (!OpenClipboard(IntPtr.Zero))
 		{
 			return;
 		}
 
-		System.Windows.Forms.Clipboard.SetText(text);
+		EmptyClipboard();
+
+		int bytes = (text.Length + 1) * 2;
+		IntPtr hGlobal = GlobalAlloc(GMEM_MOVEABLE, (UIntPtr)bytes);
+		if (hGlobal == IntPtr.Zero)
+		{
+			CloseClipboard();
+			return;
+		}
+
+		IntPtr target = GlobalLock(hGlobal);
+		if (target == IntPtr.Zero)
+		{
+			CloseClipboard();
+			return;
+		}
+
+		Marshal.Copy(text.ToCharArray(), 0, target, text.Length);
+		Marshal.WriteInt16(target, text.Length * 2, 0);
+		GlobalUnlock(hGlobal);
+
+		SetClipboardData(CF_UNICODETEXT, hGlobal);
+		CloseClipboard();
 #elif ANDROID
 		CrossClipboard.Current.SetText(text);
 #endif
@@ -109,7 +167,30 @@ internal readonly struct Clipboard
 
 		return output;
 #elif WINDOWS
-		return System.Windows.Forms.Clipboard.GetText();
+		if (!OpenClipboard(IntPtr.Zero))
+		{
+			return string.Empty;
+		}
+
+		IntPtr handle = GetClipboardData(CF_UNICODETEXT);
+		if (handle == IntPtr.Zero)
+		{
+			CloseClipboard();
+			return string.Empty;
+		}
+
+		IntPtr pointer = GlobalLock(handle);
+		if (pointer == IntPtr.Zero)
+		{
+			CloseClipboard();
+			return string.Empty;
+		}
+
+		string result = Marshal.PtrToStringUni(pointer);
+		GlobalUnlock(handle);
+		CloseClipboard();
+
+		return result;
 #elif ANDROID
 		return CrossClipboard.Current.GetTextAsync().Result;
 #endif

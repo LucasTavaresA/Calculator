@@ -10,9 +10,9 @@ namespace Calculator;
 internal readonly struct EnumExtensions
 {
 	internal static void CycleEnum<T>(ref T enumValue)
-		where T : Enum
+		where T : struct, Enum
 	{
-		T[] enumValues = (T[])Enum.GetValues(typeof(T));
+		T[] enumValues = Enum.GetValues<T>();
 		int currentIndex = Array.IndexOf(enumValues, enumValue);
 		int nextIndex = (currentIndex + 1) % enumValues.Length;
 		enumValue = enumValues[nextIndex];

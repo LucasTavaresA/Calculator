@@ -11,6 +11,10 @@
 		<ApplicationId>com.lucasta.calculator</ApplicationId>
 		<ApplicationVersion>4</ApplicationVersion>
 		<ApplicationDisplayVersion>4.0.0</ApplicationDisplayVersion>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>full</TrimMode>
+		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+		<InvariantGlobalization>true</InvariantGlobalization>
 	</PropertyGroup>
 
 	<ItemGroup>
