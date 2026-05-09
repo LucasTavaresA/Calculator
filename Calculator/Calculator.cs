@@ -407,8 +407,10 @@ public readonly struct Calculator
 
 	private static readonly Color ToggleOffColor = Color.LIGHTGRAY;
 	private static readonly Color ToggleOnColor = Color.SKYBLUE;
+#if ANDROID
 	private record struct GestureZone(int Left, int Right, int Bottom);
 	private static GestureZone Zone;
+#endif
 
 	private static void InsertExpression(string value)
 	{
@@ -672,6 +674,7 @@ public readonly struct Calculator
 					MouseY = Raylib.GetMouseY();
 					ButtonWasPressed = false;
 
+#if ANDROID
 					if (
 						Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) && MouseX < Zone.Left
 						|| MouseX > ScreenWidth - Zone.Right
@@ -680,6 +683,7 @@ public readonly struct Calculator
 					{
 						Dragging = true;
 					}
+#endif
 
 					if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
 					{
