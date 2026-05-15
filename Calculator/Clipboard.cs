@@ -192,7 +192,7 @@ internal readonly struct Clipboard
 
 		return result;
 #elif ANDROID
-		return CrossClipboard.Current.GetTextAsync().Result;
+		return CrossClipboard.Current.GetTextAsync().Result ?? string.Empty;
 #endif
 	}
 }
