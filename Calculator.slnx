@@ -1,0 +1,11 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="Calculator/Calculator.csproj" />
+  <Project Path="CalculatorAndroid/CalculatorAndroid.csproj" />
+  <Project Path="CalculatorDesktop/CalculatorDesktop.csproj" />
+  <Project Path="Raylib-cs/Raylib-cs.csproj" />
+</Solution>
