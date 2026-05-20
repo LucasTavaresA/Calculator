@@ -2,10 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net8.0-windows</TargetFrameworks>
-		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
 		<PublishSingleFile>true</PublishSingleFile>
 		<SelfContained>true</SelfContained>
 		<PublishSelfContained>true</PublishSelfContained>

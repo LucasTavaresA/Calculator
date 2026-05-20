@@ -3,17 +3,13 @@
 	<PropertyGroup>
 		<TargetFrameworks>net8.0;net8.0-android;net8.0-windows</TargetFrameworks>
 		<OutputType>Library</OutputType>
-		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>disable</Nullable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<PackageId>Calculator.cs</PackageId>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
 		<PublishSingleFile>true</PublishSingleFile>
 		<SelfContained>true</SelfContained>
 		<PublishSelfContained>true</PublishSelfContained>
 		<IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-		<PublishTrimmed>true</PublishTrimmed>
 		<TrimmerRootAssembly>Calculator</TrimmerRootAssembly>
 	</PropertyGroup>
 
@@ -44,32 +40,8 @@
 		<EmbeddedResource Include="APIKEY" />
 	</ItemGroup>
 
-	<!-- ANDROID -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-		<DefineConstants>$(DefineConstants);ANDROID</DefineConstants>
-	</PropertyGroup>
-
 	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
 		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0" />
 	</ItemGroup>
 
-	<!-- WINDOWS -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
-		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
-	</PropertyGroup>
-
-	<!-- LINUX -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0'">
-		<DefineConstants>$(DefineConstants);LINUX</DefineConstants>
-	</PropertyGroup>
-
-	<!-- MACOS -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-macos'">
-		<DefineConstants>$(DefineConstants);MACOS</DefineConstants>
-	</PropertyGroup>
-
-	<!-- DEBUG -->
-	<PropertyGroup Condition="'$(DEBUG)' != ''">
-		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
-	</PropertyGroup>
 </Project>

@@ -4,9 +4,6 @@
 		<TargetFramework>net8.0-android</TargetFramework>
 		<OutputType>Exe</OutputType>
 		<Nullable>disable</Nullable>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<ApplicationId>com.lucasta.calculator</ApplicationId>
 		<ApplicationVersion>5</ApplicationVersion>
