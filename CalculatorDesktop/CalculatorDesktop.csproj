@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net8.0-windows</TargetFrameworks>
+		<TargetFrameworks>net10.0;net10.0-windows</TargetFrameworks>
 		<Nullable>disable</Nullable>
 		<PublishSingleFile>true</PublishSingleFile>
 		<SelfContained>true</SelfContained>
@@ -11,15 +11,16 @@
 		<TrimMode>full</TrimMode>
 		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
 		<InvariantGlobalization>true</InvariantGlobalization>
+		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows'">
+	<PropertyGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
 		<OutputType>WinExe</OutputType>
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<UseWPF>false</UseWPF>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(TargetFramework)' != 'net8.0-windows'">
+	<PropertyGroup Condition="'$(TargetFramework)' != 'net10.0-windows'">
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 

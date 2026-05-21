@@ -1,0 +1,22 @@
+--- old
++++ new
+@@ -316,7 +316,8 @@
+ 
+ // To allow easier porting to android, allow the user to define a
+ // custom main function which is called from android_main
+-extern int main(int argc, char *argv[]);
++static void (*_raylib_android_callback)(void) = NULL;
++__attribute__((visibility("default"))) void RaylibSetAndroidCallback(void (*callback)(void)) { _raylib_android_callback = callback; }
+ 
+ // Android main function
+ void android_main(struct android_app *app)
+@@ -324,8 +325,7 @@
+     char arg0[] = "raylib";     // NOTE: argv[] are mutable
+     platform.app = app;
+ 
+-    // NOTE: Return from main is ignored
+-    (void)main(1, (char *[]) { arg0, NULL });
++    if (_raylib_android_callback) _raylib_android_callback();
+ 
+     // Request to end the native activity
+     ANativeActivity_finish(app->activity);

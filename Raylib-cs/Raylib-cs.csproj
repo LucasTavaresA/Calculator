@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>net10.0;net10.0-android;net10.0-windows</TargetFrameworks>
+		<EnableDefaultItems>false</EnableDefaultItems>
+		<AssemblyName>Raylib-cs</AssemblyName>
+		<RootNamespace>Raylib_cs</RootNamespace>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="interop\*.cs" />
+		<Compile Include="types\*.cs" />
+		<Compile Include="types\native\CBool.cs" />
+		<Compile Include="types\native\AnsiBuffer.cs" />
+		<Compile Include="types\native\UTF8Buffer.cs" />
+		<Compile Include="types\native\FilePathList.cs" />
+	</ItemGroup>
+</Project>
