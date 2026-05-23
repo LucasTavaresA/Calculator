@@ -40,9 +40,4 @@
 		<EmbeddedResource Include="APIKEY" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-android'">
-		<PackageReference Include="Xamarin.Plugins.Clipboard" Version="2.3.0"/>
-		<TrimmerRootAssembly Include="Plugin.Clipboard" RootMode="All" />
-	</ItemGroup>
-
 </Project>

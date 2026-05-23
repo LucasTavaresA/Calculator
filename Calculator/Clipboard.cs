@@ -5,7 +5,7 @@
 using System;
 using System.Diagnostics;
 #elif ANDROID
-using Plugin.Clipboard;
+using Android.Content;
 #elif WINDOWS
 using System;
 using System.Runtime.InteropServices;
@@ -119,7 +119,13 @@ internal readonly struct Clipboard
 		SetClipboardData(CF_UNICODETEXT, hGlobal);
 		CloseClipboard();
 #elif ANDROID
-		CrossClipboard.Current.SetText(text);
+		ClipboardManager? clipboard =
+			Calculator.Context.GetSystemService(Context.ClipboardService) as ClipboardManager;
+
+		if (clipboard is null)
+			return;
+
+		clipboard.PrimaryClip = ClipData.NewPlainText("Calculator", text);
 #endif
 	}
 
@@ -192,7 +198,16 @@ internal readonly struct Clipboard
 
 		return result ?? string.Empty;
 #elif ANDROID
-		return CrossClipboard.Current.GetTextAsync().Result ?? string.Empty;
+		ClipboardManager? clipboard =
+			Calculator.Context.GetSystemService(Context.ClipboardService) as ClipboardManager;
+
+		if (clipboard is null || !clipboard.HasPrimaryClip || clipboard.PrimaryClip is null || clipboard.PrimaryClip.ItemCount == 0)
+		{
+				return string.Empty;
+		}
+
+		string? text = clipboard.PrimaryClip.GetItemAt(0)?.CoerceToText(Calculator.Context);
+		return text?.ToString() ?? string.Empty;
 #endif
 	}
 }
