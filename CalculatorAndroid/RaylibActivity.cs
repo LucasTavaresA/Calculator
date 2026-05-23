@@ -1,20 +1,22 @@
-using Android.App;
-using Android.OS;
 using System;
 using System.Runtime.InteropServices;
 
+using Android.App;
+using Android.OS;
+
 namespace Raylib_cs;
 
-public abstract class RaylibActivity : NativeActivity
+public abstract partial class RaylibActivity : NativeActivity
 {
-    protected override void OnCreate(Bundle? savedInstanceState)
-    {
-        RaylibSetAndroidCallback(OnReady);
-        base.OnCreate(savedInstanceState);
-    }
+	protected override void OnCreate(Bundle? savedInstanceState)
+	{
+		RaylibSetAndroidCallback(OnReady);
+		base.OnCreate(savedInstanceState);
+	}
 
-    protected abstract void OnReady();
+	protected abstract void OnReady();
 
-    [DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void RaylibSetAndroidCallback(Action callback);
+	[LibraryImport(Raylib.nativeLibName)]
+	[UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+	private static partial void RaylibSetAndroidCallback(Action callback);
 }

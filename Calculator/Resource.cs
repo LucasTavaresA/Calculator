@@ -11,22 +11,26 @@ using Raylib_cs;
 
 namespace Calculator;
 
-internal readonly struct AssemblyResources
+internal readonly partial struct AssemblyResources
 {
-#pragma warning disable
-	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-	private static extern unsafe Font LoadFontFromMemory(
+	[LibraryImport(Raylib.nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
+	[UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+	private static unsafe partial Font LoadFontFromMemory(
 		string fileType,
-		byte[] fileData,
+		ReadOnlySpan<byte> fileData,
 		int dataSize,
 		int fontSize,
 		int* codepoints,
 		int codepointCount
 	);
 
-	[DllImport("raylib", CallingConvention = CallingConvention.Cdecl)]
-	private static extern Image LoadImageFromMemory(string fileType, byte[] fileData, int dataSize);
-#pragma warning restore
+	[LibraryImport(Raylib.nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
+	[UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
+	private static partial Image LoadImageFromMemory(
+			string fileType,
+			ReadOnlySpan<byte> fileData,
+			int dataSize
+	);
 
 	internal static readonly Assembly Assembly = Assembly.GetExecutingAssembly();
 	internal static readonly Dictionary<string, Texture2D> Resources = [];

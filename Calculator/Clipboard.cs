@@ -13,32 +13,36 @@ using System.Runtime.InteropServices;
 
 namespace Calculator;
 
-internal readonly struct Clipboard
+internal readonly partial struct Clipboard
 {
 #if WINDOWS
-	[DllImport("user32.dll", SetLastError = true)]
-	private static extern bool OpenClipboard(IntPtr hWndNewOwner);
+	[LibraryImport("user32.dll", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool OpenClipboard(IntPtr hWndNewOwner);
 
-	[DllImport("user32.dll", SetLastError = true)]
-	private static extern bool CloseClipboard();
+	[LibraryImport("user32.dll", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool CloseClipboard();
 
-	[DllImport("user32.dll", SetLastError = true)]
-	private static extern bool EmptyClipboard();
+	[LibraryImport("user32.dll", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool EmptyClipboard();
 
-	[DllImport("user32.dll", SetLastError = true)]
-	private static extern IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
+	[LibraryImport("user32.dll", SetLastError = true)]
+	private static partial IntPtr SetClipboardData(uint uFormat, IntPtr hMem);
 
-	[DllImport("kernel32.dll", SetLastError = true)]
-	private static extern IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
+	[LibraryImport("kernel32.dll", SetLastError = true)]
+	private static partial IntPtr GlobalAlloc(uint uFlags, UIntPtr dwBytes);
 
-	[DllImport("kernel32.dll", SetLastError = true)]
-	private static extern IntPtr GlobalLock(IntPtr hMem);
+	[LibraryImport("kernel32.dll", SetLastError = true)]
+	private static partial IntPtr GlobalLock(IntPtr hMem);
 
-	[DllImport("kernel32.dll", SetLastError = true)]
-	private static extern bool GlobalUnlock(IntPtr hMem);
+	[LibraryImport("kernel32.dll", SetLastError = true)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	private static partial bool GlobalUnlock(IntPtr hMem);
 
-	[DllImport("user32.dll", SetLastError = true)]
-	private static extern IntPtr GetClipboardData(uint uFormat);
+	[LibraryImport("user32.dll", SetLastError = true)]
+	private static partial IntPtr GetClipboardData(uint uFormat);
 
 	private const uint CF_UNICODETEXT = 13;
 	private const uint GMEM_MOVEABLE = 0x0002;
