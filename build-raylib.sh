@@ -35,6 +35,7 @@ make TARGET_PLATFORM=PLATFORM_ANDROID \
 	ANDROID_ARCH="$ABI" \
 	ANDROID_API_VERSION=21 \
 	RAYLIB_LIBTYPE=SHARED \
+	CUSTOM_LDFLAGS="-Wl,-z,max-page-size=16384" \
 	-j"$(nproc)"
 
 cp libraylib.6.0.0.so "$ROOT/CalculatorAndroid/Native/$ANDROID_ABI/libraylib.so"
