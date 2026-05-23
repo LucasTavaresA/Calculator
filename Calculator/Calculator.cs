@@ -676,10 +676,11 @@ public readonly struct Calculator
 
 #if ANDROID
 					if (
-						Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) && MouseX < Zone.Left
-						|| MouseX > ScreenWidth - Zone.Right
-						|| MouseY > ScreenHeight - Zone.Bottom
-					)
+							Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) &&
+							(MouseX < Zone.Left
+								|| MouseX > ScreenWidth - Zone.Right
+								|| MouseY > ScreenHeight - Zone.Bottom)
+							)
 					{
 						Dragging = true;
 					}
