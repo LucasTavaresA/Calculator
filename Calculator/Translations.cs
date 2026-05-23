@@ -606,9 +606,9 @@ internal readonly struct Translations
 			return phrase;
 		}
 
-		if (Locales.TryGetValue(Locale, out Dictionary<string, string> translations))
+		if (Locales.TryGetValue(Locale, out Dictionary<string, string>? translations))
 		{
-			if (translations.TryGetValue(phrase, out string translation))
+			if (translations.TryGetValue(phrase, out string? translation))
 			{
 				return translation;
 			}

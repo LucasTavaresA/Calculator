@@ -16,7 +16,7 @@ internal readonly struct History
 		Data.SaveList(PinnedExpressions, "PinnedExpressions");
 	}
 
-	internal static void Add(string expression)
+	internal static void Add(string? expression)
 	{
 		if (string.IsNullOrWhiteSpace(expression))
 		{

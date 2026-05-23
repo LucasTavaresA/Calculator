@@ -21,15 +21,13 @@ internal readonly struct EnumExtensions
 	internal static string GetDescription<T>(ref T value)
 		where T : Enum
 	{
-		FieldInfo field;
-		DescriptionAttribute attribute;
-		string result;
+		FieldInfo? field = value.GetType().GetField(value.ToString());
+		DescriptionAttribute? attribute =
+			field is null
+				? null
+				: (DescriptionAttribute?)
+					Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
 
-		field = value.GetType().GetField(value.ToString());
-		attribute = (DescriptionAttribute)
-			Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute));
-		result = attribute != null ? attribute.Description : string.Empty;
-
-		return result;
+		return attribute?.Description ?? string.Empty;
 	}
 }

@@ -1,6 +1,7 @@
 // Licensed under the GPL3 or later versions of the GPL license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -43,7 +44,8 @@ internal readonly struct AssemblyResources
 
 	internal static string LoadStringFromAssembly(string resource)
 	{
-		using Stream s = Assembly.GetManifestResourceStream(resource);
+		using Stream s = Assembly.GetManifestResourceStream(resource)
+				?? throw new InvalidOperationException($"Embedded resource '{resource}' not found.");
 		using StreamReader sr = new(s);
 		return sr.ReadToEnd();
 	}

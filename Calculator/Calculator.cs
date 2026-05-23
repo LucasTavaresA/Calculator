@@ -431,7 +431,7 @@ public readonly struct Calculator
 
 	internal static readonly Action Backspace = () =>
 	{
-		if (Expression == "" || TypingIndex == 0)
+		if (string.IsNullOrEmpty(Expression) || TypingIndex == 0)
 		{
 			return;
 		}
@@ -484,7 +484,8 @@ public readonly struct Calculator
 #elif LINUX
 		Process.Start("xdg-open", url);
 #elif ANDROID
-		Android.Net.Uri uri = Android.Net.Uri.Parse(url);
+		Android.Net.Uri uri = Android.Net.Uri.Parse(url)
+				?? throw new ArgumentException($"OpenBrowser: Invalid URL '{url}'");
 		Intent intent = new(Intent.ActionView, uri);
 		intent.SetFlags(ActivityFlags.NewTask);
 		Context.StartActivity(intent);
@@ -496,7 +497,7 @@ public readonly struct Calculator
 #if ANDROID
 	private static GestureZone GetSystemGestureZones()
 	{
-		float density = (float)Context.Resources.DisplayMetrics.Density;
+		float density = (float)Context.Resources!.DisplayMetrics!.Density;
 		int left = (int)(16 * density);
 		int right = (int)(16 * density);
 		int bottom = (int)(32 * density);
@@ -507,7 +508,7 @@ public readonly struct Calculator
 		if (!OperatingSystem.IsAndroidVersionAtLeast(23))
 			return new(left, right, bottom);
 
-		WindowInsets insets = activity.Window?.DecorView?.RootWindowInsets;
+		WindowInsets? insets = activity.Window?.DecorView?.RootWindowInsets;
 
 		if (insets is null)
 			return new(left, right, bottom);

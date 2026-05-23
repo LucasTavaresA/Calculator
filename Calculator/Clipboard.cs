@@ -186,11 +186,11 @@ internal readonly struct Clipboard
 			return string.Empty;
 		}
 
-		string result = Marshal.PtrToStringUni(pointer);
+		string? result = Marshal.PtrToStringUni(pointer);
 		GlobalUnlock(handle);
 		CloseClipboard();
 
-		return result;
+		return result ?? string.Empty;
 #elif ANDROID
 		return CrossClipboard.Current.GetTextAsync().Result ?? string.Empty;
 #endif

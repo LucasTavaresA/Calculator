@@ -555,8 +555,8 @@ internal readonly struct Conversions
 			]
 		),
 		// NOTE(LucasTA): Special cases that use a separate scenes
-		new("DateDifference", "calendar_clock_icon.png", null),
-		new("DateAddSub", "calendar_plus_icon.png", null),
+		new("DateDifference", "calendar_clock_icon.png", []),
+		new("DateAddSub", "calendar_plus_icon.png", []),
 	];
 }
 

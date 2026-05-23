@@ -62,19 +62,22 @@ internal readonly struct Currency
 
 	internal static async Task GetCurrencyRatesAsync()
 	{
-		Dictionary<string, string> currencies = JsonSerializer.Deserialize(
-			await HttpClient.GetStringAsync("https://openexchangerates.org/api/currencies.json"),
-			AppJsonContext.Default.DictionaryStringString
-		);
+		Dictionary<string, string> currencies =
+			JsonSerializer.Deserialize(
+				await HttpClient.GetStringAsync("https://openexchangerates.org/api/currencies.json"),
+				AppJsonContext.Default.DictionaryStringString
+			) ?? [];
 
-		Dictionary<string, double> rates = JsonSerializer
-			.Deserialize(
-				await HttpClient.GetStringAsync(
-					"https://openexchangerates.org/api/latest.json?app_id=" + LoadStringFromAssembly("Calculator.APIKEY")
-				),
-				AppJsonContext.Default.RatesResponse
-			)
-			.rates;
+		Dictionary<string, double> rates =
+			JsonSerializer
+				.Deserialize(
+					await HttpClient.GetStringAsync(
+						"https://openexchangerates.org/api/latest.json?app_id="
+							+ LoadStringFromAssembly("Calculator.APIKEY")
+					),
+					AppJsonContext.Default.RatesResponse
+				)
+				.rates ?? [];
 
 		Settings.LastAPICallTime = DateTime.Now;
 		Settings.Save();
