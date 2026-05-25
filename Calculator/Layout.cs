@@ -330,7 +330,7 @@ internal readonly struct Layout
 		if (
 			!Calculator.Dragging
 			&& !Calculator.ButtonWasPressed
-			&& Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT)
+			&& Raylib.IsMouseButtonReleased(MouseButton.Left)
 			&& IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height)
 			&& IsPointInsideRect(
 				Calculator.MousePressedX,
@@ -352,7 +352,7 @@ internal readonly struct Layout
 				callback();
 			}
 		}
-		else if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+		else if (Raylib.IsMouseButtonDown(MouseButton.Left))
 		{
 			if (IsPointInsideRect(Calculator.MouseX, Calculator.MouseY, x, y, width, height))
 			{

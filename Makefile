@@ -25,7 +25,8 @@ clean:
 raylib-linux:
 	make -C raylib/src clean
 	make -C raylib/src PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED -j$(NPROC)
-	cp ./raylib/src/libraylib.so.6.0.0 ./Raylib-cs/native/linux-x64/libraylib.so
+	mkdir -p ./libs/native/linux-x64 || true
+	cp ./raylib/src/libraylib.so.6.0.0 ./libs/native/linux-x64/libraylib.so
 
 debug-linux:
 	dotnet build -o $(BUILD_DIR) -f net10.0 CalculatorDesktop /p:DEBUG="1"
@@ -55,14 +56,14 @@ raylib-windows-mingw:
 	make -C raylib/src PLATFORM=PLATFORM_DESKTOP RAYLIB_LIBTYPE=SHARED \
 		OS=Windows_NT CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar \
 		LDFLAGS="-static -static-libgcc -static-libstdc++" -j$(NPROC)
-	cp ./raylib/src/raylib.dll ./Raylib-cs/native/win-x64/raylib.dll
+	mkdir -p ./libs/native/win-x64 || true
+	cp ./raylib/src/raylib.dll ./libs/native/win-x64/raylib.dll
 
 debug-windows:
-	dotnet build -o $(BUILD_DIR) -f net10.0-windows -r win-x64 CalculatorDesktop /p:DEBUG="1"
+	dotnet build -o $(BUILD_DIR) -f net10.0-windows -r win-x64 CalculatorDesktop /p:DEBUG="1" -p:UseMonoRuntime=false
 
 release-windows: clean
-	dotnet restore CalculatorDesktop/CalculatorDesktop.csproj -r win-x64 -p:TargetFramework=net10.0-windows
-	dotnet publish -o $(BUILD_DIR) -f net10.0-windows -r win-x64 -c Release --no-restore CalculatorDesktop
+	dotnet publish -o $(BUILD_DIR) -f net10.0-windows -r win-x64 -c Release CalculatorDesktop -p:UseMonoRuntime=false
 
 # Android
 raylib-android:

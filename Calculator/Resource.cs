@@ -13,7 +13,7 @@ namespace Calculator;
 
 internal readonly partial struct AssemblyResources
 {
-	[LibraryImport(Raylib.nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
+	[LibraryImport(Raylib.NativeLibName, StringMarshalling = StringMarshalling.Utf8)]
 	[UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
 	private static unsafe partial Font LoadFontFromMemory(
 		string fileType,
@@ -24,7 +24,7 @@ internal readonly partial struct AssemblyResources
 		int codepointCount
 	);
 
-	[LibraryImport(Raylib.nativeLibName, StringMarshalling = StringMarshalling.Utf8)]
+	[LibraryImport(Raylib.NativeLibName, StringMarshalling = StringMarshalling.Utf8)]
 	[UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
 	private static partial Image LoadImageFromMemory(
 			string fileType,

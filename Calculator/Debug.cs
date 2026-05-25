@@ -90,7 +90,7 @@ internal readonly struct Debug
 			new(0, 0),
 			Calculator.FontSize,
 			Calculator.FONT_SPACING,
-			Color.RED
+			Color.Red
 		);
 	}
 
@@ -112,7 +112,7 @@ internal readonly struct Debug
 		{
 			Message += message;
 
-			Raylib.DrawCircle(x, y, 5, Color.RED);
+			Raylib.DrawCircle(x, y, 5, Color.Red);
 		}
 	}
 
@@ -131,7 +131,7 @@ internal readonly struct Debug
 		{
 			Message += message;
 
-			Raylib.DrawRectangleLinesEx(new(x, y, width, height), 5, Color.RED);
+			Raylib.DrawRectangleLinesEx(new(x, y, width, height), 5, Color.Red);
 		}
 	}
 }

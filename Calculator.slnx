@@ -7,5 +7,5 @@
   <Project Path="Calculator/Calculator.csproj" />
   <Project Path="CalculatorAndroid/CalculatorAndroid.csproj" />
   <Project Path="CalculatorDesktop/CalculatorDesktop.csproj" />
-  <Project Path="Raylib-cs/Raylib-cs.csproj" />
+  <Project Path="raylib-cs/Raylib-cs/Raylib-cs.csproj" />
 </Solution>

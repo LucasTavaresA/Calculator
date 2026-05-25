@@ -370,43 +370,43 @@ public readonly struct Calculator
 	private static readonly Color LightGreen = new(0, 193, 47, 255);
 	private static readonly Color DarkerGray = new(60, 60, 60, 255);
 
-	private static readonly Color BackgroundColor = Color.BLACK;
-	private static readonly Color ForegroundColor = Color.WHITE;
-	private static readonly Color DarkForegroundColor = Color.GRAY;
+	private static readonly Color BackgroundColor = Color.Black;
+	private static readonly Color ForegroundColor = Color.White;
+	private static readonly Color DarkForegroundColor = Color.Gray;
 
 	private static readonly Color DisplayBackgroundColor = DarkerGray;
 
-	private static readonly Color BorderColor = Color.GRAY;
+	private static readonly Color BorderColor = Color.Gray;
 	private static readonly Color ButtonHoverColor = BorderColor;
-	private static readonly Color ButtonBackgroundColor = Color.DARKGRAY;
+	private static readonly Color ButtonBackgroundColor = Color.DarkGray;
 	private static readonly Color ButtonPressedColor = DarkerGray;
 	private static readonly Color ButtonSelectedColor = ForegroundColor;
-	private static readonly Color ButtonDeselectedColor = Color.LIGHTGRAY;
+	private static readonly Color ButtonDeselectedColor = Color.LightGray;
 	private static readonly Color ButtonShadowColor = ButtonPressedColor;
 
 	private static readonly Color ScrollbarBackgroundColor = DarkerGray;
 
-	private static readonly Color Transparent = Color.BLANK;
+	private static readonly Color Transparent = Color.Blank;
 	private static readonly Color TransparentButtonHoverColor = new(100, 100, 100, 128);
 
-	private static readonly Color MenuEntryBackgroundColor = Color.DARKGRAY;
+	private static readonly Color MenuEntryBackgroundColor = Color.DarkGray;
 
-	private static readonly Color RedButtonColor = Color.RED;
-	private static readonly Color RedButtonPressedColor = Color.MAROON;
+	private static readonly Color RedButtonColor = Color.Red;
+	private static readonly Color RedButtonPressedColor = Color.Maroon;
 	private static readonly Color RedButtonShadowColor = RedButtonPressedColor;
-	private static readonly Color RedButtonBorderColor = Color.ORANGE;
+	private static readonly Color RedButtonBorderColor = Color.Orange;
 	private static readonly Color RedButtonHoveredColor = RedButtonBorderColor;
 
 	private static readonly Color GreenButtonColor = LightGreen;
-	private static readonly Color GreenButtonPressedColor = Color.DARKGREEN;
+	private static readonly Color GreenButtonPressedColor = Color.DarkGreen;
 	private static readonly Color GreenButtonShadowColor = GreenButtonPressedColor;
-	private static readonly Color GreenButtonBorderColor = Color.GREEN;
+	private static readonly Color GreenButtonBorderColor = Color.Green;
 	private static readonly Color GreenButtonHoveredColor = GreenButtonBorderColor;
 
-	private static readonly Color ErrorColor = Color.RED;
+	private static readonly Color ErrorColor = Color.Red;
 
-	private static readonly Color ToggleOffColor = Color.LIGHTGRAY;
-	private static readonly Color ToggleOnColor = Color.SKYBLUE;
+	private static readonly Color ToggleOffColor = Color.LightGray;
+	private static readonly Color ToggleOnColor = Color.SkyBlue;
 #if ANDROID
 	private record struct GestureZone(int Left, int Right, int Bottom);
 	private static GestureZone Zone;
@@ -605,14 +605,14 @@ public readonly struct Calculator
 		// Raylib context
 		{
 			// NOTE(LucasTA): HIGHDPI stops the window from being scaled as its resized
-			Raylib.SetConfigFlags(ConfigFlags.FLAG_WINDOW_RESIZABLE | ConfigFlags.FLAG_WINDOW_TOPMOST);
+			Raylib.SetConfigFlags(ConfigFlags.ResizableWindow | ConfigFlags.TopmostWindow);
 #if ANDROID
 			Raylib.InitWindow(0, 0, APP_NAME);
 #else
 			Raylib.InitWindow(400, 500, APP_NAME);
 #endif
 			Raylib.SetTargetFPS(TARGET_FPS);
-			Raylib.SetExitKey(KeyboardKey.KEY_NULL);
+			Raylib.SetExitKey(KeyboardKey.Null);
 
 			Settings.Load();
 
@@ -639,7 +639,7 @@ public readonly struct Calculator
 					// it realy big and then scale it down
 					// just the filter is really blurry
 					Fonte = LoadFontFromAssembly(resource, 64);
-					Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.TEXTURE_FILTER_BILINEAR);
+					Raylib.SetTextureFilter(Fonte.Texture, TextureFilter.Bilinear);
 				}
 			}
 
@@ -677,7 +677,7 @@ public readonly struct Calculator
 
 #if ANDROID
 					if (
-							Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT) &&
+							Raylib.IsMouseButtonDown(MouseButton.Left) &&
 							(MouseX < Zone.Left
 								|| MouseX > ScreenWidth - Zone.Right
 								|| MouseY > ScreenHeight - Zone.Bottom)
@@ -687,13 +687,13 @@ public readonly struct Calculator
 					}
 #endif
 
-					if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+					if (Raylib.IsMouseButtonPressed(MouseButton.Left))
 					{
 						MousePressedX = MouseX;
 						MousePressedY = MouseY;
 					}
 
-					if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+					if (Raylib.IsMouseButtonReleased(MouseButton.Left))
 					{
 						ButtonWasHeldPressed = false;
 						ButtonPressedTime = 0;
@@ -1202,22 +1202,22 @@ public readonly struct Calculator
 
 									int keycode = Raylib.GetCharPressed();
 
-									if (Raylib.IsKeyPressed(KeyboardKey.KEY_ENTER))
+									if (Raylib.IsKeyPressed(KeyboardKey.Enter))
 									{
 										Equal();
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
+									else if (Raylib.IsKeyPressed(KeyboardKey.Left))
 									{
 										TypingIndex = Math.Max(0, TypingIndex - 1);
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
+									else if (Raylib.IsKeyPressed(KeyboardKey.Right))
 									{
 										TypingIndex = Math.Min(Expression.Length, TypingIndex + 1);
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+									else if (Raylib.IsKeyDown(KeyboardKey.Left))
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
@@ -1226,7 +1226,7 @@ public readonly struct Calculator
 
 										ButtonPressedTime += Raylib.GetFrameTime();
 									}
-									else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+									else if (Raylib.IsKeyDown(KeyboardKey.Right))
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
@@ -1237,9 +1237,9 @@ public readonly struct Calculator
 									}
 									else if (
 										(
-											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-										) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
+											Raylib.IsKeyDown(KeyboardKey.LeftControl)
+											|| Raylib.IsKeyDown(KeyboardKey.RightControl)
+										) && Raylib.IsKeyPressed(KeyboardKey.C)
 									)
 									{
 										Clipboard.Set(Expression);
@@ -1247,20 +1247,20 @@ public readonly struct Calculator
 									}
 									else if (
 										(
-											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-										) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
+											Raylib.IsKeyDown(KeyboardKey.LeftControl)
+											|| Raylib.IsKeyDown(KeyboardKey.RightControl)
+										) && Raylib.IsKeyPressed(KeyboardKey.V)
 									)
 									{
 										InsertExpression(Clipboard.Get());
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+									else if (Raylib.IsKeyPressed(KeyboardKey.Backspace))
 									{
 										Backspace();
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+									else if (Raylib.IsKeyDown(KeyboardKey.Backspace))
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
@@ -1409,7 +1409,7 @@ public readonly struct Calculator
 							{
 								List<string> expressions = [.. History.PinnedExpressions, .. History.ExpressionHistory];
 
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								if (Raylib.IsKeyPressed(KeyboardKey.Escape))
 								{
 									CurrentScene = Scene.Calculator;
 								}
@@ -1432,13 +1432,13 @@ public readonly struct Calculator
 									Math.Max(0, expressions.Count - menuVisibleEntries) * -menuEntryHeight;
 
 #if ANDROID
-								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+								if (Raylib.IsMouseButtonPressed(MouseButton.Left))
 								{
 									StartTouchPosition = Raylib.GetTouchPosition(0);
 									ScrollDelta = 0;
 								}
 
-								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+								if (Raylib.IsMouseButtonDown(MouseButton.Left))
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
 									ScrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
@@ -1687,7 +1687,7 @@ public readonly struct Calculator
 							break;
 						case Scene.Settings:
 							{
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								if (Raylib.IsKeyPressed(KeyboardKey.Escape))
 								{
 									CurrentScene = Scene.Calculator;
 								}
@@ -1821,7 +1821,7 @@ public readonly struct Calculator
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
 									() => OpenBrowser("https://github.com/lucastavaresa/Calculator"),
-									icon: new(GetResource("github_icon.png"), Color.WHITE)
+									icon: new(GetResource("github_icon.png"), Color.White)
 								);
 
 								Layout.DrawText(
@@ -1840,7 +1840,7 @@ public readonly struct Calculator
 							break;
 						case Scene.Converters:
 							{
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								if (Raylib.IsKeyPressed(KeyboardKey.Escape))
 								{
 									CurrentScene = Scene.Calculator;
 								}
@@ -2263,12 +2263,12 @@ public readonly struct Calculator
 									// TODO(LucasTA): remove repetition when handling inputs
 									int keycode = Raylib.GetCharPressed();
 
-									if (Raylib.IsKeyPressed(KeyboardKey.KEY_LEFT))
+									if (Raylib.IsKeyPressed(KeyboardKey.Left))
 									{
 										ConverterTypingIndex = Math.Max(0, ConverterTypingIndex - 1);
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_RIGHT))
+									else if (Raylib.IsKeyPressed(KeyboardKey.Right))
 									{
 										ConverterTypingIndex = Math.Min(
 											ConverterExpression.Length,
@@ -2276,7 +2276,7 @@ public readonly struct Calculator
 										);
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyDown(KeyboardKey.KEY_LEFT))
+									else if (Raylib.IsKeyDown(KeyboardKey.Left))
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
@@ -2285,7 +2285,7 @@ public readonly struct Calculator
 
 										ButtonPressedTime += Raylib.GetFrameTime();
 									}
-									else if (Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT))
+									else if (Raylib.IsKeyDown(KeyboardKey.Right))
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
@@ -2299,9 +2299,9 @@ public readonly struct Calculator
 									}
 									else if (
 										(
-											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-										) && Raylib.IsKeyPressed(KeyboardKey.KEY_C)
+											Raylib.IsKeyDown(KeyboardKey.LeftControl)
+											|| Raylib.IsKeyDown(KeyboardKey.RightControl)
+										) && Raylib.IsKeyPressed(KeyboardKey.C)
 									)
 									{
 										Clipboard.Set(ConverterExpression);
@@ -2309,20 +2309,20 @@ public readonly struct Calculator
 									}
 									else if (
 										(
-											Raylib.IsKeyDown(KeyboardKey.KEY_LEFT_CONTROL)
-											|| Raylib.IsKeyDown(KeyboardKey.KEY_RIGHT_CONTROL)
-										) && Raylib.IsKeyPressed(KeyboardKey.KEY_V)
+											Raylib.IsKeyDown(KeyboardKey.LeftControl)
+											|| Raylib.IsKeyDown(KeyboardKey.RightControl)
+										) && Raylib.IsKeyPressed(KeyboardKey.V)
 									)
 									{
 										InsertConverterExpression(Clipboard.Get());
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyPressed(KeyboardKey.KEY_BACKSPACE))
+									else if (Raylib.IsKeyPressed(KeyboardKey.Backspace))
 									{
 										ConverterBackspace();
 										ButtonPressedTime = 0;
 									}
-									else if (Raylib.IsKeyDown(KeyboardKey.KEY_BACKSPACE))
+									else if (Raylib.IsKeyDown(KeyboardKey.Backspace))
 									{
 										if (ButtonPressedTime >= INITIAL_REPEAT_INTERVAL)
 										{
@@ -2351,7 +2351,7 @@ public readonly struct Calculator
 							break;
 						case Scene.Conversions:
 							{
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								if (Raylib.IsKeyPressed(KeyboardKey.Escape))
 								{
 									CurrentScene = Scene.Converters;
 								}
@@ -2362,13 +2362,13 @@ public readonly struct Calculator
 									Math.Max(0, conversionsAmount - dropDownVisibleEntries) * -dropDownEntryHeight;
 
 #if ANDROID
-								if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_BUTTON_LEFT))
+								if (Raylib.IsMouseButtonPressed(MouseButton.Left))
 								{
 									StartTouchPosition = Raylib.GetTouchPosition(0);
 									ScrollDelta = 0;
 								}
 
-								if (Raylib.IsMouseButtonDown(MouseButton.MOUSE_BUTTON_LEFT))
+								if (Raylib.IsMouseButtonDown(MouseButton.Left))
 								{
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
 									ScrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
@@ -2464,7 +2464,7 @@ public readonly struct Calculator
 							break;
 						case Scene.DateConverter:
 							{
-								if (Raylib.IsKeyPressed(KeyboardKey.KEY_ESCAPE))
+								if (Raylib.IsKeyPressed(KeyboardKey.Escape))
 								{
 									CurrentScene = Scene.Calculator;
 								}
@@ -2661,7 +2661,7 @@ public readonly struct Calculator
 							break;
 					}
 
-					if (Raylib.IsMouseButtonReleased(MouseButton.MOUSE_BUTTON_LEFT))
+					if (Raylib.IsMouseButtonReleased(MouseButton.Left))
 					{
 						Dragging = false;
 					}

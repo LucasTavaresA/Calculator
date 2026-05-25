@@ -16,7 +16,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="../Calculator/Calculator.csproj" />
-		<ProjectReference Include="../Raylib-cs/Raylib-cs.csproj" ExcludeAssets="native" />
+		<ProjectReference Include="../raylib-cs/Raylib-cs/Raylib-cs.csproj" ExcludeAssets="native" />
 	</ItemGroup>
 
 </Project>

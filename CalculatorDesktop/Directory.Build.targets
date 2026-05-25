@@ -1,13 +1,13 @@
 <Project>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-		<None Include="../Raylib-cs/native/linux-x64/libraylib.so">
+		<None Include="../libs/native/linux-x64/libraylib.so">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0-windows'">
-		<None Include="../Raylib-cs/native/win-x64/raylib.dll">
+		<None Include="../libs/native/win-x64/raylib.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</None>

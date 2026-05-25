@@ -16,7 +16,7 @@ public abstract partial class RaylibActivity : NativeActivity
 
 	protected abstract void OnReady();
 
-	[LibraryImport(Raylib.nativeLibName)]
+	[LibraryImport(Raylib.NativeLibName)]
 	[UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
 	private static partial void RaylibSetAndroidCallback(Action callback);
 }
