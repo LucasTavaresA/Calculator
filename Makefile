@@ -37,7 +37,8 @@ release-linux: clean
 docker-linux: clean
 	$(CONTAINER) build -t calc .
 	$(CONTAINER) run --name calc-container calc
-	$(CONTAINER) cp calc-container:/Calculator/build/CalculatorDesktop Calculator
+	mkdir -p $(BUILD_DIR) || true
+	$(CONTAINER) cp calc-container:/Calculator/build/CalculatorDesktop build/CalculatorDesktop
 	$(CONTAINER) rm -f calc-container
 	$(CONTAINER) rmi -f calc
 
