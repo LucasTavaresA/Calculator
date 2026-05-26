@@ -18,9 +18,6 @@ namespace Calculator;
 // TODO(LucasTA): Have a CalculateScroll() function to reduce repetition
 internal readonly struct Layout
 {
-	/// <summary>Tolerable difference between colors</summary>
-	private const int CONTRAST_LIMIT = 70;
-
 	internal enum ShadowKind
 	{
 		Float = 0,
@@ -94,22 +91,6 @@ internal readonly struct Layout
 
 	internal readonly record struct ButtonRow(int HeightPercentage, params Button[] Buttons);
 
-	internal static bool IsBadContrast(Color backgroundColor, Color textColor)
-	{
-		int rDiff = Math.Abs(backgroundColor.R - textColor.R);
-		int gDiff = Math.Abs(backgroundColor.G - textColor.G);
-		int bDiff = Math.Abs(backgroundColor.B - textColor.B);
-
-		if ((rDiff + gDiff + bDiff) / 3 < CONTRAST_LIMIT)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
 	internal static bool IsPointInsideRect(
 		int x,
 		int y,
@@ -169,16 +150,6 @@ internal readonly struct Layout
 			text,
 			fontSize,
 			Calculator.FONT_SPACING
-		);
-
-		// FIXME(LucasTA): stop checking this here when containers are added,
-		// keeping this here for now due to this functions doing one thing pattern
-		// and i don't want to make DrawTextBox not receive text sometimes
-		Debug.IfDrawPoint(
-			IsBadContrast(backgroundColor, textColor),
-			$"ERROR: The text at the {x},{y} text box is not visible!\n",
-			x,
-			y
 		);
 
 		switch (overflow)
