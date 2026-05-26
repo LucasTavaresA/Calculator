@@ -734,10 +734,14 @@ public readonly struct Calculator
 					int displayWidth = ScreenWidth - (Padding * 2);
 					int displayHeight = (int)(textSize.Y * 3);
 
+#if ANDROID
+					int menuSidePadding = 0;
+#else
 					int menuSidePadding = Padding * 2 + topIconSize;
+#endif
 					int menuEntryHeight = ((int)textSize.Y * 2) + Padding;
-					int menuEntryX = 0;
-					int menuEntryWidth = ScreenWidth - menuSidePadding;
+					int menuEntryX = menuSidePadding;
+					int menuEntryWidth = ScreenWidth - menuSidePadding * 2;
 					int menuVisibleEntries = ScreenHeight / menuEntryHeight;
 
 					int dropDownVisibleEntries = 16;
@@ -1319,11 +1323,18 @@ public readonly struct Calculator
 								{
 									int topButtonAmount = 7;
 									int topButtonWidth = 100 / topButtonAmount;
+#if ANDROID
+									int topButtonsX = Zone.Left;
+									int topButtonsWidth = ScreenWidth - Zone.Right - Zone.Left;
+#else
+									int topButtonsX = 0;
+									int topButtonsWidth = ScreenWidth;
+#endif
 
 									Layout.DrawButtonGrid(
+										topButtonsX,
 										0,
-										0,
-										ScreenWidth,
+										topButtonsWidth,
 										(ScreenHeight + ScreenWidth) / 28,
 										Padding,
 										[
@@ -1464,20 +1475,7 @@ public readonly struct Calculator
 									Vector2 currentTouchPosition = Raylib.GetTouchPosition(0);
 									ScrollDelta = currentTouchPosition.Y - StartTouchPosition.Y;
 
-									if (
-										Math.Abs(ScrollDelta) > 2
-										&&
-										// NOTE(LucasTA): Don't scroll if touch starts outside the
-										// list
-										Layout.IsPointInsideRect(
-											MousePressedX,
-											MousePressedY,
-											0,
-											0,
-											ScreenWidth - menuSidePadding,
-											ScreenHeight
-										)
-									)
+									if (Math.Abs(ScrollDelta) > 2)
 									{
 										Dragging = true;
 
@@ -1513,6 +1511,7 @@ public readonly struct Calculator
 								);
 #endif
 
+#if !ANDROID
 								Layout.DrawButton(
 									ScreenWidth - topIconSize,
 									0,
@@ -1524,33 +1523,21 @@ public readonly struct Calculator
 									() => CurrentScene = Scene.Calculator,
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
-
-								Layout.DrawButton(
-									ScreenWidth - topIconSize,
-									ScreenHeight - topIconSize,
-									topIconSize,
-									topIconSize,
-									Transparent,
-									RedButtonPressedColor,
-									TransparentButtonHoverColor,
-									History.Clear,
-									icon: new(GetResource("trash_all_icon.png"), RedButtonColor),
-									pressMode: Layout.ButtonPressMode.HoldToPress
-								);
+#endif
 
 								// Draw history entries
 								{
 									// Draws a background that matches the scrollbar color
 									Raylib.DrawRectangle(
+										menuEntryX,
 										0,
-										0,
-										ScreenWidth - menuSidePadding,
+										menuEntryWidth - ScrollbarWidth,
 										ScreenHeight,
 										ScrollbarBackgroundColor
 									);
 
 									Layout.DrawScrollbar(
-										ScreenWidth - menuSidePadding,
+										menuEntryWidth + menuEntryX - ScrollbarWidth,
 										0,
 										ScrollbarWidth,
 										ScreenHeight,
@@ -1570,7 +1557,7 @@ public readonly struct Calculator
 										Layout.DrawBox(
 											menuEntryX,
 											menuEntryY,
-											menuEntryWidth,
+											menuEntryWidth - ScrollbarWidth,
 											menuEntryHeight,
 											MenuEntryBackgroundColor,
 											new(BorderColor, BorderThickness)
@@ -1600,7 +1587,7 @@ public readonly struct Calculator
 										Layout.DrawText(
 											resultTextX,
 											menuEntryY,
-											historyTextWidth,
+											historyTextWidth - ScrollbarWidth,
 											menuEntryHeight,
 											BorderThickness,
 											result,
@@ -1704,6 +1691,20 @@ public readonly struct Calculator
 										);
 									}
 								}
+
+								Layout.DrawButton(
+									0,
+									0,
+									topIconSize,
+									topIconSize,
+									TransparentButtonHoverColor,
+									RedButtonPressedColor,
+									TransparentButtonHoverColor,
+									History.Clear,
+									icon: new(GetResource("trash_all_icon.png"), RedButtonColor),
+									pressMode: Layout.ButtonPressMode.HoldToPress,
+									borderStyle: new(RedButtonPressedColor, BorderThickness)
+								);
 							}
 							break;
 						case Scene.Settings:
@@ -1713,6 +1714,19 @@ public readonly struct Calculator
 									CurrentScene = Scene.Calculator;
 								}
 
+#if ANDROID
+								int optBoxX = 0;
+#else
+								int optBoxX = topIconSize;
+#endif
+								int buttonX = ScreenWidth - menuEntryHeight + BorderThickness;
+								int buttonY = BorderThickness;
+								int buttonSize = menuEntryHeight - BorderThickness * 2;
+								int optTextX = optBoxX + BorderThickness;
+								int optTextWidth = ScreenWidth - buttonSize;
+								int optBoxWidth = ScreenWidth - optBoxX;
+
+#if !ANDROID
 								Layout.DrawButton(
 									0,
 									0,
@@ -1724,21 +1738,22 @@ public readonly struct Calculator
 									() => CurrentScene = Scene.Calculator,
 									icon: new(GetResource("close_icon.png"), ForegroundColor)
 								);
+#endif
 
 								Layout.DrawBox(
-									menuEntryX + menuSidePadding,
+									optBoxX,
 									0,
-									menuEntryWidth,
+									optBoxWidth,
 									menuEntryHeight,
 									MenuEntryBackgroundColor,
 									new(BorderColor, BorderThickness)
 								);
 
 								Layout.DrawButton(
-									ScreenWidth - menuSidePadding + BorderThickness,
-									BorderThickness,
-									menuSidePadding - BorderThickness * 2,
-									menuEntryHeight - BorderThickness * 2,
+									buttonX,
+									buttonY,
+									buttonSize,
+									buttonSize,
 									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
@@ -1756,9 +1771,9 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawText(
-									menuEntryX + menuSidePadding,
+									optTextX,
 									0,
-									menuEntryWidth - menuSidePadding,
+									optTextWidth,
 									menuEntryHeight,
 									BorderThickness,
 									GetTranslation("\"=\" adds to history"),
@@ -1769,9 +1784,9 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawTextBox(
-									menuEntryX + menuSidePadding,
+									optBoxX,
 									menuEntryHeight,
-									menuEntryWidth,
+									optBoxWidth,
 									menuEntryHeight,
 									new(
 										GetTranslation("Version") + ":",
@@ -1784,9 +1799,9 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawText(
-									menuEntryX + menuSidePadding,
+									optTextX,
 									menuEntryHeight,
-									menuEntryWidth,
+									optBoxWidth,
 									menuEntryHeight,
 									BorderThickness,
 									APP_VERSION,
@@ -1797,9 +1812,9 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawTextBox(
-									menuEntryX + menuSidePadding,
+									optBoxX,
 									menuEntryHeight * 2,
-									menuEntryWidth,
+									optBoxWidth,
 									menuEntryHeight,
 									new(
 										GetTranslation("License") + ":",
@@ -1812,9 +1827,9 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawText(
-									menuEntryX + menuSidePadding,
+									optTextX,
 									menuEntryHeight * 2,
-									menuEntryWidth,
+									optBoxWidth,
 									menuEntryHeight,
 									BorderThickness,
 									APP_LICENSE,
@@ -1825,19 +1840,19 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawBox(
-									menuEntryX + menuSidePadding,
+									optBoxX,
 									menuEntryHeight * 3,
-									menuEntryWidth,
+									optBoxWidth,
 									menuEntryHeight,
 									MenuEntryBackgroundColor,
 									new(BorderColor, BorderThickness)
 								);
 
 								Layout.DrawButton(
-									ScreenWidth - menuSidePadding + BorderThickness,
-									menuEntryHeight * 3 + BorderThickness,
-									menuSidePadding - BorderThickness * 2,
-									menuEntryHeight - BorderThickness * 2,
+									buttonX,
+									menuEntryHeight * 3 + buttonY,
+									buttonSize,
+									buttonSize,
 									Transparent,
 									ButtonPressedColor,
 									TransparentButtonHoverColor,
@@ -1846,9 +1861,9 @@ public readonly struct Calculator
 								);
 
 								Layout.DrawText(
-									menuEntryX + menuSidePadding,
+									optTextX,
 									menuEntryHeight * 3,
-									menuEntryWidth - menuSidePadding,
+									optTextWidth,
 									menuEntryHeight,
 									BorderThickness,
 									GetTranslation("Source code") + ":",
@@ -2036,7 +2051,7 @@ public readonly struct Calculator
 										];
 
 										Layout.DrawButtonGrid(
-											ScreenWidth - gridButtonSize * gridCols - BorderThickness,
+											leftButtonSize + BorderThickness,
 											leftButtonSize + converterBoxHeight - gridButtonSize - BorderThickness,
 											gridButtonSize * gridCols,
 											gridButtonSize,
@@ -2121,7 +2136,7 @@ public readonly struct Calculator
 										);
 
 										Layout.DrawButton(
-											ScreenWidth - gridButtonSize,
+											leftButtonSize + BorderThickness,
 											leftButtonSize + converterBoxHeight * 2 - gridButtonSize,
 											gridButtonSize - BorderThickness,
 											gridButtonSize - BorderThickness,
@@ -2136,7 +2151,7 @@ public readonly struct Calculator
 										if (converting == "Currency")
 										{
 											Layout.DrawText(
-												leftButtonSize,
+												leftButtonSize + gridButtonSize + BorderThickness,
 												converterBoxHeight + leftButtonSize,
 												converterBoxWidth - gridButtonSize,
 												converterBoxHeight,
