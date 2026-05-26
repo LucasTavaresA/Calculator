@@ -33,6 +33,7 @@ public class MainActivity : RaylibActivity
 	protected override void OnCreate(Bundle? savedInstanceState)
 	{
 		base.OnCreate(savedInstanceState);
+		Calculator.Context = this;
 
 		if (OperatingSystem.IsAndroidVersionAtLeast(33))
 		{

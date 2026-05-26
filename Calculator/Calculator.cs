@@ -550,7 +550,9 @@ public readonly struct Calculator
 #endif
 
 #if ANDROID
-	internal static Context Context = Application.Context;
+#pragma warning disable CS8618
+	public static Context Context;
+#pragma warning restore CS8618
 	internal const float INITIAL_REPEAT_INTERVAL = 0.5f;
 	internal static int TouchCount = 0;
 	internal static Vector2 StartTouchPosition;
