@@ -601,7 +601,7 @@ internal readonly struct Translations
 
 	internal static string GetTranslation(string phrase)
 	{
-		if (Locale == "en-US")
+		if (Locale == "en-US" || string.IsNullOrEmpty(Locale))
 		{
 			return phrase;
 		}
