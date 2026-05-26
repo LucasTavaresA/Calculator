@@ -361,7 +361,7 @@ public readonly struct Calculator
 		date = capturedDate;
 	}
 
-	private const string APP_VERSION = "5.0.0";
+	private const string APP_VERSION = "6.0.0";
 	private const string APP_LICENSE = "GPL-3.0";
 	private const string APP_NAME = "Calculator";
 	private const int TARGET_FPS = 60;

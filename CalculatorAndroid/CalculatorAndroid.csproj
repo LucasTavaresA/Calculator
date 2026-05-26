@@ -6,8 +6,8 @@
 		<Nullable>enable</Nullable>
 		<SupportedOSPlatformVersion>21</SupportedOSPlatformVersion>
 		<ApplicationId>com.lucasta.calculator</ApplicationId>
-		<ApplicationVersion>5</ApplicationVersion>
-		<ApplicationDisplayVersion>5.0.0</ApplicationDisplayVersion>
+		<ApplicationVersion>6</ApplicationVersion>
+		<ApplicationDisplayVersion>6.0.0</ApplicationDisplayVersion>
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimMode>full</TrimMode>
 		<EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
