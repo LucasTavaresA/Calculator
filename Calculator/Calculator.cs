@@ -412,6 +412,26 @@ public readonly struct Calculator
 	private static GestureZone Zone;
 #endif
 
+#if ANDROID
+	public static bool HandleBackButton()
+	{
+		switch (CurrentScene)
+		{
+			case Scene.Conversions:
+				CurrentScene = Scene.Converters;
+				return true;
+			case Scene.History:
+			case Scene.Settings:
+			case Scene.Converters:
+			case Scene.DateConverter:
+				CurrentScene = Scene.Calculator;
+				return true;
+			default:
+				return false;
+		}
+	}
+#endif
+
 	private static void InsertExpression(string value)
 	{
 		Expression = Expression.Insert(TypingIndex, value);
