@@ -79,8 +79,8 @@ raylib-android:
 	wait
 	patch -R ./raylib/src/platforms/rcore_android.c <android.patch
 
-debug-android: clean
-	dotnet build -o $(BUILD_DIR) CalculatorAndroid /p:DEBUG="1"
+debug-android:
+	dotnet publish -o $(BUILD_DIR) -c Release CalculatorAndroid /p:DEBUG="1"
 
 release-android: clean
 	dotnet publish -o $(BUILD_DIR) -c Release CalculatorAndroid

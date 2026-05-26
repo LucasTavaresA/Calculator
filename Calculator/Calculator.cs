@@ -367,7 +367,6 @@ public readonly struct Calculator
 	private const int TARGET_FPS = 60;
 	internal const int FONT_SPACING = 2;
 
-	private static readonly Color LightGreen = new(0, 193, 47, 255);
 	private static readonly Color DarkerGray = new(60, 60, 60, 255);
 
 	private static readonly Color BackgroundColor = Color.Black;
@@ -397,7 +396,7 @@ public readonly struct Calculator
 	private static readonly Color RedButtonBorderColor = Color.Orange;
 	private static readonly Color RedButtonHoveredColor = RedButtonBorderColor;
 
-	private static readonly Color GreenButtonColor = LightGreen;
+	private static readonly Color GreenButtonColor = Color.Lime;
 	private static readonly Color GreenButtonPressedColor = Color.DarkGreen;
 	private static readonly Color GreenButtonShadowColor = GreenButtonPressedColor;
 	private static readonly Color GreenButtonBorderColor = Color.Green;
